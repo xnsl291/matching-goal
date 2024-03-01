@@ -14,6 +14,7 @@ import java.util.Set;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Builder.Default;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -31,9 +32,10 @@ import org.hibernate.annotations.DynamicUpdate;
 public class ChatRoom {
 
   @Id
-  private long id;
+  private String id;
 
   @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+  @Default
   @JoinTable(name = "chatRoomMembers",
       joinColumns = @JoinColumn(name = "chatRoomId"),
       inverseJoinColumns = @JoinColumn(name = "userId"))
@@ -43,19 +45,17 @@ public class ChatRoom {
 
   public static ChatRoom create() {
     ChatRoom room = new ChatRoom();
-    room.setId(Long.parseLong(UUID.randomUUID().toString()));
+    room.setId(UUID.randomUUID().toString());
 
     return room;
 
   }
-
   public void addMembers(List<User> members) {
 
     this.chatRoomMembers.addAll(members);
+    System.out.println("엔티티 메소드 " + this.getChatRoomMembers().size());
 
   }
-
-
 
 
 }
