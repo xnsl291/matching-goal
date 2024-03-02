@@ -1,0 +1,30 @@
+spring:
+  profiles:
+    include:
+      - secret
+
+  servlet:
+    multipart:
+      enabled: true
+
+  datasource:
+    driver-class-name: org.mariadb.jdbc.Driver
+    url: jdbc:mariadb://${db.hostname}:${db.port}/${db.schema-name}?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+    username: ${db.username}
+    password: ${db.password}
+
+  jpa:
+    defer-datasource-initialization: true
+    hibernate:
+      ddl-auto:  create  #update
+    open-in-view: true
+    properties:
+      hibernate:
+        format_sql: true
+        show_sql: true
+
+  mvc:
+    path-match:
+      matching-strategy: ant_path_matcher
+
+
