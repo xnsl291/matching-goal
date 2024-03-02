@@ -1,10 +1,12 @@
-package matchingGoal.matchingGoal.dtoConverter;
+package matchingGoal.matchingGoal.chat.dto.dtoConverter;
 
 import java.util.List;
-import matchingGoal.matchingGoal.domain.entity.ChatRoom;
-import matchingGoal.matchingGoal.domain.entity.User;
-import matchingGoal.matchingGoal.dto.ChatRoomListResponse;
+import matchingGoal.matchingGoal.chat.entity.ChatRoom;
+import matchingGoal.matchingGoal.chat.entity.User;
+import matchingGoal.matchingGoal.chat.dto.ChatRoomListResponse;
+import org.springframework.stereotype.Component;
 
+@Component
 public class ChatRoomConverter {
 
   public List<ChatRoomListResponse> toChatRoomListResponseList(List<ChatRoom> rooms) {

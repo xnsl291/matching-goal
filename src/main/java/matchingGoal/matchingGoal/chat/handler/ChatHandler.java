@@ -1,4 +1,4 @@
-package matchingGoal.matchingGoal.handler;
+package matchingGoal.matchingGoal.chat.handler;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;

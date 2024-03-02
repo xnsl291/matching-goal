@@ -1,16 +1,16 @@
-package matchingGoal.matchingGoal.service.impl;
+package matchingGoal.matchingGoal.chat.service.impl;
 
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import matchingGoal.matchingGoal.domain.entity.ChatRoom;
-import matchingGoal.matchingGoal.domain.entity.User;
-import matchingGoal.matchingGoal.dto.ChatRoomListResponse;
-import matchingGoal.matchingGoal.dtoConverter.ChatRoomConverter;
-import matchingGoal.matchingGoal.repository.ChatRoomRepository;
-import matchingGoal.matchingGoal.repository.UserRepository;
-import matchingGoal.matchingGoal.service.ChatService;
+import matchingGoal.matchingGoal.chat.entity.ChatRoom;
+import matchingGoal.matchingGoal.chat.entity.User;
+import matchingGoal.matchingGoal.chat.dto.ChatRoomListResponse;
+import matchingGoal.matchingGoal.chat.dto.dtoConverter.ChatRoomConverter;
+import matchingGoal.matchingGoal.chat.repository.ChatRoomRepository;
+import matchingGoal.matchingGoal.chat.repository.UserRepository;
+import matchingGoal.matchingGoal.chat.service.ChatService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -61,6 +61,20 @@ public class ChatServiceImpl implements ChatService {
     List<ChatRoom> myChat = chatRoomRepository.findListsByChatRoomMembersId(userId);
 
     return chatRoomConverter.toChatRoomListResponseList(myChat);
+  }
+
+  @Override
+  public void quit(long userId, String chatRoomId) {
+
+    ChatRoom chatRoom = getChatRoom(chatRoomId);
+    chatRoom.quit(userId);
+
+  }
+
+  public ChatRoom getChatRoom(String chatRoomId) {
+
+    return chatRoomRepository.findById(chatRoomId).orElseThrow(RuntimeException::new);
+
   }
 
   public User getUser(long userId) {

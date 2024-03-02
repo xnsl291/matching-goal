@@ -1,6 +1,6 @@
 package matchingGoal.matchingGoal.config;
 
-import matchingGoal.matchingGoal.stomp.interceptor.StompHandshakeInterceptor;
+import matchingGoal.matchingGoal.chat.stomp.interceptor.StompHandshakeInterceptor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;

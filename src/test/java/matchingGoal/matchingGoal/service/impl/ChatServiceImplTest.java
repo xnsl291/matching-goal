@@ -4,11 +4,12 @@ package matchingGoal.matchingGoal.service.impl;
 
 import java.util.ArrayList;
 import java.util.List;
-import matchingGoal.matchingGoal.domain.entity.ChatRoom;
-import matchingGoal.matchingGoal.domain.entity.User;
-import matchingGoal.matchingGoal.dto.ChatRoomListResponse;
-import matchingGoal.matchingGoal.repository.ChatRoomRepository;
-import matchingGoal.matchingGoal.repository.UserRepository;
+import matchingGoal.matchingGoal.chat.entity.ChatRoom;
+import matchingGoal.matchingGoal.chat.entity.User;
+import matchingGoal.matchingGoal.chat.dto.ChatRoomListResponse;
+import matchingGoal.matchingGoal.chat.repository.ChatRoomRepository;
+import matchingGoal.matchingGoal.chat.repository.UserRepository;
+import matchingGoal.matchingGoal.chat.service.impl.ChatServiceImpl;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -75,6 +76,28 @@ class ChatServiceImplTest  {
     boolean check = !result.isEmpty();
     //then
     assert check;
+
+  }
+
+  @Test
+  @DisplayName("quit")
+  @Transactional
+  public void quit() {
+    //given
+
+    String id = chatServiceimpl.createChatRoom(1, 2);
+    System.out.println(id);
+
+    //when
+    chatServiceimpl.quit(2, id);
+    ChatRoom chatRoom = chatRoomRepository.findById(id).orElseThrow(RuntimeException::new);
+
+    boolean result = chatRoom.getChatRoomMembers().size() == 1;
+
+    System.out.println(chatRoom.getChatRoomMembers());
+    //then
+
+    assert result;
 
   }
 }

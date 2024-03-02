@@ -1,4 +1,4 @@
-package matchingGoal.matchingGoal.domain.entity;
+package matchingGoal.matchingGoal.chat.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -7,7 +7,6 @@ import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.autoconfigure.web.WebProperties.Resources.Chain.Strategy;
 
 @Entity
 @Data

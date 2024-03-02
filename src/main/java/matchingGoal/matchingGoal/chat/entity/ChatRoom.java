@@ -1,4 +1,4 @@
-package matchingGoal.matchingGoal.domain.entity;
+package matchingGoal.matchingGoal.chat.entity;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
@@ -53,9 +53,17 @@ public class ChatRoom {
   public void addMembers(List<User> members) {
 
     this.chatRoomMembers.addAll(members);
-    System.out.println("엔티티 메소드 " + this.getChatRoomMembers().size());
 
   }
+  //TODO:: 인원 0 됐을 때 처리 방법안 1) 즉시 방 폐쇄하고 삭제
+  //                              2) 30일 딜레이 후에 삭제 (복구기능 가능성)
+  public void quit(Long userId) {
+    for (User user : this.getChatRoomMembers()) {
 
+      if (user.getId() == userId) {
+        this.chatRoomMembers.remove(user);
 
+      }
+    }
+  }
 }

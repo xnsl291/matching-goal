@@ -1,4 +1,4 @@
-package matchingGoal.matchingGoal.dto;
+package matchingGoal.matchingGoal.chat.dto;
 
 import java.util.ArrayList;
 import java.util.List;

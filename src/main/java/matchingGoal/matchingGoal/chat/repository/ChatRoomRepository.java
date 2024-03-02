@@ -1,8 +1,8 @@
-package matchingGoal.matchingGoal.repository;
+package matchingGoal.matchingGoal.chat.repository;
 
 import java.util.List;
 import java.util.Optional;
-import matchingGoal.matchingGoal.domain.entity.ChatRoom;
+import matchingGoal.matchingGoal.chat.entity.ChatRoom;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;

@@ -1,4 +1,4 @@
-package matchingGoal.matchingGoal.stomp.interceptor;
+package matchingGoal.matchingGoal.chat.stomp.interceptor;
 
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
