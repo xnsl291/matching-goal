@@ -21,8 +21,18 @@ public class AuthController {
      */
     @Transactional
     @PostMapping("/sign-up")
-    public ResponseEntity<?> registerMember(@RequestBody MemberRegisterDto registerDto) {
+    public ResponseEntity<String> registerMember(@RequestBody MemberRegisterDto registerDto) {
         memberService.registerMember(registerDto);
         return ResponseEntity.ok().body("회원가입 성공");
+    }
+
+    /**
+     * 중복된 닉네임이 존재하는지 확인
+     * @param nickname - 닉네임
+     * @return 중복여부 (중복 시, false)
+     */
+    @PostMapping("/checkNickname")
+    public ResponseEntity<Boolean> checkNickname(@RequestParam String nickname) {
+        return ResponseEntity.ok().body(memberService.checkNickname(nickname));
     }
 }

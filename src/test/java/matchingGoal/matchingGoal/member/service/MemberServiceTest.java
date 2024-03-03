@@ -63,4 +63,12 @@ class MemberServiceTest {
         System.out.println(invalid_registerDto_3.getPassword()+": ");
         Assertions.assertThrows(InvalidPasswordFormatException.class, () -> memberService.registerMember(invalid_registerDto_3));
     }
+
+    @Test
+    void checknickname(){
+        String name1 = "test FC";
+        String name2 = "new FC";
+        System.out.println(name1 +" : " + memberService.checkNickname(name1));
+        System.out.println(name2 + " : " + memberService.checkNickname(name2));
+    }
 }

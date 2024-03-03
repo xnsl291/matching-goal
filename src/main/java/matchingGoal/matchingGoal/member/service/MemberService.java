@@ -20,6 +20,10 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final BCryptPasswordEncoder passwordEncoder;
 
+    /**
+     * 회원가입
+     * @param registerDto - 회원가입 dto
+     */
     public void registerMember(MemberRegisterDto registerDto) {
 
         // 이메일 중복 확인
@@ -44,5 +48,14 @@ public class MemberService {
                 .build();
 
         memberRepository.save(member);
+    }
+
+    /**
+     * 닉네임 중복 체크
+     * @param nickname - 닉네임
+     * @return 중복 닉네임 존재시, false 반환
+     */
+    public Boolean checkNickname(String nickname) {
+        return memberRepository.findByNickname(nickname).isEmpty();
     }
 }
