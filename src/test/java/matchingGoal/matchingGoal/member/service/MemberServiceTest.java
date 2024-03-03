@@ -1,6 +1,6 @@
 package matchingGoal.matchingGoal.member.service;
 
-import matchingGoal.matchingGoal.common.exception.InvalidPasswordFormatException;
+import matchingGoal.matchingGoal.member.exception.InvalidPasswordFormatException;
 import matchingGoal.matchingGoal.member.dto.MemberRegisterDto;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

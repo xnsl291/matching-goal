@@ -2,8 +2,8 @@ package matchingGoal.matchingGoal.member.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import matchingGoal.matchingGoal.common.exception.AlreadyRegisteredEmailException;
-import matchingGoal.matchingGoal.common.exception.InvalidPasswordFormatException;
+import matchingGoal.matchingGoal.member.exception.AlreadyRegisteredEmailException;
+import matchingGoal.matchingGoal.member.exception.InvalidPasswordFormatException;
 import matchingGoal.matchingGoal.common.type.ErrorCode;
 import matchingGoal.matchingGoal.member.dto.MemberRegisterDto;
 import matchingGoal.matchingGoal.member.model.entity.Member;
