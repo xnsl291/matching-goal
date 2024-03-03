@@ -8,6 +8,7 @@ import matchingGoal.matchingGoal.common.type.ErrorCode;
 import matchingGoal.matchingGoal.member.dto.MemberRegisterDto;
 import matchingGoal.matchingGoal.member.model.entity.Member;
 import matchingGoal.matchingGoal.member.repository.MemberRepository;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 public class MemberService {
     private final MemberRepository memberRepository;
+    private final BCryptPasswordEncoder passwordEncoder;
 
     public void registerMember(MemberRegisterDto registerDto) {
 
@@ -35,7 +37,7 @@ public class MemberService {
         Member member = Member.builder()
                 .name(registerDto.getName())
                 .email(registerDto.getEmail())
-                .password(registerDto.getPassword())
+                .password(passwordEncoder.encode(registerDto.getPassword()))
                 .nickname(registerDto.getNickname())
                 .introduction(registerDto.getIntroduction())
                 .region(registerDto.getRegion())
