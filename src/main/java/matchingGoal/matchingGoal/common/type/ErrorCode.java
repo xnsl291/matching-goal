@@ -12,6 +12,7 @@ public enum ErrorCode {
     INVALID_ARGUMENT(HttpStatus.BAD_REQUEST,"RequestBody가 올바르지 않습니다."),
 
     //auth
+    INVALID_CODE(HttpStatus.BAD_REQUEST,"인증코드가 일치하지 않습니다"),
 
     // member
     MEMBER_NOT_EXISTS(HttpStatus.NOT_FOUND,"사용자를 찾을 수 없습니다"),

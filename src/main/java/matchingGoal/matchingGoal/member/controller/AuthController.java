@@ -2,7 +2,9 @@ package matchingGoal.matchingGoal.member.controller;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import matchingGoal.matchingGoal.mail.service.MailService;
 import matchingGoal.matchingGoal.member.dto.MemberRegisterDto;
+import matchingGoal.matchingGoal.mail.dto.MailVerificationDto;
 import matchingGoal.matchingGoal.member.service.MemberService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final MemberService memberService;
+    private final MailService mailService;
 
     /**
      * 회원가입
@@ -34,5 +37,28 @@ public class AuthController {
     @PostMapping("/checkNickname")
     public ResponseEntity<Boolean> checkNickname(@RequestParam String nickname) {
         return ResponseEntity.ok().body(memberService.checkNickname(nickname));
+    }
+
+    /**
+     * 인증메일 발송
+     * @param mailVerificationDto - email
+     * @return 발송성공여부
+     */
+    @GetMapping(value = "/mails/send-verification")
+    public ResponseEntity<Boolean> verifyMail(@RequestBody MailVerificationDto mailVerificationDto) {
+        return ResponseEntity.ok().body(mailService.sendVerificationMail(mailVerificationDto));
+    }
+
+    /**
+     * 인증번호 검증
+     * @param email - 이메일
+     * @param code - 인증코드
+     * @return "인증성공"
+     */
+    @GetMapping(value = "/mails/verify")
+    public ResponseEntity<String> verifyMail(
+            @RequestParam(name = "email") String email, @RequestParam(name = "code") String code) {
+        mailService.verifyMail(email,code);
+        return ResponseEntity.ok().body("인증성공");
     }
 }
