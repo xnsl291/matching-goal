@@ -66,7 +66,7 @@ public class MailService {
         try {
             message.addRecipients(Message.RecipientType.TO, dto.getTo());
             message.setSubject(dto.getSubject());
-            message.setText(setContext(emailValue, dto.getTemplate()), MAIL_CHARSET);
+            message.setContent(setContext(emailValue, dto.getTemplate()), "text/html; charset="+MAIL_CHARSET);
             message.setFrom(new InternetAddress(sender,"matching-goal"));
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -142,5 +142,12 @@ public class MailService {
         if (! redisUtil.getData(email).equals(code) )
             throw new InvalidValidationCodeException(ErrorCode.INVALID_CODE);
         redisUtil.deleteData(VALID_PREFIX+email);
+    }
+
+    public void sendWelcomeMail(String email, String name){
+        final String TEMPLATE_NAME = "welcome.html";
+        HashMap<String,String> emailValues = new HashMap<>();
+        emailValues.put("name",name);
+        sendMail(TEMPLATE_NAME, email, emailValues);
     }
 }

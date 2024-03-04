@@ -2,6 +2,7 @@ package matchingGoal.matchingGoal.member.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import matchingGoal.matchingGoal.mail.service.MailService;
 import matchingGoal.matchingGoal.member.exception.AlreadyRegisteredEmailException;
 import matchingGoal.matchingGoal.member.exception.DuplicatedNicknameException;
 import matchingGoal.matchingGoal.member.exception.InvalidPasswordFormatException;
@@ -19,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 public class MemberService {
     private final MemberRepository memberRepository;
+    private final MailService mailService;
     private final BCryptPasswordEncoder passwordEncoder;
 
     /**
@@ -49,6 +51,9 @@ public class MemberService {
                 .build();
 
         memberRepository.save(member);
+
+        // 가입 환영 메일 발송
+        mailService.sendWelcomeMail(registerDto.getEmail(), registerDto.getName());
     }
 
     /**
