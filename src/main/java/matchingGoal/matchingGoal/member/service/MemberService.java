@@ -48,6 +48,7 @@ public class MemberService {
                 .nickname(registerDto.getNickname())
                 .introduction(registerDto.getIntroduction())
                 .region(registerDto.getRegion())
+                .imgId(registerDto.getImgId())
                 .build();
 
         memberRepository.save(member);

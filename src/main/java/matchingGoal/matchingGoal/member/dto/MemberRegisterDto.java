@@ -32,4 +32,7 @@ public class MemberRegisterDto {
 
     @NotBlank
     private String region;
+
+    @NotBlank
+    private Long imgId;
 }
