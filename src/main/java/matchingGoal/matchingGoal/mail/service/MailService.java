@@ -14,7 +14,6 @@ import lombok.extern.slf4j.Slf4j;
 import matchingGoal.matchingGoal.common.type.RedisTime;
 import matchingGoal.matchingGoal.mail.dto.MailDto;
 import matchingGoal.matchingGoal.mail.dto.MailVerificationDto;
-import matchingGoal.matchingGoal.member.service.AuthService;
 import org.jsoup.Jsoup;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -31,7 +30,6 @@ import java.util.HashMap;
 @RequiredArgsConstructor
 @Slf4j
 public class MailService {
-    private final AuthService authService;
     private final JavaMailSender javaMailSender;
     private final SpringTemplateEngine springTemplateEngine;
     private final RedisUtil redisUtil;
@@ -76,10 +74,10 @@ public class MailService {
 
     /**
      * 이메일 인증 메일 발송
-     * @param mailVerificationDto - email
+     * @param email - 이메일
      * @return 발송성공여부 (성공시 true)
      */
-    public Boolean sendVerificationMail(MailVerificationDto mailVerificationDto) {
+    public Boolean sendVerificationMail(String email) {
         final long redisDurationInMinutes = RedisTime.MAIL_EXPIRE_IN_MINUTES.getTime();
         final String TEMPLATE_NAME = "InitialEmailVerification.html";
         final String code = RandomStringUtils.random(7, true, true);
@@ -93,8 +91,8 @@ public class MailService {
 
         log.info("\n--- emailValues : "+emailValues);
 
-        if (sendMail(TEMPLATE_NAME, mailVerificationDto.getEmail(), emailValues)) {
-            redisUtil.setData(VALID_PREFIX+mailVerificationDto.getEmail(), code, redisDurationInMinutes);
+        if (sendMail(TEMPLATE_NAME, email, emailValues)) {
+            redisUtil.setData(VALID_PREFIX+email, code, redisDurationInMinutes);
             return true;
         }
         else
@@ -134,14 +132,15 @@ public class MailService {
 
     /**
      * 인증번호 검증
-     *
-     * @param email - 이메일
-     * @param code  - 인증코드
+     * @param mailVerificationDto - email, code, name
      */
-    public void verifyMail(String email, String code) {
-        if (! redisUtil.getData(email).equals(code) )
+    public void verifyMail(MailVerificationDto mailVerificationDto) {
+        if (! redisUtil.getData(VALID_PREFIX+mailVerificationDto.getEmail()).equals(mailVerificationDto.getCode()) )
             throw new InvalidValidationCodeException(ErrorCode.INVALID_CODE);
-        redisUtil.deleteData(VALID_PREFIX+email);
+        redisUtil.deleteData(VALID_PREFIX+mailVerificationDto.getEmail());
+
+        // 가입 환영 메일 발송
+        sendWelcomeMail(mailVerificationDto.getEmail(), mailVerificationDto.getName());
     }
 
     public void sendWelcomeMail(String email, String name){

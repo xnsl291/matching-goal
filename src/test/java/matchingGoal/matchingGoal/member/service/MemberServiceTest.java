@@ -20,7 +20,7 @@ class MemberServiceTest {
             .email("test_00@gmail.com")
             .name("test111")
             .password(invalidPw1)
-            .nickname("test FC")
+            .nickname("test5 FC")
             .introduction("hello, there")
             .region("seoul")
             .build();
@@ -29,7 +29,7 @@ class MemberServiceTest {
             .email("test_11@gmail.com")
             .name("test111")
             .password(invalidPw2)
-            .nickname("test FC")
+            .nickname("test3 FC")
             .introduction("hello, there")
             .region("seoul")
             .build();
@@ -37,7 +37,7 @@ class MemberServiceTest {
             .email("test_22@gmail.com")
             .name("test111")
             .password(invalidPw3)
-            .nickname("test FC")
+            .nickname("test2 FC")
             .introduction("hello, there")
             .region("seoul")
             .build();

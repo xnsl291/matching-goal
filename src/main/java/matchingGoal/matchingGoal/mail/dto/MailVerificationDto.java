@@ -14,4 +14,10 @@ public class MailVerificationDto {
   @NotBlank
   private String email;
 
+  @NotBlank
+  private String code;
+
+  @NotBlank
+  private String name;
+
 }

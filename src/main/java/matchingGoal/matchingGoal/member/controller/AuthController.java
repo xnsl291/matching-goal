@@ -41,24 +41,23 @@ public class AuthController {
 
     /**
      * 인증메일 발송
-     * @param mailVerificationDto - email
+     * @param email - 이메일
      * @return 발송성공여부
      */
     @GetMapping(value = "/mails/send-verification")
-    public ResponseEntity<Boolean> verifyMail(@RequestBody MailVerificationDto mailVerificationDto) {
-        return ResponseEntity.ok().body(mailService.sendVerificationMail(mailVerificationDto));
+    public ResponseEntity<Boolean> verifyMail(@RequestParam String email) {
+        return ResponseEntity.ok().body(mailService.sendVerificationMail(email));
     }
 
     /**
      * 인증번호 검증
-     * @param email - 이메일
-     * @param code - 인증코드
+     * @param mailVerificationDto - email, code, name
      * @return "인증성공"
      */
-    @GetMapping(value = "/mails/verify")
+    @PostMapping(value = "/mails/verify")
     public ResponseEntity<String> verifyMail(
-            @RequestParam(name = "email") String email, @RequestParam(name = "code") String code) {
-        mailService.verifyMail(email,code);
+            MailVerificationDto mailVerificationDto) {
+        mailService.verifyMail(mailVerificationDto);
         return ResponseEntity.ok().body("인증성공");
     }
 }
