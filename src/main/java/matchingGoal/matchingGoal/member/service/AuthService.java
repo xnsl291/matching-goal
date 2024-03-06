@@ -2,9 +2,8 @@ package matchingGoal.matchingGoal.member.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import matchingGoal.matchingGoal.member.exception.AlreadyRegisteredEmailException;
-import matchingGoal.matchingGoal.member.exception.DuplicatedNicknameException;
-import matchingGoal.matchingGoal.member.exception.InvalidPasswordFormatException;
+import matchingGoal.matchingGoal.member.dto.WithdrawMemberDto;
+import matchingGoal.matchingGoal.member.exception.*;
 import matchingGoal.matchingGoal.common.type.ErrorCode;
 import matchingGoal.matchingGoal.member.dto.MemberRegisterDto;
 import matchingGoal.matchingGoal.member.model.entity.Member;
@@ -13,19 +12,24 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+
+
 @Service
 @RequiredArgsConstructor
 @Transactional
 @Slf4j
-public class MemberService {
+public class AuthService {
     private final MemberRepository memberRepository;
     private final BCryptPasswordEncoder passwordEncoder;
 
     /**
      * 회원가입
      * @param registerDto - 회원가입 dto
+     * @return "회원가입 성공"
      */
-    public void registerMember(MemberRegisterDto registerDto) {
+    @Transactional
+    public String registerMember(MemberRegisterDto registerDto) {
 
         // 이메일 중복 확인
         if(memberRepository.findByEmail(registerDto.getEmail()).isPresent())
@@ -50,6 +54,28 @@ public class MemberService {
                 .build();
 
         memberRepository.save(member);
+        return "회원가입 성공";
+    }
+
+    /**
+     * 회원 탈퇴
+     * @param withdrawMemberDto - 회원 ID, PW
+     * @return "탈퇴 완료"
+     */
+    @Transactional
+    public String withdrawMember(WithdrawMemberDto withdrawMemberDto) {
+        Member member = memberRepository.findById(withdrawMemberDto.getId())
+                .orElseThrow(() -> new MemberNotFoundException(ErrorCode.MEMBER_NOT_EXISTS));
+
+        // 탈퇴 전 비밀번호 재확인
+        if (!member.getPassword().equals(withdrawMemberDto.getPassword())) {
+            throw new UnmatchedPasswordException(ErrorCode.WRONG_PASSWORD);
+        }
+
+        member.setDeleted(true);
+        member.setDeletedDate(LocalDateTime.now());
+
+        return "탈퇴 완료";
     }
 
     /**
@@ -60,4 +86,5 @@ public class MemberService {
     public Boolean checkNickname(String nickname) {
         return memberRepository.findByNickname(nickname).isEmpty();
     }
+
 }

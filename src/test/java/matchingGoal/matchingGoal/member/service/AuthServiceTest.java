@@ -8,9 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class MemberServiceTest {
+class AuthServiceTest {
     @Autowired
-    private MemberService memberService;
+    private AuthService authService;
     String validPw = "password123!!";
     String invalidPw1 = "password!!!!";  // no digit
     String invalidPw2 = "pass123";  //len < 10
@@ -52,23 +52,23 @@ class MemberServiceTest {
 
     @Test
     void register(){
-        memberService.registerMember(valid_registerDto);
+        authService.registerMember(valid_registerDto);
 
         System.out.println(invalid_registerDto_1.getPassword()+": ");
-        Assertions.assertThrows(InvalidPasswordFormatException.class, () -> memberService.registerMember(invalid_registerDto_1));
+        Assertions.assertThrows(InvalidPasswordFormatException.class, () -> authService.registerMember(invalid_registerDto_1));
 
         System.out.println(invalid_registerDto_2.getPassword()+": ");
-        Assertions.assertThrows(InvalidPasswordFormatException.class, () -> memberService.registerMember(invalid_registerDto_2));
+        Assertions.assertThrows(InvalidPasswordFormatException.class, () -> authService.registerMember(invalid_registerDto_2));
 
         System.out.println(invalid_registerDto_3.getPassword()+": ");
-        Assertions.assertThrows(InvalidPasswordFormatException.class, () -> memberService.registerMember(invalid_registerDto_3));
+        Assertions.assertThrows(InvalidPasswordFormatException.class, () -> authService.registerMember(invalid_registerDto_3));
     }
 
     @Test
     void checknickname(){
         String name1 = "test FC";
         String name2 = "new FC";
-        System.out.println(name1 +" : " + memberService.checkNickname(name1));
-        System.out.println(name2 + " : " + memberService.checkNickname(name2));
+        System.out.println(name1 +" : " + authService.checkNickname(name1));
+        System.out.println(name2 + " : " + authService.checkNickname(name2));
     }
 }

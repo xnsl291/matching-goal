@@ -5,7 +5,8 @@ import lombok.RequiredArgsConstructor;
 import matchingGoal.matchingGoal.mail.service.MailService;
 import matchingGoal.matchingGoal.member.dto.MemberRegisterDto;
 import matchingGoal.matchingGoal.mail.dto.MailVerificationDto;
-import matchingGoal.matchingGoal.member.service.MemberService;
+import matchingGoal.matchingGoal.member.dto.WithdrawMemberDto;
+import matchingGoal.matchingGoal.member.service.AuthService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,8 +15,8 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/auth")
 public class AuthController {
 
-    private final MemberService memberService;
     private final MailService mailService;
+    private final AuthService authService;
 
     /**
      * 회원가입
@@ -25,8 +26,18 @@ public class AuthController {
     @Transactional
     @PostMapping("/sign-up")
     public ResponseEntity<String> registerMember(@RequestBody MemberRegisterDto registerDto) {
-        memberService.registerMember(registerDto);
-        return ResponseEntity.ok().body("회원가입 성공");
+        return ResponseEntity.ok().body(authService.registerMember(registerDto));
+    }
+
+    /**
+     * 회원탈퇴
+     * @param withdrawMemberDto - 회원 ID, PW
+     * @return "탈퇴 완료"
+     */
+    @DeleteMapping("/withdraw")
+    //TODO: memberId는 token에서 얻어오는 방식으로 변경
+    public ResponseEntity<String> withdrawMember(@RequestBody WithdrawMemberDto withdrawMemberDto) {
+        return ResponseEntity.ok().body(authService.withdrawMember(withdrawMemberDto));
     }
 
     /**
@@ -36,7 +47,7 @@ public class AuthController {
      */
     @PostMapping("/checkNickname")
     public ResponseEntity<Boolean> checkNickname(@RequestParam String nickname) {
-        return ResponseEntity.ok().body(memberService.checkNickname(nickname));
+        return ResponseEntity.ok().body(authService.checkNickname(nickname));
     }
 
     /**
