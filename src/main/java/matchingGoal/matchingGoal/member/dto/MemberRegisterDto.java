@@ -2,9 +2,9 @@ package matchingGoal.matchingGoal.member.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
 import lombok.*;
+import matchingGoal.matchingGoal.common.annotation.Nickname;
+import matchingGoal.matchingGoal.common.annotation.Password;
 
 @Getter
 @Setter
@@ -13,26 +13,26 @@ import lombok.*;
 @Builder
 public class MemberRegisterDto {
 
-    @NotBlank
+    @NotBlank(message = "이름을 입력해주세요")
     private String name;
 
-    @NotBlank()
+    @NotBlank(message = "이메일을 입력해주세요")
     @Email
     private String email;
 
-    @NotBlank()
-    @Size(min = 10, max = 20, message = "비밀번호는 10자 이상 20자 이하로 입력해주세요.")
-    @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d!@#$%^&*]{10,}$")
+    @NotBlank(message = "비밀번호를 입력해주세요")
+    @Password
     private String password;
 
-    @NotBlank
+    @NotBlank(message = "닉네임을 입력해주세요")
+    @Nickname
     private String nickname;
 
     private String introduction;
 
-    @NotBlank
+    @NotBlank(message = "지역을 입력해주세요")
     private String region;
 
-    @NotBlank
+    @NotBlank(message = "이미지가 누락되었습니다")
     private Long imgId;
 }

@@ -1,7 +1,11 @@
 package matchingGoal.matchingGoal.member.controller;
 
 import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
+import matchingGoal.matchingGoal.common.annotation.Nickname;
 import matchingGoal.matchingGoal.mail.service.MailService;
 import matchingGoal.matchingGoal.member.dto.MemberRegisterDto;
 import matchingGoal.matchingGoal.mail.dto.MailVerificationDto;
@@ -26,7 +30,7 @@ public class AuthController {
      */
     @Transactional
     @PostMapping("/sign-up")
-    public ResponseEntity<String> registerMember(@RequestBody MemberRegisterDto registerDto) {
+    public ResponseEntity<String> registerMember(@Valid @RequestBody MemberRegisterDto registerDto) {
         return ResponseEntity.ok().body(authService.registerMember(registerDto));
     }
 
@@ -37,7 +41,7 @@ public class AuthController {
      */
     @DeleteMapping("/withdraw")
     //TODO: memberId는 token에서 얻어오는 방식으로 변경
-    public ResponseEntity<String> withdrawMember(@RequestBody WithdrawMemberDto withdrawMemberDto) {
+    public ResponseEntity<String> withdrawMember(@Valid @RequestBody WithdrawMemberDto withdrawMemberDto) {
         return ResponseEntity.ok().body(authService.withdrawMember(withdrawMemberDto));
     }
 
@@ -47,7 +51,7 @@ public class AuthController {
      * @return 중복여부 (중복 시, false)
      */
     @PostMapping("/checkNickname")
-    public ResponseEntity<Boolean> checkNickname(@RequestParam String nickname) {
+    public ResponseEntity<Boolean> checkNickname(@NotBlank @Nickname @RequestParam String nickname) {
         return ResponseEntity.ok().body(authService.checkNickname(nickname));
     }
 
@@ -57,7 +61,7 @@ public class AuthController {
      * @return "변경완료"
      */
     @PatchMapping("/password")
-    public ResponseEntity<String> changePassword(@RequestBody UpdatePwDto updatePwDto) {
+    public ResponseEntity<String> changePassword(@Valid @RequestBody UpdatePwDto updatePwDto) {
         return ResponseEntity.ok().body(authService.updatePassword(updatePwDto));
     }
 
@@ -67,7 +71,7 @@ public class AuthController {
      * @return 발송성공여부
      */
     @GetMapping(value = "/mails/send-verification")
-    public ResponseEntity<Boolean> verifyMail(@RequestParam String email) {
+    public ResponseEntity<Boolean> verifyMail(@NotBlank @Email  @RequestParam String email) {
         return ResponseEntity.ok().body(mailService.sendVerificationMail(email));
     }
 
@@ -77,8 +81,7 @@ public class AuthController {
      * @return "인증성공"
      */
     @PostMapping(value = "/mails/verify")
-    public ResponseEntity<String> verifyMail(
-            MailVerificationDto mailVerificationDto) {
+    public ResponseEntity<String> verifyMail(@Valid MailVerificationDto mailVerificationDto) {
         mailService.verifyMail(mailVerificationDto);
         return ResponseEntity.ok().body("인증성공");
     }

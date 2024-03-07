@@ -11,13 +11,13 @@ import lombok.Setter;
 @Builder
 public class MailVerificationDto {
   @Email
-  @NotBlank
+  @NotBlank(message = "이메일을 입력해주세요")
   private String email;
 
-  @NotBlank
+  @NotBlank(message = "인증코드를 입력해주세요")
   private String code;
 
-  @NotBlank
+  @NotBlank(message = "이름을 입력해주세요")
   private String name;
 
 }
