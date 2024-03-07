@@ -6,6 +6,8 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,7 +15,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import matchingGoal.matchingGoal.matching.domain.StatusType;
-import org.springframework.data.annotation.CreatedDate;
+import matchingGoal.matchingGoal.member.model.entity.Member;
 
 @Entity
 @Builder
@@ -27,7 +29,9 @@ public class MatchingBoard {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  private Long memberId;  // todo: member 변경
+  @ManyToOne
+  @JoinColumn(name = "member_id")
+  private Member memberId;
 
 //  private Long imgId;
 
@@ -48,7 +52,7 @@ public class MatchingBoard {
 
   private LocalDateTime deletedDate;
 
-  private Long viewCount;
+  private Integer viewCount;
 
   private LocalDateTime modifiedDate;
 }
