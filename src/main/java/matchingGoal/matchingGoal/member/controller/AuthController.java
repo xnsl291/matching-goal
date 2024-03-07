@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import matchingGoal.matchingGoal.mail.service.MailService;
 import matchingGoal.matchingGoal.member.dto.MemberRegisterDto;
 import matchingGoal.matchingGoal.mail.dto.MailVerificationDto;
+import matchingGoal.matchingGoal.member.dto.UpdatePwDto;
 import matchingGoal.matchingGoal.member.dto.WithdrawMemberDto;
 import matchingGoal.matchingGoal.member.service.AuthService;
 import org.springframework.http.ResponseEntity;
@@ -48,6 +49,16 @@ public class AuthController {
     @PostMapping("/checkNickname")
     public ResponseEntity<Boolean> checkNickname(@RequestParam String nickname) {
         return ResponseEntity.ok().body(authService.checkNickname(nickname));
+    }
+
+    /**
+     * 비밀번호 변경
+     * @param updatePwDto - 회원 ID, 새로운 PW
+     * @return "변경완료"
+     */
+    @PatchMapping("/password")
+    public ResponseEntity<String> changePassword(@RequestBody UpdatePwDto updatePwDto) {
+        return ResponseEntity.ok().body(authService.updatePassword(updatePwDto));
     }
 
     /**

@@ -2,6 +2,7 @@ package matchingGoal.matchingGoal.member.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import matchingGoal.matchingGoal.member.dto.UpdatePwDto;
 import matchingGoal.matchingGoal.member.dto.WithdrawMemberDto;
 import matchingGoal.matchingGoal.member.exception.*;
 import matchingGoal.matchingGoal.common.type.ErrorCode;
@@ -24,6 +25,15 @@ public class AuthService {
     private final BCryptPasswordEncoder passwordEncoder;
 
     /**
+     * 비밀번호 포맷 검증
+     * @param password - 비밀번호
+     * @return 포맷 일치 여부
+     */
+    public boolean checkPwFormat(String password){
+        return password.matches("^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d!@#$%^&*]{10,}$");
+    }
+
+    /**
      * 회원가입
      * @param registerDto - 회원가입 dto
      * @return "회원가입 성공"
@@ -40,7 +50,7 @@ public class AuthService {
             throw new DuplicatedNicknameException(ErrorCode.DUPLICATED_NICKNAME);
 
         // 비밀번호 포맷 검증 : 10자 이상, 알파벳 & 숫자 필수, 특수문자( !@#$%^&*) 입력 가능
-        if (!registerDto.getPassword().matches("^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d!@#$%^&*]{10,}$"))
+        if (! checkPwFormat(registerDto.getPassword()))
             throw new InvalidPasswordFormatException(ErrorCode.INVALID_PASSWORD_FORMAT);
 
         Member member = Member.builder()
@@ -87,4 +97,18 @@ public class AuthService {
         return memberRepository.findByNickname(nickname).isEmpty();
     }
 
+
+    /**
+     * 비밀번호 변경
+     * @param updatePwDto - 회원 ID, 새로운 PW
+     * @return "변경완료"
+     */
+    public String updatePassword(UpdatePwDto updatePwDto) {
+        Member member = memberRepository.findById(updatePwDto.getId()).orElseThrow(() -> new MemberNotFoundException(ErrorCode.MEMBER_NOT_EXISTS));
+
+        if (! checkPwFormat(updatePwDto.getNewPassword()))
+            throw new InvalidPasswordFormatException(ErrorCode.INVALID_PASSWORD_FORMAT);
+        member.setPassword(updatePwDto.getNewPassword());
+        return "변경완료";
+    }
 }
