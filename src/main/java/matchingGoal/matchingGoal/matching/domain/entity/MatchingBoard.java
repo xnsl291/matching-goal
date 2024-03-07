@@ -15,6 +15,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import matchingGoal.matchingGoal.matching.domain.StatusType;
+import matchingGoal.matchingGoal.matching.dto.UpdateBoardRequestDto;
 import matchingGoal.matchingGoal.member.model.entity.Member;
 
 @Entity
@@ -55,4 +56,10 @@ public class MatchingBoard {
   private Integer viewCount;
 
   private LocalDateTime modifiedDate;
+
+  public void update(UpdateBoardRequestDto requestDto) {
+    this.title = requestDto.getTitle();
+    this.content = requestDto.getContent();
+    this.modifiedDate = LocalDateTime.now();
+  }
 }

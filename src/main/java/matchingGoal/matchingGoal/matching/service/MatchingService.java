@@ -11,11 +11,13 @@ import matchingGoal.matchingGoal.matching.domain.entity.Game;
 import matchingGoal.matchingGoal.matching.domain.entity.MatchingBoard;
 import matchingGoal.matchingGoal.matching.dto.BoardRequestDto;
 import matchingGoal.matchingGoal.matching.dto.BoardResponseDto;
+import matchingGoal.matchingGoal.matching.dto.UpdateBoardRequestDto;
 import matchingGoal.matchingGoal.matching.repository.GameRepository;
 import matchingGoal.matchingGoal.matching.repository.MatchingBoardRepository;
 import matchingGoal.matchingGoal.member.model.entity.Member;
 import matchingGoal.matchingGoal.member.repository.MemberRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -25,6 +27,7 @@ public class MatchingService {
   private final GameRepository gameRepository;
   private final MemberRepository memberRepository;
 
+  @Transactional
   public void createBoard(BoardRequestDto requestDto) {
     Member member = memberRepository.findById(requestDto.getMemberId())
         .orElseThrow(() -> new NotFoundMemberException(ErrorCode.MEMBER_NOT_FOUND));
@@ -57,5 +60,14 @@ public class MatchingService {
         .orElseThrow(() -> new NotFoundGameException(ErrorCode.GAME_NOT_FOUND));
 
     return BoardResponseDto.convertToDto(matchingBoard, game);
+  }
+
+  public void updateBoard(Long id, UpdateBoardRequestDto requestDto) {
+    MatchingBoard matchingBoard = matchingBoardRepository.findById(id)
+        .orElseThrow(() -> new NotFoundPostException(ErrorCode.POST_NOT_FOUND));
+
+    matchingBoard.update(requestDto);
+
+    matchingBoardRepository.save(matchingBoard);
   }
 }
