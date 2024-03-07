@@ -70,4 +70,15 @@ public class MatchingService {
 
     matchingBoardRepository.save(matchingBoard);
   }
+
+  @Transactional
+  public void deleteBoard(Long id) {
+    MatchingBoard matchingBoard = matchingBoardRepository.findById(id)
+        .orElseThrow(() -> new NotFoundPostException(ErrorCode.POST_NOT_FOUND));
+    Game game = gameRepository.findByBoardId_Id(id)
+        .orElseThrow(() -> new NotFoundGameException(ErrorCode.GAME_NOT_FOUND));
+
+    gameRepository.delete(game);
+    matchingBoardRepository.delete(matchingBoard);
+  }
 }

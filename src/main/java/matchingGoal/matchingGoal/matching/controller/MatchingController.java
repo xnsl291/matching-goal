@@ -8,6 +8,7 @@ import matchingGoal.matchingGoal.matching.dto.UpdateBoardRequestDto;
 import matchingGoal.matchingGoal.matching.service.MatchingService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -40,6 +41,12 @@ public class MatchingController {
   public ResponseEntity<?> updateBoard(@PathVariable Long id, @RequestBody UpdateBoardRequestDto requestDto) {
     matchingService.updateBoard(id, requestDto);
     return ResponseEntity.ok().body("게시글 수정 성공");
+  }
+
+  @DeleteMapping("/{id}")
+  public ResponseEntity<?> deleteBoard(@PathVariable Long id) {
+    matchingService.deleteBoard(id);
+    return ResponseEntity.ok().body("게시글 삭제 성공");
   }
 
 }
