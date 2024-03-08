@@ -4,12 +4,17 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import java.time.LocalDateTime;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import matchingGoal.matchingGoal.member.model.entity.Member;
 
 @Entity
 @Builder
@@ -23,14 +28,22 @@ public class Game {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  private Long boardId;
+  @OneToOne
+  @JoinColumn(name = "board_id")
+  private MatchingBoard boardId;
 
-  private Long team1Id;
+  @ManyToOne
+  @JoinColumn(name = "team1_id")
+  private Member team1Id;
 
-  private Long team2Id;
+  @ManyToOne
+  @JoinColumn(name = "team2_id")
+  private Member team2Id;
 
   private String stadiumName;
 
-  private LocalDateTime time;
+  private LocalDate date;
+
+  private LocalTime time;
 
 }
