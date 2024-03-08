@@ -1,4 +1,3 @@
-HELP.md
 .gradle
 
 build/
@@ -37,5 +36,6 @@ out/
 
 ### VS Code ###
 .vscode/
-/src/main/resources/application.yml
-/src/main/resources/application.properties
+
+application-secret.yml
+
