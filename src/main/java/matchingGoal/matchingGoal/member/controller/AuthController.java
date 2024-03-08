@@ -6,9 +6,11 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import matchingGoal.matchingGoal.common.annotation.Nickname;
+import matchingGoal.matchingGoal.common.auth.JwtToken;
 import matchingGoal.matchingGoal.mail.service.MailService;
 import matchingGoal.matchingGoal.member.dto.MemberRegisterDto;
 import matchingGoal.matchingGoal.mail.dto.MailVerificationDto;
+import matchingGoal.matchingGoal.member.dto.SignInDto;
 import matchingGoal.matchingGoal.member.dto.UpdatePwDto;
 import matchingGoal.matchingGoal.member.dto.WithdrawMemberDto;
 import matchingGoal.matchingGoal.member.service.AuthService;
@@ -22,6 +24,8 @@ public class AuthController {
 
     private final MailService mailService;
     private final AuthService authService;
+    private static final String AUTH_HEADER = "Authorization";
+
 
     /**
      * 회원가입
@@ -43,6 +47,26 @@ public class AuthController {
     //TODO: memberId는 token에서 얻어오는 방식으로 변경
     public ResponseEntity<String> withdrawMember(@Valid @RequestBody WithdrawMemberDto withdrawMemberDto) {
         return ResponseEntity.ok().body(authService.withdrawMember(withdrawMemberDto));
+    }
+
+    /**
+     * 로그인
+     * @param signInDto - 회원 ID, 비밀번호
+     * @return token - 토큰
+     */
+    @PostMapping("/sign-in")
+    public ResponseEntity<JwtToken> signIn(@Valid @RequestBody SignInDto signInDto) {
+        return ResponseEntity.ok().body(authService.signIn(signInDto));
+    }
+
+    /**
+     * 로그아웃
+     * @param token - 토큰
+     * @return "로그아웃 완료"
+     */
+    @PostMapping("/sign-out")
+    public ResponseEntity<String> signOut(@RequestHeader(name = AUTH_HEADER) String token) {
+        return ResponseEntity.ok(authService.signOut(token));
     }
 
     /**

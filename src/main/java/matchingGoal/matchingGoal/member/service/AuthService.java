@@ -2,6 +2,10 @@ package matchingGoal.matchingGoal.member.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import matchingGoal.matchingGoal.common.auth.JwtToken;
+import matchingGoal.matchingGoal.common.auth.JwtTokenProvider;
+import matchingGoal.matchingGoal.common.util.RedisUtil;
+import matchingGoal.matchingGoal.member.dto.SignInDto;
 import matchingGoal.matchingGoal.member.dto.UpdatePwDto;
 import matchingGoal.matchingGoal.member.dto.WithdrawMemberDto;
 import matchingGoal.matchingGoal.member.exception.*;
@@ -23,6 +27,9 @@ import java.time.LocalDateTime;
 public class AuthService {
     private final MemberRepository memberRepository;
     private final BCryptPasswordEncoder passwordEncoder;
+    private final JwtTokenProvider jwtTokenProvider;
+    private final RedisUtil redisUtil;
+    private final String TOKEN_PREFIX = "RT_";
 
     /**
      * 비밀번호 포맷 검증
@@ -89,6 +96,51 @@ public class AuthService {
     }
 
     /**
+     * 로그인
+     * @param signInDto - 회원 ID, 비밀번호
+     * @return token - 토큰
+     */
+    @Transactional
+    public JwtToken signIn(SignInDto signInDto) {
+        Member member = memberRepository.findByEmail(signInDto.getEmail()).orElseThrow(() -> new MemberNotFoundException(ErrorCode.MEMBER_NOT_EXISTS));
+
+        // 비밀번호 체크
+        boolean isMatch = passwordEncoder.matches(signInDto.getPassword(),member.getPassword());
+        log.info("\n\n"+member.getPassword()   +"    " + signInDto.getPassword()  +" " +passwordEncoder.matches(member.getPassword() ,signInDto.getPassword())  );
+        if (!isMatch) {
+            throw new InvalidPasswordException(ErrorCode.WRONG_PASSWORD);
+        }
+
+        if(member.isDeleted())
+            throw new WithdrawnMemberAccessException(ErrorCode.WITHDRAWN_MEMBER);
+
+        // 토큰 발행
+        return jwtTokenProvider.generateToken(member.getId(), member.getEmail());
+    }
+
+    /**
+     * 로그아웃
+     * @param token - 토큰
+     * @return "로그아웃 완료"
+     */
+    @Transactional
+    public String signOut(String token) {
+
+        if(!jwtTokenProvider.validateToken(token))
+            throw new InvalidTokenException(ErrorCode.EXPIRED_TOKEN);
+
+        String email = jwtTokenProvider.getEmail(token);
+        if (redisUtil.getData(TOKEN_PREFIX + email) == null) {
+            throw new InvalidTokenException(ErrorCode.INVALID_TOKEN);
+        }
+
+        // 블랙 리스트에 추가(로그아웃)
+        jwtTokenProvider.setBlacklist(email);
+
+        return "로그아웃 완료";
+    }
+
+    /**
      * 닉네임 중복 체크
      * @param nickname - 닉네임
      * @return 중복 닉네임 존재시, false 반환
@@ -96,7 +148,6 @@ public class AuthService {
     public Boolean checkNickname(String nickname) {
         return memberRepository.findByNickname(nickname).isEmpty();
     }
-
 
     /**
      * 비밀번호 변경
@@ -111,4 +162,5 @@ public class AuthService {
         member.setPassword(updatePwDto.getNewPassword());
         return "변경완료";
     }
+
 }

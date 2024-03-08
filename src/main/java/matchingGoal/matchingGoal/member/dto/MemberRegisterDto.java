@@ -2,6 +2,7 @@ package matchingGoal.matchingGoal.member.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Positive;
 import lombok.*;
 import matchingGoal.matchingGoal.common.annotation.Nickname;
 import matchingGoal.matchingGoal.common.annotation.Password;
@@ -16,8 +17,8 @@ public class MemberRegisterDto {
     @NotBlank(message = "이름을 입력해주세요")
     private String name;
 
-    @NotBlank(message = "이메일을 입력해주세요")
     @Email
+    @NotBlank(message = "이메일을 입력해주세요")
     private String email;
 
     @NotBlank(message = "비밀번호를 입력해주세요")
@@ -34,5 +35,6 @@ public class MemberRegisterDto {
     private String region;
 
     @NotBlank(message = "이미지가 누락되었습니다")
+    @Positive
     private Long imgId;
 }
