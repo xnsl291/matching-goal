@@ -20,7 +20,7 @@ import java.util.Map;
 public class JwtTokenProvider {
 
     private final RedisUtil redisUtil;
-    private static final String AUTHORIZATION_PREFIX = "Bearer ";
+    private static final String BEARER_TYPE = "Bearer ";
     private static final String BLACK_TOKEN_PREFIX = "BLACK: ";
     private static final Long accessTokenExpirationTimeInSeconds = 30 * 60 * 1000L;
     private static final Long refreshTokenExpirationTimeInSeconds = 7 * 24 * 60 * 60 * 1000L;
@@ -84,7 +84,7 @@ public class JwtTokenProvider {
     }
 
     public String getRawToken(String token) {
-        if (token != null && token.startsWith(AUTHORIZATION_PREFIX)) {
+        if (token != null && token.startsWith(BEARER_TYPE)) {
             return token.substring(7);
         }
         return token;
