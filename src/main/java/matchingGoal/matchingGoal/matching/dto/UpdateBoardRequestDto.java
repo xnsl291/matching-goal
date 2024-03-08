@@ -9,15 +9,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class BoardRequestDto {
+public class UpdateBoardRequestDto {
 
-  private Long memberId;
-//  private Long imgId;
-  private String region;
-  private String stadium;
-  private String date;
-  private String time;
   private String title;
   private String content;
+//  private Long imgId;
 
 }

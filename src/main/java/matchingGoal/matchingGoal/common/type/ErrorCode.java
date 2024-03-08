@@ -4,10 +4,11 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
+
 @Getter
 @AllArgsConstructor
 public enum ErrorCode {
-
+      
     //common
     INVALID_ARGUMENT(HttpStatus.BAD_REQUEST,"입력된 값이 올바르지 않습니다"),
 
@@ -25,7 +26,16 @@ public enum ErrorCode {
     INVALID_PASSWORD_FORMAT(HttpStatus.BAD_REQUEST,"비밀번호의 형식이 올바르지 않습니다"),
 
 
-    ;
+    ALREADY_REGISTERED_EMAIL("이미 등록된 이메일 입니다."),
+    INVALID_PASSWORD_FORMAT("비밀번호의 형식이 올바르지 않습니다"),
+    SELF_REQUEST("모집글 작성자가 신청할 수 없습니다."),
+    ALREADY_REQUEST_MATCHING("이미 신청한 모집글입니다."),
+
+    // matching
+    POST_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 게시글입니다."),
+    GAME_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 게임입니다."),
+    MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 회원입니다.");
     private final HttpStatus status;
+
     private final String description;
 }

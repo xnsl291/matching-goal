@@ -1,42 +1,149 @@
 package matchingGoal.matchingGoal.matching.service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import lombok.RequiredArgsConstructor;
+import matchingGoal.matchingGoal.common.exception.AlreadyRequestException;
+import matchingGoal.matchingGoal.common.exception.NotFoundGameException;
+import matchingGoal.matchingGoal.common.exception.NotFoundMemberException;
+import matchingGoal.matchingGoal.common.exception.NotFoundPostException;
+import matchingGoal.matchingGoal.common.exception.SelfRequestException;
+import matchingGoal.matchingGoal.common.type.ErrorCode;
 import matchingGoal.matchingGoal.matching.domain.StatusType;
 import matchingGoal.matchingGoal.matching.domain.entity.Game;
 import matchingGoal.matchingGoal.matching.domain.entity.MatchingBoard;
+import matchingGoal.matchingGoal.matching.domain.entity.MatchingRequest;
 import matchingGoal.matchingGoal.matching.dto.BoardRequestDto;
-import matchingGoal.matchingGoal.matching.repository.MatchRepository;
-import matchingGoal.matchingGoal.matching.repository.MatchingRepository;
+import matchingGoal.matchingGoal.matching.dto.BoardResponseDto;
+import matchingGoal.matchingGoal.matching.dto.UpdateBoardRequestDto;
+import matchingGoal.matchingGoal.matching.repository.GameRepository;
+import matchingGoal.matchingGoal.matching.repository.MatchingBoardRepository;
+import matchingGoal.matchingGoal.matching.repository.MatchingRequestRepository;
+import matchingGoal.matchingGoal.member.model.entity.Member;
+import matchingGoal.matchingGoal.member.repository.MemberRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
 public class MatchingService {
 
-  private final MatchingRepository matchingRepository;
-  private final MatchRepository matchRepository;
+  private final MatchingBoardRepository boardRepository;
+  private final GameRepository gameRepository;
+  private final MemberRepository memberRepository;
+  private final MatchingRequestRepository requestRepository;
 
-  public void createBoard(BoardRequestDto requestDto) {
+  /**
+   * 게시글 작성
+   * @param requestDto - 게시글작성 dto
+   */
+  @Transactional
+  public BoardResponseDto createBoard(BoardRequestDto requestDto) {
+    Member member = memberRepository.findById(requestDto.getMemberId())
+        .orElseThrow(() -> new NotFoundMemberException(ErrorCode.MEMBER_NOT_FOUND));
+
     MatchingBoard matchingBoard = MatchingBoard.builder()
-        .memberId(requestDto.getMemberId())   // todo: member 변경
+        .memberId(member)
         .region(requestDto.getRegion())
-        .capacity(requestDto.getCapacity())
         .title(requestDto.getTitle())
         .content(requestDto.getContent())
         .status(StatusType.모집중)
         .createdDate(LocalDateTime.now())
+        .isDeleted(Boolean.FALSE)
         .build();
-    MatchingBoard savedBoard = matchingRepository.save(matchingBoard);
+    MatchingBoard savedBoard = boardRepository.save(matchingBoard);
 
     Game game = Game.builder()
-        .boardId(savedBoard.getId())
-        .team1Id(requestDto.getMemberId())
+        .boardId(savedBoard)
+        .team1Id(member)
         .team2Id(null)
         .stadiumName(requestDto.getStadium())
-        .time(LocalDateTime.parse(requestDto.getTime()))
+        .date(LocalDate.parse(requestDto.getDate()))
+        .time(LocalTime.parse(requestDto.getTime()))
         .build();
-    Game savedGame = matchRepository.save(game);
+    gameRepository.save(game);
+
+    return BoardResponseDto.convertToDto(savedBoard, game);
   }
 
+  public BoardResponseDto getBoardById(Long id) {
+    MatchingBoard matchingBoard = boardRepository.findById(id)
+        .orElseThrow(() -> new NotFoundPostException(ErrorCode.POST_NOT_FOUND));
+    Game game = gameRepository.findByBoardId_Id(id)
+        .orElseThrow(() -> new NotFoundGameException(ErrorCode.GAME_NOT_FOUND));
+
+    return BoardResponseDto.convertToDto(matchingBoard, game);
+  }
+
+  public String updateBoard(Long id, UpdateBoardRequestDto requestDto) {
+    MatchingBoard matchingBoard = boardRepository.findById(id)
+        .orElseThrow(() -> new NotFoundPostException(ErrorCode.POST_NOT_FOUND));
+
+    matchingBoard.update(requestDto);
+
+    boardRepository.save(matchingBoard);
+
+    return "게시글 수정 완료";
+  }
+
+
+
+  public BoardResponseDto getBoardById(Long id) {
+    MatchingBoard matchingBoard = boardRepository.findById(id)
+        .orElseThrow(() -> new NotFoundPostException(ErrorCode.POST_NOT_FOUND));
+    Game game = gameRepository.findByBoardId_Id(id)
+        .orElseThrow(() -> new NotFoundGameException(ErrorCode.GAME_NOT_FOUND));
+   return BoardResponseDto.convertToDto(matchingBoard, game);
+
+  }
+
+  public String requestMatching(Long id, Long memberId) {
+    MatchingBoard matchingBoard = boardRepository.findById(id)
+        .orElseThrow(() -> new NotFoundPostException(ErrorCode.POST_NOT_FOUND));
+    Member member = memberRepository.findById(memberId)
+        .orElseThrow(() -> new NotFoundMemberException(ErrorCode.MEMBER_NOT_FOUND));
+
+    if (matchingBoard.getMemberId() == member) {
+      throw new SelfRequestException(ErrorCode.SELF_REQUEST);
+    }
+
+    if (requestRepository.existsByBoardIdAndMemberId(matchingBoard, member)) {
+      throw new AlreadyRequestException(ErrorCode.ALREADY_REQUEST_MATCHING);
+    }
+
+    MatchingRequest matchingRequest = MatchingRequest.builder()
+        .boardId(matchingBoard)
+        .memberId(member)
+        .isAccepted(Boolean.FALSE)
+        .build();
+    requestRepository.save(matchingRequest);
+
+    return "매칭 신청 완료";
+   
+  }
+
+  public String updateBoard(Long id, UpdateBoardRequestDto requestDto) {
+    MatchingBoard matchingBoard = boardRepository.findById(id)
+        .orElseThrow(() -> new NotFoundPostException(ErrorCode.POST_NOT_FOUND));
+
+    matchingBoard.update(requestDto);
+
+    boardRepository.save(matchingBoard);
+
+    return "게시글 수정 완료";
+  }
+
+  @Transactional
+  public String deleteBoard(Long id) {
+    MatchingBoard matchingBoard = boardRepository.findById(id)
+        .orElseThrow(() -> new NotFoundPostException(ErrorCode.POST_NOT_FOUND));
+    Game game = gameRepository.findByBoardId_Id(id)
+        .orElseThrow(() -> new NotFoundGameException(ErrorCode.GAME_NOT_FOUND));
+
+    gameRepository.delete(game);
+    boardRepository.delete(matchingBoard);
+
+    return "게시글 삭제 완료";
+  }
 }
