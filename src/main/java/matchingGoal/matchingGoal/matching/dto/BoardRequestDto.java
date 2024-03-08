@@ -15,8 +15,8 @@ public class BoardRequestDto {
 //  private Long imgId;
   private String region;
   private String stadium;
+  private String date;
   private String time;
-  private Integer capacity;
   private String title;
   private String content;
 

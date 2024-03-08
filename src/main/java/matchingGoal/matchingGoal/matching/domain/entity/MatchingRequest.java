@@ -6,9 +6,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
-import java.time.LocalDate;
-import java.time.LocalTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -22,28 +19,20 @@ import matchingGoal.matchingGoal.member.model.entity.Member;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Game {
+public class MatchingRequest {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  @OneToOne
+  @ManyToOne
   @JoinColumn(name = "board_id")
   private MatchingBoard boardId;
 
   @ManyToOne
-  @JoinColumn(name = "team1_id")
-  private Member team1Id;
+  @JoinColumn(name = "member_id")
+  private Member memberId;
 
-  @ManyToOne
-  @JoinColumn(name = "team2_id")
-  private Member team2Id;
-
-  private String stadiumName;
-
-  private LocalDate date;
-
-  private LocalTime time;
+  private Boolean isAccepted;
 
 }
