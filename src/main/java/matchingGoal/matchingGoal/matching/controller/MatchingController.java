@@ -43,6 +43,13 @@ public class MatchingController {
   @DeleteMapping("/{id}")
   public ResponseEntity<String> deleteBoard(@PathVariable Long id) {
     return ResponseEntity.ok(matchingService.deleteBoard(id));
+
+  }
+
+  @PostMapping("/{id}/request/{memberId}")
+  public ResponseEntity<String> requestMatching(@PathVariable Long id, @PathVariable Long memberId) {
+    return ResponseEntity.ok(matchingService.requestMatching(id, memberId));
+
   }
 
 }
