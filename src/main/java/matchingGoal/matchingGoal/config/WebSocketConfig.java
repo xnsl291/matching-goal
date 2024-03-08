@@ -1,30 +1,49 @@
 package matchingGoal.matchingGoal.config;
 
-import matchingGoal.matchingGoal.chat.stomp.interceptor.StompHandshakeInterceptor;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
 
 @Configuration
 @EnableWebSocketMessageBroker
+@RequiredArgsConstructor
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
+  @Value("${spring.rabbitmq.username}")
+  private String rabbitUser;
+  @Value("${spring.rabbitmq.password}")
+  private String rabbitPw;
+  @Value("${spring.rabbitmq.host}")
+  private String rabbitHost;
+  @Value("${spring.rabbitmq.virtual-host}")
+  private String rabbitVHost;
+  @Value("${spring.rabbitmq.port}")
+  private int rabbitPort;
 
   @Override
   public void registerStompEndpoints(StompEndpointRegistry registry) {
-    registry.addEndpoint("/chat/inbox")
-        .setAllowedOrigins("*")
-        .addInterceptors(new StompHandshakeInterceptor())
-        .withSockJS()
-//        .setClientLibraryUrl()
-        .setDisconnectDelay(10 * 1000);
-
+    registry.addEndpoint("/ws")
+        .setAllowedOriginPatterns("*");
   }
 
   @Override
-  public void configureMessageBroker(MessageBrokerRegistry registry) {
-    registry.setApplicationDestinationPrefixes("/pub");
-    registry.enableSimpleBroker("/sub");
+  public void configureMessageBroker(MessageBrokerRegistry reg) {
+    reg.enableStompBrokerRelay("/exchange")
+        .setClientLogin(rabbitUser)
+        .setClientPasscode(rabbitPw)
+        .setSystemLogin(rabbitUser)
+        .setSystemPasscode(rabbitPw)
+        .setVirtualHost(rabbitVHost)
+        .setRelayHost(rabbitHost)
+        .setRelayPort(rabbitPort);
+
+    reg.setPathMatcher(new AntPathMatcher("."));
+
+    reg.setApplicationDestinationPrefixes("/pub");
+
   }
 }

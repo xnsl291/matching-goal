@@ -32,6 +32,10 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	//websocket
 	implementation 'org.springframework.boot:spring-boot-starter-websocket'
+	//rabbitmq
+	implementation 'org.springframework.boot:spring-boot-starter-amqp'
+	implementation group: 'org.springframework.boot', name:'spring-boot-starter-reactor-netty', version: '2.4.6'
+	testImplementation 'org.springframework.amqp:spring-rabbit-test'
 	//jpa
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 

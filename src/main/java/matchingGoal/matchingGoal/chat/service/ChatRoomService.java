@@ -6,7 +6,7 @@ import matchingGoal.matchingGoal.chat.dto.ChatRoomListResponse;
 import org.springframework.stereotype.Service;
 
 @Service
-public interface ChatService {
+public interface ChatRoomService {
   String createChatRoom(long hostId, long guestId);
   void addMembers(String chatRoomId, List<User> members);
   List<ChatRoomListResponse> myChat(long userId);

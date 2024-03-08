@@ -9,7 +9,7 @@ import matchingGoal.matchingGoal.chat.entity.User;
 import matchingGoal.matchingGoal.chat.dto.ChatRoomListResponse;
 import matchingGoal.matchingGoal.chat.repository.ChatRoomRepository;
 import matchingGoal.matchingGoal.chat.repository.UserRepository;
-import matchingGoal.matchingGoal.chat.service.impl.ChatServiceImpl;
+import matchingGoal.matchingGoal.chat.service.impl.ChatRoomServiceImpl;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,12 +17,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
-class ChatServiceImplTest  {
+class ChatRoomServiceImplTest {
 
   @Autowired
   ChatRoomRepository chatRoomRepository;
   @Autowired
-  ChatServiceImpl chatServiceimpl;
+  ChatRoomServiceImpl chatServiceimpl;
   @Autowired
   UserRepository userRepository;
 

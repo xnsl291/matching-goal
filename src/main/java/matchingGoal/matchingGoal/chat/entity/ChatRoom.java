@@ -2,6 +2,7 @@ package matchingGoal.matchingGoal.chat.entity;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
@@ -15,20 +16,21 @@ import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Builder.Default;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.DynamicUpdate;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Entity
 @Builder
 @Getter
 @Setter
 @DynamicUpdate
-@EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
+@EntityListeners(AuditingEntityListener.class)
 public class ChatRoom {
 
   @Id
@@ -40,7 +42,7 @@ public class ChatRoom {
       joinColumns = @JoinColumn(name = "chatRoomId"),
       inverseJoinColumns = @JoinColumn(name = "userId"))
   private Set<User> chatRoomMembers = new HashSet<>();
-
+  @CreatedDate
   private LocalDateTime createdDate;
 
   public static ChatRoom create() {

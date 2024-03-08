@@ -10,14 +10,14 @@ import matchingGoal.matchingGoal.chat.dto.ChatRoomListResponse;
 import matchingGoal.matchingGoal.chat.dto.dtoConverter.ChatRoomConverter;
 import matchingGoal.matchingGoal.chat.repository.ChatRoomRepository;
 import matchingGoal.matchingGoal.chat.repository.UserRepository;
-import matchingGoal.matchingGoal.chat.service.ChatService;
+import matchingGoal.matchingGoal.chat.service.ChatRoomService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class ChatServiceImpl implements ChatService {
+public class ChatRoomServiceImpl implements ChatRoomService {
 
   private final ChatRoomRepository chatRoomRepository;
   private final UserRepository userRepository;

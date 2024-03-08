@@ -1,6 +1,6 @@
 package matchingGoal.matchingGoal.chat.dto;
 
-import java.util.List;
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -9,11 +9,13 @@ import lombok.Setter;
 
 @Builder
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Setter
-public class ChatRoomListResponse {
-  private String id;
-  private List<Long> members ;
+public class ChatMessageDto {
+  private String roomId;
+  private long memberId;
+  private String message;
+  private LocalDateTime createdDate;
 
 }
