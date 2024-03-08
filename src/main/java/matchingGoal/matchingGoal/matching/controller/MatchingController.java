@@ -26,27 +26,23 @@ public class MatchingController {
   private final MatchingService matchingService;
 
   @PostMapping("/write")
-  public ResponseEntity<?> createBoard(@RequestBody BoardRequestDto requestDto) {
-    matchingService.createBoard(requestDto);
-    return ResponseEntity.ok().body("모집글 등록 성공");
+  public ResponseEntity<BoardResponseDto> createBoard(@RequestBody BoardRequestDto requestDto) {
+    return ResponseEntity.ok(matchingService.createBoard(requestDto));
   }
 
   @GetMapping("/{id}")
   public ResponseEntity<BoardResponseDto> getBoardById(@PathVariable Long id) {
-    BoardResponseDto result = matchingService.getBoardById(id);
-    return ResponseEntity.ok(result);
+    return ResponseEntity.ok(matchingService.getBoardById(id));
   }
 
   @PatchMapping("/{id}")
-  public ResponseEntity<?> updateBoard(@PathVariable Long id, @RequestBody UpdateBoardRequestDto requestDto) {
-    matchingService.updateBoard(id, requestDto);
-    return ResponseEntity.ok().body("게시글 수정 성공");
+  public ResponseEntity<String> updateBoard(@PathVariable Long id, @RequestBody UpdateBoardRequestDto requestDto) {
+    return ResponseEntity.ok(matchingService.updateBoard(id, requestDto));
   }
 
   @DeleteMapping("/{id}")
-  public ResponseEntity<?> deleteBoard(@PathVariable Long id) {
-    matchingService.deleteBoard(id);
-    return ResponseEntity.ok().body("게시글 삭제 성공");
+  public ResponseEntity<String> deleteBoard(@PathVariable Long id) {
+    return ResponseEntity.ok(matchingService.deleteBoard(id));
   }
 
 }

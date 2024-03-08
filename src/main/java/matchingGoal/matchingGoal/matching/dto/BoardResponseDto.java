@@ -1,6 +1,8 @@
 package matchingGoal.matchingGoal.matching.dto;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -29,8 +31,8 @@ public class BoardResponseDto {
 //  private Integer requestCount;
   private String region;
   private String stadium;
-  private LocalDateTime time;
-  private Integer capacity;
+  private LocalDate date;
+  private LocalTime time;
 
   public static BoardResponseDto convertToDto(MatchingBoard matchingBoard, Game game) {
     return BoardResponseDto.builder()
@@ -38,6 +40,7 @@ public class BoardResponseDto {
         .memberId(matchingBoard.getMemberId().getId())
         .nickname(matchingBoard.getMemberId().getNickname())
         .title(matchingBoard.getTitle())
+        .content(matchingBoard.getContent())
         .createdDate(matchingBoard.getCreatedDate())
         .modifiedDate(matchingBoard.getModifiedDate())
         .viewCount(matchingBoard.getViewCount())
@@ -45,9 +48,8 @@ public class BoardResponseDto {
 //        .requestCount()
         .region(matchingBoard.getRegion())
         .stadium(game.getStadiumName())
+        .date(game.getDate())
         .time(game.getTime())
-        .capacity(matchingBoard.getCapacity())
-        .content(matchingBoard.getContent())
         .build();
   }
 }

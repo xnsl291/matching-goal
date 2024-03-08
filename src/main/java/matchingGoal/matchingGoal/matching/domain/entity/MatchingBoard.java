@@ -38,8 +38,6 @@ public class MatchingBoard {
 
   private String region;
 
-  private Integer capacity;
-
   private String title;
 
   private String content;

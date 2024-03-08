@@ -8,12 +8,6 @@ import org.springframework.http.HttpStatus;
 @Getter
 @AllArgsConstructor
 public enum ErrorCode {
-
-    ALREADY_REGISTERED_EMAIL("이미 등록된 이메일 입니다."),
-    INVALID_PASSWORD_FORMAT("비밀번호의 형식이 올바르지 않습니다"),
-    POST_NOT_FOUND("존재하지 않는 게시글입니다."),
-    GAME_NOT_FOUND("존재하지 않는 게임입니다."),
-    MEMBER_NOT_FOUND("존재하지 않는 회원입니다.")
       
     //common
     INVALID_ARGUMENT(HttpStatus.BAD_REQUEST,"RequestBody가 올바르지 않습니다."),
@@ -27,6 +21,11 @@ public enum ErrorCode {
     DUPLICATED_EMAIL(HttpStatus.BAD_REQUEST, "이미 등록된 이메일 입니다."),
     DUPLICATED_NICKNAME(HttpStatus.BAD_REQUEST,"중복된 닉네임 입니다"),
     INVALID_PASSWORD_FORMAT(HttpStatus.BAD_REQUEST,"비밀번호의 형식이 올바르지 않습니다."),
+
+    // matching
+    POST_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 게시글입니다."),
+    GAME_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 게임입니다."),
+    MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 회원입니다.")
 
     ;
     private final HttpStatus status;

@@ -7,7 +7,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -41,6 +42,8 @@ public class Game {
 
   private String stadiumName;
 
-  private LocalDateTime time;
+  private LocalDate date;
+
+  private LocalTime time;
 
 }
