@@ -26,8 +26,9 @@ public class ChatMessageServiceImpl implements ChatMessageService {
   public ChatMessage createMessage(ChatMessageDto chatDto, String chatRoomId) {
     chatDto.setRoomId(chatRoomId);
     ChatMessage chatMessage = chatMessageConverter.toEntity(chatDto);
-    rabbitTemplate.convertAndSend(CHAT_EXCHANGE_NAME, "room." + chatRoomId, chatDto);
     chatMessageRepository.save(chatMessage);
+    chatDto.setCreatedDate(chatMessage.getCreatedDate());
+    rabbitTemplate.convertAndSend(CHAT_EXCHANGE_NAME, "room." + chatRoomId, chatDto);
 
 
 

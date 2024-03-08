@@ -40,7 +40,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         .setVirtualHost(rabbitVHost)
         .setRelayHost(rabbitHost)
         .setRelayPort(rabbitPort);
-
+//    reg.enableSimpleBroker("/sub");
     reg.setPathMatcher(new AntPathMatcher("."));
 
     reg.setApplicationDestinationPrefixes("/pub");
