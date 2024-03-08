@@ -34,6 +34,10 @@ public class MatchingService {
   private final MemberRepository memberRepository;
   private final MatchingRequestRepository requestRepository;
 
+  /**
+   * 게시글 작성
+   * @param requestDto - 게시글작성 dto
+   */
   @Transactional
   public BoardResponseDto createBoard(BoardRequestDto requestDto) {
     Member member = memberRepository.findById(requestDto.getMemberId())
@@ -83,17 +87,15 @@ public class MatchingService {
     return "게시글 수정 완료";
   }
 
-  @Transactional
-  public String deleteBoard(Long id) {
+
+
+  public BoardResponseDto getBoardById(Long id) {
     MatchingBoard matchingBoard = boardRepository.findById(id)
         .orElseThrow(() -> new NotFoundPostException(ErrorCode.POST_NOT_FOUND));
     Game game = gameRepository.findByBoardId_Id(id)
         .orElseThrow(() -> new NotFoundGameException(ErrorCode.GAME_NOT_FOUND));
+   return BoardResponseDto.convertToDto(matchingBoard, game);
 
-    gameRepository.delete(game);
-    boardRepository.delete(matchingBoard);
-
-    return "게시글 삭제 완료";
   }
 
   public String requestMatching(Long id, Long memberId) {
@@ -118,5 +120,30 @@ public class MatchingService {
     requestRepository.save(matchingRequest);
 
     return "매칭 신청 완료";
+   
+  }
+
+  public String updateBoard(Long id, UpdateBoardRequestDto requestDto) {
+    MatchingBoard matchingBoard = boardRepository.findById(id)
+        .orElseThrow(() -> new NotFoundPostException(ErrorCode.POST_NOT_FOUND));
+
+    matchingBoard.update(requestDto);
+
+    boardRepository.save(matchingBoard);
+
+    return "게시글 수정 완료";
+  }
+
+  @Transactional
+  public String deleteBoard(Long id) {
+    MatchingBoard matchingBoard = boardRepository.findById(id)
+        .orElseThrow(() -> new NotFoundPostException(ErrorCode.POST_NOT_FOUND));
+    Game game = gameRepository.findByBoardId_Id(id)
+        .orElseThrow(() -> new NotFoundGameException(ErrorCode.GAME_NOT_FOUND));
+
+    gameRepository.delete(game);
+    boardRepository.delete(matchingBoard);
+
+    return "게시글 삭제 완료";
   }
 }

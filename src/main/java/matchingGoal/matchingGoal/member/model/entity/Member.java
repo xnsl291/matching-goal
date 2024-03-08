@@ -25,6 +25,8 @@ public class Member{
     @Column(unique = true)
     private String email;
 
+    private Long imgId;
+
     private String name;
 
     private String password;
