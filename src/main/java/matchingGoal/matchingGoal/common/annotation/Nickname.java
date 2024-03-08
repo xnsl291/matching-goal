@@ -1,6 +1,7 @@
 package matchingGoal.matchingGoal.common.annotation;
 
 import jakarta.validation.Constraint;
+import jakarta.validation.Payload;
 import matchingGoal.matchingGoal.common.annotation.valid.NicknameValidator;
 
 import java.lang.annotation.ElementType;
@@ -13,4 +14,6 @@ import java.lang.annotation.Target;
 @Constraint(validatedBy = NicknameValidator.class)
 public @interface Nickname {
     String message() default "닉네임은 2-20자 이내로 특수문자를 포함하지 않아야 합니다";
+    Class<?>[] groups() default {};
+    Class<? extends Payload>[] payload() default {};
 }
