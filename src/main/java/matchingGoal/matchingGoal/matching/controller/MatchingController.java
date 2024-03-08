@@ -1,5 +1,6 @@
 package matchingGoal.matchingGoal.matching.controller;
 
+import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import matchingGoal.matchingGoal.matching.dto.BoardRequestDto;
@@ -26,7 +27,7 @@ public class MatchingController {
   private final MatchingService matchingService;
 
   @PostMapping("/write")
-  public ResponseEntity<BoardResponseDto> createBoard(@RequestBody BoardRequestDto requestDto) {
+  public ResponseEntity<BoardResponseDto> createBoard(@Valid @RequestBody BoardRequestDto requestDto) {
     return ResponseEntity.ok(matchingService.createBoard(requestDto));
   }
 
@@ -36,7 +37,7 @@ public class MatchingController {
   }
 
   @PatchMapping("/{id}")
-  public ResponseEntity<String> updateBoard(@PathVariable Long id, @RequestBody UpdateBoardRequestDto requestDto) {
+  public ResponseEntity<String> updateBoard(@PathVariable Long id, @Valid @RequestBody UpdateBoardRequestDto requestDto) {
     return ResponseEntity.ok(matchingService.updateBoard(id, requestDto));
   }
 
