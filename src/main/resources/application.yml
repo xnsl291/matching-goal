@@ -16,7 +16,7 @@ spring:
   jpa:
     defer-datasource-initialization: true
     hibernate:
-      ddl-auto:  create  #update
+      ddl-auto:  update  #update
     open-in-view: true
     properties:
       hibernate:
@@ -27,8 +27,15 @@ spring:
     path-match:
       matching-strategy: ant_path_matcher
 
+  rabbitmq:
+    username: guest
+    password: guest
+    host: localhost
+    port: 61613
+    virtual-host: /
 
   mail:
+    username: ${mail.username}
     host: smtp.gmail.com
     port: 587
     properties:

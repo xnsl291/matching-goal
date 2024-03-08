@@ -5,9 +5,6 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import lombok.RequiredArgsConstructor;
 import matchingGoal.matchingGoal.common.exception.AlreadyRequestException;
-import matchingGoal.matchingGoal.common.exception.NotFoundGameException;
-import matchingGoal.matchingGoal.common.exception.NotFoundMemberException;
-import matchingGoal.matchingGoal.common.exception.NotFoundPostException;
 import matchingGoal.matchingGoal.common.exception.SelfRequestException;
 import matchingGoal.matchingGoal.common.type.ErrorCode;
 import matchingGoal.matchingGoal.matching.domain.StatusType;
@@ -17,6 +14,9 @@ import matchingGoal.matchingGoal.matching.domain.entity.MatchingRequest;
 import matchingGoal.matchingGoal.matching.dto.BoardRequestDto;
 import matchingGoal.matchingGoal.matching.dto.BoardResponseDto;
 import matchingGoal.matchingGoal.matching.dto.UpdateBoardRequestDto;
+import matchingGoal.matchingGoal.matching.exception.NotFoundGameException;
+import matchingGoal.matchingGoal.matching.exception.NotFoundMemberException;
+import matchingGoal.matchingGoal.matching.exception.NotFoundPostException;
 import matchingGoal.matchingGoal.matching.repository.GameRepository;
 import matchingGoal.matchingGoal.matching.repository.MatchingBoardRepository;
 import matchingGoal.matchingGoal.matching.repository.MatchingRequestRepository;
@@ -74,28 +74,6 @@ public class MatchingService {
         .orElseThrow(() -> new NotFoundGameException(ErrorCode.GAME_NOT_FOUND));
 
     return BoardResponseDto.convertToDto(matchingBoard, game);
-  }
-
-  public String updateBoard(Long id, UpdateBoardRequestDto requestDto) {
-    MatchingBoard matchingBoard = boardRepository.findById(id)
-        .orElseThrow(() -> new NotFoundPostException(ErrorCode.POST_NOT_FOUND));
-
-    matchingBoard.update(requestDto);
-
-    boardRepository.save(matchingBoard);
-
-    return "게시글 수정 완료";
-  }
-
-
-
-  public BoardResponseDto getBoardById(Long id) {
-    MatchingBoard matchingBoard = boardRepository.findById(id)
-        .orElseThrow(() -> new NotFoundPostException(ErrorCode.POST_NOT_FOUND));
-    Game game = gameRepository.findByBoardId_Id(id)
-        .orElseThrow(() -> new NotFoundGameException(ErrorCode.GAME_NOT_FOUND));
-   return BoardResponseDto.convertToDto(matchingBoard, game);
-
   }
 
   public String requestMatching(Long id, Long memberId) {
