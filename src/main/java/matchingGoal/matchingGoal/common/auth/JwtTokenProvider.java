@@ -51,7 +51,7 @@ public class JwtTokenProvider {
                 .signWith(secretKey, SignatureAlgorithm.HS256)
                 .compact();
 
-        saveRefreshToken(getRefreshTokenKey(email), refreshToken);  //redis key : RT_{email}
+        saveRefreshToken(email, refreshToken);  //redis key : RT_{email}
         return new JwtToken(accessToken,refreshToken);
     }
 
