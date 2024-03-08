@@ -2,6 +2,7 @@ package matchingGoal.matchingGoal.config;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.util.AntPathMatcher;
@@ -23,6 +24,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
   private String rabbitVHost;
   @Value("${spring.rabbitmq.port}")
   private int rabbitPort;
+
 
   @Override
   public void registerStompEndpoints(StompEndpointRegistry registry) {
