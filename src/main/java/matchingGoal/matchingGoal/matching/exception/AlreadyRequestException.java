@@ -1,4 +1,4 @@
-package matchingGoal.matchingGoal.common.exception;
+package matchingGoal.matchingGoal.matching.exception;
 
 import lombok.Getter;
 import matchingGoal.matchingGoal.common.type.ErrorCode;
