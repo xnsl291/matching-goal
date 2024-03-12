@@ -13,12 +13,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class ChatMessageController {
 
-  private final static String CHAT_EXCHANGE_NAME = "chat.exchange";
   private final static String CHAT_QUEUE_NAME = "chat.queue";
   private final ChatMessageService chatMessageService;
   @MessageMapping("chat.message.{chatRoomId}")
   public void send(@Payload ChatMessageDto chat, @DestinationVariable String chatRoomId) {
-    System.out.println(chat.getMessage());
+
     chatMessageService.createMessage(chat, chatRoomId);
 
   }
