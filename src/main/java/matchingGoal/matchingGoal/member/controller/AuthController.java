@@ -40,7 +40,7 @@ public class AuthController {
 
     /**
      * 회원탈퇴
-     * @param withdrawMemberDto - 회원 ID, PW
+     * @param withdrawMemberDto - 회원 ID, Password
      * @return "탈퇴 완료"
      */
     @DeleteMapping("/withdraw")
@@ -81,7 +81,7 @@ public class AuthController {
 
     /**
      * 비밀번호 변경
-     * @param updatePwDto - 회원 ID, 새로운 PW
+     * @param updatePwDto - 회원 ID, 새로운 Password
      * @return "변경완료"
      */
     @PatchMapping("/password")

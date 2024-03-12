@@ -1,4 +1,4 @@
-package matchingGoal.matchingGoal.common.util;
+package matchingGoal.matchingGoal.common.service;
 
 import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class RedisUtil {
+public class RedisService {
     private final StringRedisTemplate stringRedisTemplate;
 
     public String getData(String key){
