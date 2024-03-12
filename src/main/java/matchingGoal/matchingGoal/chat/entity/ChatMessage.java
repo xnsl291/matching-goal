@@ -27,8 +27,8 @@ public class ChatMessage {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private long id;
 
-  @JoinColumn(name = "roomId", insertable = false, updatable = false)
-  private String roomId;
+  @JoinColumn(insertable = false, updatable = false)
+  private String chatRoomId;
 
   @JoinColumn(name = "memberId", insertable = false, updatable = false)
   private long memberId;

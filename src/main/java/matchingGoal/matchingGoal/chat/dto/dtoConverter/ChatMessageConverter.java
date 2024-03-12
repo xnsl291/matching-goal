@@ -17,7 +17,7 @@ public class ChatMessageConverter {
 
     return ChatMessage.builder()
         .message(dto.getMessage())
-        .roomId(dto.getRoomId())
+        .chatRoomId(dto.getChatRoomId())
         .memberId(dto.getMemberId())
         .build();
   }

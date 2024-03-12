@@ -4,10 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import matchingGoal.matchingGoal.chat.dto.ChatMessageDto;
 import matchingGoal.matchingGoal.chat.entity.ChatRoom;
 import matchingGoal.matchingGoal.chat.entity.User;
 import matchingGoal.matchingGoal.chat.dto.ChatRoomListResponse;
 import matchingGoal.matchingGoal.chat.dto.dtoConverter.ChatRoomConverter;
+import matchingGoal.matchingGoal.chat.repository.ChatMessageRepository;
 import matchingGoal.matchingGoal.chat.repository.ChatRoomRepository;
 import matchingGoal.matchingGoal.chat.repository.UserRepository;
 import matchingGoal.matchingGoal.chat.service.ChatRoomService;
@@ -22,6 +24,8 @@ public class ChatRoomServiceImpl implements ChatRoomService {
   private final ChatRoomRepository chatRoomRepository;
   private final UserRepository userRepository;
   private final ChatRoomConverter chatRoomConverter;
+
+  private final ChatMessageRepository chatMessageRepository;
 
 
   @Override
@@ -52,7 +56,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     ChatRoom room = chatRoomRepository.findById(chatRoomId).orElseThrow(RuntimeException::new);
     room.addMembers(members);
 
-    log.info(chatRoomId + " 에 " + members.toString() +" 추가");
+    log.info(chatRoomId + " 에 " + members.toString() + " 추가");
   }
 
   @Override
@@ -69,6 +73,13 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     ChatRoom chatRoom = getChatRoom(chatRoomId);
     chatRoom.quit(userId);
 
+  }
+
+  @Override
+  public List<ChatMessageDto> getChatMessage(String chatRoomId) {
+
+    return chatMessageRepository.findByChatRoomId(chatRoomId).stream()
+        .map(ChatMessageDto::fromEntity).toList();
   }
 
   public ChatRoom getChatRoom(String chatRoomId) {

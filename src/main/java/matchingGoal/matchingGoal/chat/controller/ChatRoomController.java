@@ -2,11 +2,13 @@ package matchingGoal.matchingGoal.chat.controller;
 
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import matchingGoal.matchingGoal.chat.dto.ChatMessageDto;
 import matchingGoal.matchingGoal.chat.dto.ChatRoomListResponse;
 import matchingGoal.matchingGoal.chat.service.ChatRoomService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -40,7 +42,15 @@ public class ChatRoomController {
   @DeleteMapping
   public ResponseEntity<?> quitChatRoom(@RequestParam("chat-room-id") String chatRoomId) {
 
-   return null;
+    chatRoomService.quit(1, chatRoomId);
+
+   return ResponseEntity.ok(null);
   }
 
+  @GetMapping ("/{chatRoomId}")
+  public ResponseEntity<?> getChatMessage(@PathVariable String chatRoomId) {
+    List<ChatMessageDto> result = chatRoomService.getChatMessage(chatRoomId);
+
+    return ResponseEntity.ok(result);
+  }
 }
