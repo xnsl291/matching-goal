@@ -11,7 +11,6 @@ import org.thymeleaf.context.Context;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import matchingGoal.matchingGoal.common.type.RedisTime;
 import matchingGoal.matchingGoal.mail.dto.MailDto;
 import matchingGoal.matchingGoal.mail.dto.MailVerificationDto;
 import org.jsoup.Jsoup;
@@ -78,7 +77,7 @@ public class MailService {
      * @return 발송성공여부 (성공시 true)
      */
     public Boolean sendVerificationMail(String email) {
-        final long redisDurationInMinutes = RedisTime.MAIL_EXPIRE_IN_MINUTES.getTime();
+        final long redisDurationInMinutes = 3;
         final String TEMPLATE_NAME = "InitialEmailVerification.html";
         final String code = RandomStringUtils.random(7, true, true);
         final String expire = LocalDateTime.now().plusMinutes(redisDurationInMinutes).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
