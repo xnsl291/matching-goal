@@ -1,6 +1,6 @@
 package matchingGoal.matchingGoal.mail.service;
 
-import matchingGoal.matchingGoal.common.util.RedisUtil;
+import matchingGoal.matchingGoal.common.service.RedisService;
 import matchingGoal.matchingGoal.mail.dto.MailVerificationDto;
 import matchingGoal.matchingGoal.mail.exception.InvalidValidationCodeException;
 import org.junit.jupiter.api.Test;
@@ -17,7 +17,7 @@ class MailServiceTest {
     private MailService mailService;
 
     @Autowired
-    private RedisUtil redisUtil;
+    private RedisService redisService;
 
     @Value("${spring.mail.username}")
     private String username;
@@ -45,7 +45,7 @@ class MailServiceTest {
     @Test
     public void testVerifyMailWithValidCode() {
         String email = username;
-        String code = redisUtil.getData("VAL_"+email);
+        String code = redisService.getData("VAL_"+email);
         String name = "anonymous";
 
         MailVerificationDto mailVerificationDto = MailVerificationDto.builder()

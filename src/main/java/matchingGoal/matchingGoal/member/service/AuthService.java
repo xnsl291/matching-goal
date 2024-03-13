@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import matchingGoal.matchingGoal.common.auth.JwtToken;
 import matchingGoal.matchingGoal.common.auth.JwtTokenProvider;
-import matchingGoal.matchingGoal.common.util.RedisUtil;
+import matchingGoal.matchingGoal.common.service.RedisService;
 import matchingGoal.matchingGoal.member.dto.SignInDto;
 import matchingGoal.matchingGoal.member.dto.UpdatePwDto;
 import matchingGoal.matchingGoal.member.dto.WithdrawMemberDto;
@@ -28,7 +28,7 @@ public class AuthService {
     private final MemberRepository memberRepository;
     private final BCryptPasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
-    private final RedisUtil redisUtil;
+    private final RedisService redisService;
     private final String TOKEN_PREFIX = "RT_";
 
     /**
@@ -63,7 +63,7 @@ public class AuthService {
 
     /**
      * 회원 탈퇴
-     * @param withdrawMemberDto - 회원 ID, PW
+     * @param withdrawMemberDto - 회원 ID, Password
      * @return "탈퇴 완료"
      */
     @Transactional
@@ -117,7 +117,7 @@ public class AuthService {
             throw new InvalidTokenException(ErrorCode.EXPIRED_TOKEN);
 
         String email = jwtTokenProvider.getEmail(token);
-        if (redisUtil.getData(TOKEN_PREFIX + email) == null) {
+        if (redisService.getData(TOKEN_PREFIX + email) == null) {
             throw new InvalidTokenException(ErrorCode.INVALID_TOKEN);
         }
 
@@ -138,7 +138,7 @@ public class AuthService {
 
     /**
      * 비밀번호 변경
-     * @param updatePwDto - 회원 ID, 새로운 PW
+     * @param updatePwDto - 회원 ID, 새로운 Password
      * @return "변경완료"
      */
     public String updatePassword(UpdatePwDto updatePwDto) {
