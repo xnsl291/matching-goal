@@ -12,6 +12,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import matchingGoal.matchingGoal.chat.dto.ChatMessageDto;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -27,8 +28,8 @@ public class ChatMessage {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private long id;
 
-  @JoinColumn(name = "roomId", insertable = false, updatable = false)
-  private String roomId;
+  @JoinColumn(insertable = false, updatable = false)
+  private String chatRoomId;
 
   @JoinColumn(name = "memberId", insertable = false, updatable = false)
   private long memberId;
@@ -37,5 +38,13 @@ public class ChatMessage {
   @CreatedDate
   private LocalDateTime createdDate;
 
+  public static ChatMessage fromDto(ChatMessageDto dto) {
+
+    return ChatMessage.builder()
+        .message(dto.getMessage())
+        .chatRoomId(dto.getChatRoomId())
+        .memberId(dto.getMemberId())
+        .build();
+  }
 
 }

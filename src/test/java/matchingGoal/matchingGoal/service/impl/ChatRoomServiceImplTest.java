@@ -5,11 +5,11 @@ package matchingGoal.matchingGoal.service.impl;
 import java.util.ArrayList;
 import java.util.List;
 import matchingGoal.matchingGoal.chat.entity.ChatRoom;
-import matchingGoal.matchingGoal.chat.entity.User;
 import matchingGoal.matchingGoal.chat.dto.ChatRoomListResponse;
 import matchingGoal.matchingGoal.chat.repository.ChatRoomRepository;
-import matchingGoal.matchingGoal.chat.repository.UserRepository;
-import matchingGoal.matchingGoal.chat.service.impl.ChatRoomServiceImpl;
+import matchingGoal.matchingGoal.chat.service.ChatRoomService;
+import matchingGoal.matchingGoal.member.model.entity.Member;
+import matchingGoal.matchingGoal.member.repository.MemberRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,9 +22,9 @@ class ChatRoomServiceImplTest {
   @Autowired
   ChatRoomRepository chatRoomRepository;
   @Autowired
-  ChatRoomServiceImpl chatServiceimpl;
+  ChatRoomService chatRoomService;
   @Autowired
-  UserRepository userRepository;
+  MemberRepository memberRepository;
 
   @Test
   @DisplayName("create")
@@ -33,7 +33,7 @@ class ChatRoomServiceImplTest {
     //given
 
     //when
-    String id = chatServiceimpl.createChatRoom(1, 2);
+    String id = chatRoomService.createChatRoom(1, 2);
 
     //then
     ChatRoom newChat = chatRoomRepository.findById(id).orElseThrow(RuntimeException::new);
@@ -47,13 +47,13 @@ class ChatRoomServiceImplTest {
   @Transactional
   public void addMembers() {
     //given
-    String id = chatServiceimpl.createChatRoom(1, 2);
+    String id = chatRoomService.createChatRoom(1, 2);
 
     //when
-    List<User> users2 = new ArrayList<>();
-    User third = userRepository.findById(3L).orElseThrow(RuntimeException::new);
-    users2.add(third);
-    chatServiceimpl.addMembers(id, users2);
+    List<Member> members2 = new ArrayList<>();
+    Member third = memberRepository.findById(3L).orElseThrow(RuntimeException::new);
+    members2.add(third);
+    chatRoomService.addMembers(id, members2);
 
     //then
     ChatRoom newChat = chatRoomRepository.findById(id).orElseThrow(RuntimeException::new);
@@ -68,10 +68,10 @@ class ChatRoomServiceImplTest {
   public void myChat() {
 
     //given
-    String id = chatServiceimpl.createChatRoom(1, 2);
+    String id = chatRoomService.createChatRoom(1, 2);
     System.out.println(id);
     //when
-    List<ChatRoomListResponse> result = chatServiceimpl.myChat(1L);
+    List<ChatRoomListResponse> result = chatRoomService.myChat(1L);
 
     boolean check = !result.isEmpty();
     //then
@@ -85,11 +85,11 @@ class ChatRoomServiceImplTest {
   public void quit() {
     //given
 
-    String id = chatServiceimpl.createChatRoom(1, 2);
+    String id = chatRoomService.createChatRoom(1, 2);
     System.out.println(id);
 
     //when
-    chatServiceimpl.quit(2, id);
+    chatRoomService.quit(2, id);
     ChatRoom chatRoom = chatRoomRepository.findById(id).orElseThrow(RuntimeException::new);
 
     boolean result = chatRoom.getChatRoomMembers().size() == 1;
