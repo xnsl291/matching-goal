@@ -5,8 +5,10 @@ import lombok.extern.slf4j.Slf4j;
 import matchingGoal.matchingGoal.common.auth.JwtToken;
 import matchingGoal.matchingGoal.common.auth.JwtTokenProvider;
 import matchingGoal.matchingGoal.common.service.RedisService;
+import matchingGoal.matchingGoal.image.service.ImageService;
 import matchingGoal.matchingGoal.member.dto.SignInDto;
 import matchingGoal.matchingGoal.member.dto.GetPasswordDto;
+import matchingGoal.matchingGoal.member.dto.SignInResponse;
 import matchingGoal.matchingGoal.member.exception.*;
 import matchingGoal.matchingGoal.member.dto.MemberRegisterDto;
 import matchingGoal.matchingGoal.member.model.entity.Member;
@@ -28,6 +30,7 @@ public class AuthService {
     private final JwtTokenProvider jwtTokenProvider;
     private final RedisService redisService;
     private final MemberService memberService;
+    private final ImageService imageService;
     private final String TOKEN_PREFIX = "RT_";
 
     /**
@@ -53,7 +56,7 @@ public class AuthService {
                 .nickname(registerDto.getNickname())
                 .introduction(registerDto.getIntroduction())
                 .region(registerDto.getRegion())
-                .imgId(registerDto.getImgId())
+                .imageId(registerDto.getImageId())
                 .build();
 
         memberRepository.save(member);
@@ -63,12 +66,12 @@ public class AuthService {
     /**
      * 회원 탈퇴
      * @param token - 토큰
-     * @param getPasswordDto - Password
+     * @param getPasswordDto - 비밀번호
      * @return "탈퇴 완료"
      */
     @Transactional
     public String withdrawMember(String token, GetPasswordDto getPasswordDto) {
-        Member member = getMemberByToken(token);
+        Member member = memberService.getMemberByToken(token);
 
         // 탈퇴 전 비밀번호 재확인
         if (!member.getPassword().equals(getPasswordDto.getPassword())) {
@@ -84,15 +87,14 @@ public class AuthService {
     /**
      * 로그인
      * @param signInDto - 회원 ID, 비밀번호
-     * @return token - 토큰
+     * @return SignInResponse - accessToken, refreshToken, id, nickname, imageUrl
      */
     @Transactional
-    public JwtToken signIn(SignInDto signInDto) {
+    public SignInResponse signIn(SignInDto signInDto) {
         Member member = memberRepository.findByEmail(signInDto.getEmail()).orElseThrow(MemberNotFoundException::new);
 
         // 비밀번호 체크
         boolean isMatch = passwordEncoder.matches(signInDto.getPassword(),member.getPassword());
-        log.info("\n\n"+member.getPassword()   +"    " + signInDto.getPassword()  +" " +passwordEncoder.matches(member.getPassword() ,signInDto.getPassword())  );
         if (!isMatch) {
             throw new UnmatchedPasswordException();
         }
@@ -101,7 +103,17 @@ public class AuthService {
             throw new WithdrawnMemberAccessException();
 
         // 토큰 발행
-        return jwtTokenProvider.generateToken(member.getId(), member.getEmail());
+        JwtToken tokens = jwtTokenProvider.generateToken(member.getId(), member.getEmail());
+
+        //프로필이미지
+        String imageUrl = imageService.getImageUrl(member.getImageId());
+
+        return SignInResponse.builder()
+                .accessToken(tokens.getAccessToken())
+                .refreshToken(tokens.getRefreshToken())
+                .id(member.getId())
+                .nickname(member.getNickname())
+                .imageUrl(imageUrl).build();
     }
 
     /**
@@ -126,14 +138,4 @@ public class AuthService {
         return "로그아웃 완료";
     }
 
-    /**
-     * 토큰을 사용하여 회원 반환
-     * @param token - 토큰
-     * @return Member
-     */
-    public Member getMemberByToken(String token){
-        Long memberId = jwtTokenProvider.getId(token);
-        return  memberRepository.findById(memberId)
-                .orElseThrow(MemberNotFoundException::new);
-    }
 }
