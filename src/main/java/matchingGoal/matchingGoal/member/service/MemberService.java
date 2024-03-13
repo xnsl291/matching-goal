@@ -3,7 +3,6 @@ package matchingGoal.matchingGoal.member.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import matchingGoal.matchingGoal.member.dto.GetPasswordDto;
-import matchingGoal.matchingGoal.member.exception.*;
 import matchingGoal.matchingGoal.member.model.entity.Member;
 import matchingGoal.matchingGoal.member.repository.MemberRepository;
 import org.springframework.stereotype.Service;
@@ -15,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 public class MemberService {
     private final MemberRepository memberRepository;
+    private final AuthService authService;
 
     /**
      * 닉네임 중복 체크
@@ -27,14 +27,12 @@ public class MemberService {
 
     /**
      * 비밀번호 변경
-     * @param getPasswordDto - 새로운 Password
+     * @param token - 토큰
+     * @param getPasswordDto - Password
      * @return "변경완료"
      */
-    public String updatePassword(GetPasswordDto getPasswordDto) {
-        //TODO: 토큰에서 받아오기
-        Member member = memberRepository.findById(getPasswordDto.getId())
-                .orElseThrow(MemberNotFoundException::new);
-
+    public String updatePassword(String token, GetPasswordDto getPasswordDto) {
+        Member member = authService.getMemberByToken(token);
         member.setPassword(getPasswordDto.getPassword());
         return "변경완료";
     }

@@ -33,13 +33,14 @@ public class AuthController {
 
     /**
      * 회원탈퇴
+     * @param token - 토큰
      * @param getPasswordDto - 회원 ID, Password
      * @return "탈퇴 완료"
      */
     @DeleteMapping("/withdraw")
     //TODO: memberId는 token에서 얻어오는 방식으로 변경
-    public ResponseEntity<String> withdrawMember(@Valid @RequestBody GetPasswordDto getPasswordDto) {
-        return ResponseEntity.ok().body(authService.withdrawMember(getPasswordDto));
+    public ResponseEntity<String> withdrawMember(@RequestHeader(name = AUTH_HEADER) String token, @Valid @RequestBody GetPasswordDto getPasswordDto) {
+        return ResponseEntity.ok().body(authService.withdrawMember(token, getPasswordDto));
     }
 
     /**

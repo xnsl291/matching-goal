@@ -62,14 +62,13 @@ public class AuthService {
 
     /**
      * 회원 탈퇴
-     * @param getPasswordDto - 회원 ID, Password
+     * @param token - 토큰
+     * @param getPasswordDto - Password
      * @return "탈퇴 완료"
      */
     @Transactional
-    public String withdrawMember(GetPasswordDto getPasswordDto) {
-        // todo : token에서 받아오기
-        Member member = memberRepository.findById(getPasswordDto.getId())
-                .orElseThrow(MemberNotFoundException::new);
+    public String withdrawMember(String token, GetPasswordDto getPasswordDto) {
+        Member member = getMemberByToken(token);
 
         // 탈퇴 전 비밀번호 재확인
         if (!member.getPassword().equals(getPasswordDto.getPassword())) {
@@ -127,4 +126,14 @@ public class AuthService {
         return "로그아웃 완료";
     }
 
+    /**
+     * 토큰을 사용하여 회원 반환
+     * @param token - 토큰
+     * @return Member
+     */
+    public Member getMemberByToken(String token){
+        Long memberId = jwtTokenProvider.getId(token);
+        return  memberRepository.findById(memberId)
+                .orElseThrow(MemberNotFoundException::new);
+    }
 }

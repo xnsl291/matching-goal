@@ -1,7 +1,6 @@
 package matchingGoal.matchingGoal.member.dto;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Positive;
 import lombok.*;
 import matchingGoal.matchingGoal.common.annotation.Password;
 
@@ -11,10 +10,6 @@ import matchingGoal.matchingGoal.common.annotation.Password;
 @AllArgsConstructor
 @Builder
 public class GetPasswordDto {
-
-    @NotBlank
-    @Positive
-    private Long id;
 
     @NotBlank(message = "비밀번호르 입력해주세요")
     @Password

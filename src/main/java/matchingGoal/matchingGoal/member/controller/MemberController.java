@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @RequestMapping("/api")
 public class MemberController {
-
+    private static final String AUTH_HEADER = "Authorization";
     private final MemberService memberService;
 
     /**
@@ -28,11 +28,12 @@ public class MemberController {
 
     /**
      * 비밀번호 변경
+     * @param token - 토큰
      * @param dto - 새로운 Password
      * @return "변경완료"
      */
     @PatchMapping("members/password")
-    public ResponseEntity<String> updatePassword(@Valid @RequestBody GetPasswordDto dto) {
-        return ResponseEntity.ok().body(memberService.updatePassword(dto));
+    public ResponseEntity<String> updatePassword(@RequestHeader(name = AUTH_HEADER) String token, @Valid @RequestBody GetPasswordDto dto) {
+        return ResponseEntity.ok().body(memberService.updatePassword(token, dto));
     }
 }
