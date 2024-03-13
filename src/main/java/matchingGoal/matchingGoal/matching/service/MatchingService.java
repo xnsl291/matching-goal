@@ -9,7 +9,6 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import matchingGoal.matchingGoal.matching.dto.RequestMatchingDto;
 import matchingGoal.matchingGoal.matching.exception.AlreadyRequestException;
-import matchingGoal.matchingGoal.matching.exception.NotFoundRequestException;
 import matchingGoal.matchingGoal.matching.exception.SelfRequestException;
 import matchingGoal.matchingGoal.common.type.ErrorCode;
 import matchingGoal.matchingGoal.matching.domain.StatusType;
@@ -54,7 +53,7 @@ public class MatchingService {
         .content(requestDto.getContent())
         .status(StatusType.모집중)
         .createdDate(LocalDateTime.now())
-        .isDeleted(false)
+        .isDeleted(Boolean.FALSE)
         .build();
     MatchingBoard savedBoard = boardRepository.save(matchingBoard);
 
@@ -139,7 +138,7 @@ public class MatchingService {
     MatchingRequest matchingRequest = MatchingRequest.builder()
         .board(matchingBoard)
         .member(member)
-        .isAccepted(false)
+        .isAccepted(Boolean.FALSE)
         .createdDate(LocalDateTime.now())
         .build();
     requestRepository.save(matchingRequest);
@@ -158,20 +157,6 @@ public class MatchingService {
     return requestList.stream().map(RequestMatchingDto::of)
         .sorted(Comparator.comparing(RequestMatchingDto::getCreatedDate))
         .collect(Collectors.toList());
-  }
-
-  /**
-   * 매칭 신청 수락
-   * @param id - 매칭 신청 id
-   * @return "신청 수락 완료"
-   */
-  public String acceptRequest(Long id) {
-    MatchingRequest request = requestRepository.findById(id)
-        .orElseThrow(() -> new NotFoundRequestException(ErrorCode.REQUEST_NOT_FOUND));
-
-    request.accept();
-
-    return "신청 수락 완료";
   }
 
 }

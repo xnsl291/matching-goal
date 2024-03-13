@@ -56,9 +56,4 @@ public class MatchingController {
     return ResponseEntity.ok(matchingService.getRequestList(id));
   }
 
-  @PostMapping("/{id}/accept")
-  public ResponseEntity<String> acceptRequest(@PathVariable Long id) {
-    return ResponseEntity.ok(matchingService.acceptRequest(id));
-  }
-
 }
