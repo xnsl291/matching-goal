@@ -85,7 +85,7 @@ public class AuthController {
      * @return "변경완료"
      */
     @PatchMapping("/password")
-    public ResponseEntity<String> changePassword(@Valid @RequestBody UpdatePwDto updatePwDto) {
+    public ResponseEntity<String> updatePassword(@Valid @RequestBody UpdatePwDto updatePwDto) {
         return ResponseEntity.ok().body(authService.updatePassword(updatePwDto));
     }
 
