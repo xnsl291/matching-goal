@@ -10,7 +10,7 @@ import matchingGoal.matchingGoal.common.annotation.Password;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class WithdrawMemberDto {
+public class GetPasswordDto {
 
     @NotBlank
     @Positive
