@@ -36,15 +36,15 @@ public class MatchingService {
 
   /**
    * 게시글 작성
-   * @param requestDto - 게시글작성 dto
+   * @param requestDto - 게시글 작성 dto
    */
   @Transactional
-  public BoardResponseDto createBoard(BoardRequestDto requestDto) {
+  public String createBoard(BoardRequestDto requestDto) {
     Member member = memberRepository.findById(requestDto.getMemberId())
         .orElseThrow(() -> new NotFoundMemberException(ErrorCode.MEMBER_NOT_FOUND));
 
     MatchingBoard matchingBoard = MatchingBoard.builder()
-        .memberId(member)
+        .member(member)
         .region(requestDto.getRegion())
         .title(requestDto.getTitle())
         .content(requestDto.getContent())
@@ -55,52 +55,36 @@ public class MatchingService {
     MatchingBoard savedBoard = boardRepository.save(matchingBoard);
 
     Game game = Game.builder()
-        .boardId(savedBoard)
-        .team1Id(member)
-        .team2Id(null)
+        .board(savedBoard)
+        .team1(member)
+        .team2(null)
         .stadiumName(requestDto.getStadium())
         .date(LocalDate.parse(requestDto.getDate()))
         .time(LocalTime.parse(requestDto.getTime()))
         .build();
     gameRepository.save(game);
 
-    return BoardResponseDto.convertToDto(savedBoard, game);
+    return "게시글 등록 완료";
   }
 
+  /**
+   * 게시글 조회
+   * @param id - 게시글 id
+   * @return 게시글 dto
+   */
   public BoardResponseDto getBoardById(Long id) {
     MatchingBoard matchingBoard = boardRepository.findById(id)
         .orElseThrow(() -> new NotFoundPostException(ErrorCode.POST_NOT_FOUND));
-    Game game = gameRepository.findByBoardId_Id(id)
-        .orElseThrow(() -> new NotFoundGameException(ErrorCode.GAME_NOT_FOUND));
 
-    return BoardResponseDto.convertToDto(matchingBoard, game);
+    return BoardResponseDto.convertToDto(matchingBoard);
   }
 
-  public String requestMatching(Long id, Long memberId) {
-    MatchingBoard matchingBoard = boardRepository.findById(id)
-        .orElseThrow(() -> new NotFoundPostException(ErrorCode.POST_NOT_FOUND));
-    Member member = memberRepository.findById(memberId)
-        .orElseThrow(() -> new NotFoundMemberException(ErrorCode.MEMBER_NOT_FOUND));
-
-    if (matchingBoard.getMemberId() == member) {
-      throw new SelfRequestException(ErrorCode.SELF_REQUEST);
-    }
-
-    if (requestRepository.existsByBoardIdAndMemberId(matchingBoard, member)) {
-      throw new AlreadyRequestException(ErrorCode.ALREADY_REQUEST_MATCHING);
-    }
-
-    MatchingRequest matchingRequest = MatchingRequest.builder()
-        .boardId(matchingBoard)
-        .memberId(member)
-        .isAccepted(Boolean.FALSE)
-        .build();
-    requestRepository.save(matchingRequest);
-
-    return "매칭 신청 완료";
-   
-  }
-
+  /**
+   * 게시글 수정
+   * @param id - 게시글 id
+   * @param requestDto - 게시글 수정 dto
+   * @return "게시글 수정 완료"
+   */
   public String updateBoard(Long id, UpdateBoardRequestDto requestDto) {
     MatchingBoard matchingBoard = boardRepository.findById(id)
         .orElseThrow(() -> new NotFoundPostException(ErrorCode.POST_NOT_FOUND));
@@ -112,16 +96,50 @@ public class MatchingService {
     return "게시글 수정 완료";
   }
 
+  /**
+   * 게시글 삭제
+   * @param id - 게시글 id
+   * @return "게시글 삭제 완료"
+   */
   @Transactional
   public String deleteBoard(Long id) {
     MatchingBoard matchingBoard = boardRepository.findById(id)
         .orElseThrow(() -> new NotFoundPostException(ErrorCode.POST_NOT_FOUND));
-    Game game = gameRepository.findByBoardId_Id(id)
-        .orElseThrow(() -> new NotFoundGameException(ErrorCode.GAME_NOT_FOUND));
 
-    gameRepository.delete(game);
+    gameRepository.delete(matchingBoard.getGame());
     boardRepository.delete(matchingBoard);
 
     return "게시글 삭제 완료";
   }
+
+  /**
+   * 경기 매칭 신청
+   * @param id - 게시글 id
+   * @param memberId - 신청자 id
+   * @return "매칭 신청 완료"
+   */
+  public String requestMatching(Long id, Long memberId) {
+    MatchingBoard matchingBoard = boardRepository.findById(id)
+        .orElseThrow(() -> new NotFoundPostException(ErrorCode.POST_NOT_FOUND));
+    Member member = memberRepository.findById(memberId)
+        .orElseThrow(() -> new NotFoundMemberException(ErrorCode.MEMBER_NOT_FOUND));
+
+    if (matchingBoard.getMember() == member) {
+      throw new SelfRequestException(ErrorCode.SELF_REQUEST);
+    }
+
+    if (requestRepository.existsByBoardIdAndMemberId(matchingBoard, member)) {
+      throw new AlreadyRequestException(ErrorCode.ALREADY_REQUEST_MATCHING);
+    }
+
+    MatchingRequest matchingRequest = MatchingRequest.builder()
+        .board(matchingBoard)
+        .member(member)
+        .isAccepted(Boolean.FALSE)
+        .build();
+    requestRepository.save(matchingRequest);
+
+    return "매칭 신청 완료";
+  }
+
 }

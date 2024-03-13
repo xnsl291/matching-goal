@@ -8,7 +8,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import matchingGoal.matchingGoal.matching.domain.StatusType;
-import matchingGoal.matchingGoal.matching.domain.entity.Game;
 import matchingGoal.matchingGoal.matching.domain.entity.MatchingBoard;
 
 @Getter
@@ -34,11 +33,11 @@ public class BoardResponseDto {
   private LocalDate date;
   private LocalTime time;
 
-  public static BoardResponseDto convertToDto(MatchingBoard matchingBoard, Game game) {
+  public static BoardResponseDto convertToDto(MatchingBoard matchingBoard) {
     return BoardResponseDto.builder()
         .id(matchingBoard.getId())
-        .memberId(matchingBoard.getMemberId().getId())
-        .nickname(matchingBoard.getMemberId().getNickname())
+        .memberId(matchingBoard.getMember().getId())
+        .nickname(matchingBoard.getMember().getNickname())
         .title(matchingBoard.getTitle())
         .content(matchingBoard.getContent())
         .createdDate(matchingBoard.getCreatedDate())
@@ -47,9 +46,9 @@ public class BoardResponseDto {
         .status(matchingBoard.getStatus())
 //        .requestCount()
         .region(matchingBoard.getRegion())
-        .stadium(game.getStadiumName())
-        .date(game.getDate())
-        .time(game.getTime())
+        .stadium(matchingBoard.getGame().getStadiumName())
+        .date(matchingBoard.getGame().getDate())
+        .time(matchingBoard.getGame().getTime())
         .build();
   }
 }

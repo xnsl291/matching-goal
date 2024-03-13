@@ -16,7 +16,6 @@ import matchingGoal.matchingGoal.member.model.entity.Member;
 @Entity
 @Builder
 @Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class MatchingRequest {
@@ -27,11 +26,11 @@ public class MatchingRequest {
 
   @ManyToOne
   @JoinColumn(name = "board_id")
-  private MatchingBoard boardId;
+  private MatchingBoard board;
 
   @ManyToOne
   @JoinColumn(name = "member_id")
-  private Member memberId;
+  private Member member;
 
   private Boolean isAccepted;
 

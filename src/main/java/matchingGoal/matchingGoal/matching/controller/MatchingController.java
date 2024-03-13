@@ -27,7 +27,7 @@ public class MatchingController {
   private final MatchingService matchingService;
 
   @PostMapping("/write")
-  public ResponseEntity<BoardResponseDto> createBoard(@Valid @RequestBody BoardRequestDto requestDto) {
+  public ResponseEntity<String> createBoard(@Valid @RequestBody BoardRequestDto requestDto) {
     return ResponseEntity.ok(matchingService.createBoard(requestDto));
   }
 
