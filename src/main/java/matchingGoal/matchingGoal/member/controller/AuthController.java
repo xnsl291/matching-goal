@@ -75,8 +75,8 @@ public class AuthController {
      * @return 중복여부 (중복 시, false)
      */
     @PostMapping("/checkNickname")
-    public ResponseEntity<Boolean> checkNickname(@NotBlank @Nickname @RequestParam String nickname) {
-        return ResponseEntity.ok().body(authService.checkNickname(nickname));
+    public ResponseEntity<Boolean> isDuplicatedNickname(@NotBlank @Nickname @RequestParam String nickname) {
+        return ResponseEntity.ok().body(authService.isDuplicatedNickname(nickname));
     }
 
     /**
@@ -85,7 +85,7 @@ public class AuthController {
      * @return "변경완료"
      */
     @PatchMapping("/password")
-    public ResponseEntity<String> changePassword(@Valid @RequestBody UpdatePwDto updatePwDto) {
+    public ResponseEntity<String> updatePassword(@Valid @RequestBody UpdatePwDto updatePwDto) {
         return ResponseEntity.ok().body(authService.updatePassword(updatePwDto));
     }
 
@@ -95,7 +95,7 @@ public class AuthController {
      * @return 발송성공여부
      */
     @GetMapping(value = "/mails/send-verification")
-    public ResponseEntity<Boolean> verifyMail(@NotBlank @Email  @RequestParam String email) {
+    public ResponseEntity<Boolean> sendVerificationMail(@NotBlank @Email  @RequestParam String email) {
         return ResponseEntity.ok().body(mailService.sendVerificationMail(email));
     }
 
