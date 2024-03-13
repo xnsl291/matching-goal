@@ -8,7 +8,7 @@ import matchingGoal.matchingGoal.common.type.ErrorCode;
 public class InvalidTokenException extends CustomException {
     private final ErrorCode errorCode;
 
-    public InvalidTokenException(ErrorCode errorCode) {
-        this.errorCode = errorCode;
+    public InvalidTokenException() {
+        this.errorCode = ErrorCode.INVALID_TOKEN;
     }
 }

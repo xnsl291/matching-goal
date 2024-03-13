@@ -4,7 +4,6 @@ import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import matchingGoal.matchingGoal.common.type.ErrorCode;
 import matchingGoal.matchingGoal.common.service.RedisService;
 import matchingGoal.matchingGoal.member.exception.InvalidTokenException;
 import org.springframework.stereotype.Component;
@@ -62,7 +61,7 @@ public class JwtTokenProvider {
     public void deleteToken(String email) {
         String rtKey = getRefreshTokenKey(email);
         if (redisService.getData(rtKey) == null)
-            throw new InvalidTokenException(ErrorCode.INVALID_TOKEN);
+            throw new InvalidTokenException();
 
         redisService.deleteData(rtKey);
     }
@@ -79,7 +78,7 @@ public class JwtTokenProvider {
             Jwts.parser().setSigningKey(secretKey).parseClaimsJws(getRawToken(token));
             return true;
         } catch (Exception e) {
-            throw new InvalidTokenException(ErrorCode.INVALID_TOKEN);
+            throw new InvalidTokenException();
         }
     }
 

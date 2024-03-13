@@ -41,11 +41,11 @@ public class AuthService {
 
         // 이메일 중복 확인
         if(memberRepository.findByEmail(registerDto.getEmail()).isPresent())
-            throw new AlreadyRegisteredEmailException(ErrorCode.DUPLICATED_EMAIL);
+            throw new AlreadyRegisteredEmailException();
 
         // 닉네임 중복 확인
         if (! memberService.isDuplicatedNickname(registerDto.getNickname()))
-            throw new DuplicatedNicknameException(ErrorCode.DUPLICATED_NICKNAME);
+            throw new DuplicatedNicknameException();
 
         Member member = Member.builder()
                 .name(registerDto.getName())
@@ -69,11 +69,11 @@ public class AuthService {
     @Transactional
     public String withdrawMember(WithdrawMemberDto withdrawMemberDto) {
         Member member = memberRepository.findById(withdrawMemberDto.getId())
-                .orElseThrow(() -> new MemberNotFoundException(ErrorCode.MEMBER_NOT_EXISTS));
+                .orElseThrow(MemberNotFoundException::new);
 
         // 탈퇴 전 비밀번호 재확인
         if (!member.getPassword().equals(withdrawMemberDto.getPassword())) {
-            throw new UnmatchedPasswordException(ErrorCode.WRONG_PASSWORD);
+            throw new UnmatchedPasswordException();
         }
 
         member.setDeleted(true);
@@ -89,17 +89,17 @@ public class AuthService {
      */
     @Transactional
     public JwtToken signIn(SignInDto signInDto) {
-        Member member = memberRepository.findByEmail(signInDto.getEmail()).orElseThrow(() -> new MemberNotFoundException(ErrorCode.MEMBER_NOT_EXISTS));
+        Member member = memberRepository.findByEmail(signInDto.getEmail()).orElseThrow(MemberNotFoundException::new);
 
         // 비밀번호 체크
         boolean isMatch = passwordEncoder.matches(signInDto.getPassword(),member.getPassword());
         log.info("\n\n"+member.getPassword()   +"    " + signInDto.getPassword()  +" " +passwordEncoder.matches(member.getPassword() ,signInDto.getPassword())  );
         if (!isMatch) {
-            throw new InvalidPasswordException(ErrorCode.WRONG_PASSWORD);
+            throw new UnmatchedPasswordException();
         }
 
         if(member.isDeleted())
-            throw new WithdrawnMemberAccessException(ErrorCode.WITHDRAWN_MEMBER);
+            throw new WithdrawnMemberAccessException();
 
         // 토큰 발행
         return jwtTokenProvider.generateToken(member.getId(), member.getEmail());
@@ -114,11 +114,11 @@ public class AuthService {
     public String signOut(String token) {
 
         if(!jwtTokenProvider.validateToken(token))
-            throw new InvalidTokenException(ErrorCode.EXPIRED_TOKEN);
+            throw new InvalidTokenException();
 
         String email = jwtTokenProvider.getEmail(token);
         if (redisService.getData(TOKEN_PREFIX + email) == null) {
-            throw new InvalidTokenException(ErrorCode.INVALID_TOKEN);
+            throw new InvalidTokenException();
         }
 
         // 블랙 리스트에 추가(로그아웃)

@@ -8,7 +8,7 @@ import matchingGoal.matchingGoal.common.type.ErrorCode;
 public class InvalidValidationCodeException extends CustomException {
     private final ErrorCode errorCode;
 
-    public InvalidValidationCodeException(ErrorCode errorCode) {
-        this.errorCode = errorCode;
+    public InvalidValidationCodeException() {
+        this.errorCode = ErrorCode.INVALID_CODE;
     }
 }

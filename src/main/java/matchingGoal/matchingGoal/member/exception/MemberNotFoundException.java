@@ -8,7 +8,7 @@ import matchingGoal.matchingGoal.common.type.ErrorCode;
 public class MemberNotFoundException extends CustomException {
     private final ErrorCode errorCode;
 
-    public MemberNotFoundException(ErrorCode errorCode) {
-        this.errorCode = errorCode;
+    public MemberNotFoundException() {
+        this.errorCode = ErrorCode.MEMBER_NOT_EXISTS;
     }
 }

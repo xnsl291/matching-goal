@@ -8,7 +8,7 @@ import matchingGoal.matchingGoal.common.type.ErrorCode;
 public class DuplicatedNicknameException extends CustomException {
     private final ErrorCode errorCode;
 
-    public DuplicatedNicknameException(ErrorCode errorCode) {
-        this.errorCode = errorCode;
+    public DuplicatedNicknameException() {
+        this.errorCode =ErrorCode.DUPLICATED_NICKNAME;
     }
 }
