@@ -1,6 +1,5 @@
 package matchingGoal.matchingGoal.member.controller;
 
-import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import matchingGoal.matchingGoal.member.dto.MemberRegisterDto;
@@ -25,7 +24,6 @@ public class AuthController {
      * @param registerDto - 회원가입 dto
      * @return "회원가입 성공"
      */
-    @Transactional
     @PostMapping("/sign-up")
     public ResponseEntity<String> registerMember(@Valid @RequestBody MemberRegisterDto registerDto) {
         return ResponseEntity.ok().body(authService.registerMember(registerDto));

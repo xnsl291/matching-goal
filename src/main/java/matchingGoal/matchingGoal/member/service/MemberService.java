@@ -12,7 +12,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
 @Slf4j
 public class MemberService {
     private final MemberRepository memberRepository;
@@ -33,6 +32,7 @@ public class MemberService {
      * @param getPasswordDto - 비밀번호
      * @return "변경완료"
      */
+    @Transactional
     public String updatePassword(String token, GetPasswordDto getPasswordDto) {
         Member member = getMemberByToken(token);
         member.setPassword(getPasswordDto.getPassword());
