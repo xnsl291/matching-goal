@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import matchingGoal.matchingGoal.common.annotation.Nickname;
 import matchingGoal.matchingGoal.member.dto.GetPasswordDto;
+import matchingGoal.matchingGoal.member.dto.OtherMemberInfoResponse;
 import matchingGoal.matchingGoal.member.dto.UpdateMemberInfoDto;
 import matchingGoal.matchingGoal.member.model.entity.Member;
 import matchingGoal.matchingGoal.member.service.MemberService;
@@ -46,9 +47,8 @@ public class MemberController {
      */
     @GetMapping("/")
     public ResponseEntity<Member> getMemberInfo(@RequestHeader(name = AUTH_HEADER) String token) {
-        return ResponseEntity.ok().body(memberService.getMemberInfo(token));
+        return ResponseEntity.ok().body(memberService.getMemberByToken(token));
     }
-
     /**
      * 개인 정보 수정
      * @param token - 토큰
@@ -59,4 +59,15 @@ public class MemberController {
     public ResponseEntity<String> editMemberInfo(@RequestHeader(name = AUTH_HEADER) String token, @Valid UpdateMemberInfoDto updateDto) {
         return ResponseEntity.ok().body(memberService.editMemberInfo(token,updateDto));
     }
+
+    /**
+     * 다른 회원 정보 조회
+     * @param memberId - 조회하고 싶은 회원 ID
+     * @return OtherMemberInfoResponse - 닉네임, 소개, 지역, 이미지url
+     */
+    @GetMapping("/{memberId}")
+    public ResponseEntity<OtherMemberInfoResponse> getOtherMemberInfo(@PathVariable("memberId") Long memberId) {
+        return ResponseEntity.ok().body(memberService.getOtherMemberInfo(memberId));
+    }
+
 }
