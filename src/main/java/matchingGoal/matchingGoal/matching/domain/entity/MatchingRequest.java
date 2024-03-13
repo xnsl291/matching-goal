@@ -37,4 +37,8 @@ public class MatchingRequest {
 
   private LocalDateTime createdDate;
 
+  public void accept() {
+    this.isAccepted = true;
+  }
+
 }
