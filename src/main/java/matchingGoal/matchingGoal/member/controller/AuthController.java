@@ -2,14 +2,11 @@ package matchingGoal.matchingGoal.member.controller;
 
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import matchingGoal.matchingGoal.common.annotation.Nickname;
 import matchingGoal.matchingGoal.common.auth.JwtToken;
-import matchingGoal.matchingGoal.mail.service.MailService;
 import matchingGoal.matchingGoal.member.dto.MemberRegisterDto;
-import matchingGoal.matchingGoal.mail.dto.MailVerificationDto;
 import matchingGoal.matchingGoal.member.dto.SignInDto;
 import matchingGoal.matchingGoal.member.dto.UpdatePwDto;
 import matchingGoal.matchingGoal.member.dto.WithdrawMemberDto;
@@ -22,7 +19,6 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/auth")
 public class AuthController {
 
-    private final MailService mailService;
     private final AuthService authService;
     private static final String AUTH_HEADER = "Authorization";
 
@@ -87,26 +83,5 @@ public class AuthController {
     @PatchMapping("/password")
     public ResponseEntity<String> updatePassword(@Valid @RequestBody UpdatePwDto updatePwDto) {
         return ResponseEntity.ok().body(authService.updatePassword(updatePwDto));
-    }
-
-    /**
-     * 인증메일 발송
-     * @param email - 이메일
-     * @return 발송성공여부
-     */
-    @GetMapping(value = "/mails/send-verification")
-    public ResponseEntity<Boolean> sendVerificationMail(@NotBlank @Email  @RequestParam String email) {
-        return ResponseEntity.ok().body(mailService.sendVerificationMail(email));
-    }
-
-    /**
-     * 인증번호 검증
-     * @param mailVerificationDto - email, code, name
-     * @return "인증성공"
-     */
-    @PostMapping(value = "/mails/verify")
-    public ResponseEntity<String> verifyMail(@Valid MailVerificationDto mailVerificationDto) {
-        mailService.verifyMail(mailVerificationDto);
-        return ResponseEntity.ok().body("인증성공");
     }
 }
