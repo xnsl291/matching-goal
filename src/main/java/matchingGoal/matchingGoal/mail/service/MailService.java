@@ -3,7 +3,6 @@ package matchingGoal.matchingGoal.mail.service;
 import jakarta.mail.Message;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
-import matchingGoal.matchingGoal.common.type.ErrorCode;
 import matchingGoal.matchingGoal.common.service.RedisService;
 import matchingGoal.matchingGoal.mail.exception.InvalidValidationCodeException;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -135,7 +134,7 @@ public class MailService {
      */
     public void verifyMail(MailVerificationDto mailVerificationDto) {
         if (! redisService.getData(VALID_PREFIX+mailVerificationDto.getEmail()).equals(mailVerificationDto.getCode()) )
-            throw new InvalidValidationCodeException(ErrorCode.INVALID_CODE);
+            throw new InvalidValidationCodeException();
         redisService.deleteData(VALID_PREFIX+mailVerificationDto.getEmail());
 
         // 가입 환영 메일 발송

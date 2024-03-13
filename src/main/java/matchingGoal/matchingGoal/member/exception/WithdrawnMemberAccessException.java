@@ -8,7 +8,7 @@ import matchingGoal.matchingGoal.common.type.ErrorCode;
 public class WithdrawnMemberAccessException extends CustomException {
     private final ErrorCode errorCode;
 
-    public WithdrawnMemberAccessException(ErrorCode errorCode) {
-        this.errorCode = errorCode;
+    public WithdrawnMemberAccessException() {
+        this.errorCode = ErrorCode.WITHDRAWN_MEMBER;
     }
 }

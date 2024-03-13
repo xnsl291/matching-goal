@@ -33,7 +33,7 @@ public class MemberService {
      */
     public String updatePassword(UpdatePwDto updatePwDto) {
         Member member = memberRepository.findById(updatePwDto.getId())
-                .orElseThrow(() -> new MemberNotFoundException(ErrorCode.MEMBER_NOT_EXISTS));
+                .orElseThrow(MemberNotFoundException::new);
 
         member.setPassword(updatePwDto.getNewPassword());
         return "변경완료";
