@@ -95,7 +95,7 @@ public class AuthController {
      * @return 발송성공여부
      */
     @GetMapping(value = "/mails/send-verification")
-    public ResponseEntity<Boolean> verifyMail(@NotBlank @Email  @RequestParam String email) {
+    public ResponseEntity<Boolean> sendVerificationMail(@NotBlank @Email  @RequestParam String email) {
         return ResponseEntity.ok().body(mailService.sendVerificationMail(email));
     }
 
