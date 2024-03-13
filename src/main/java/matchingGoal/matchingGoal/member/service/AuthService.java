@@ -6,7 +6,6 @@ import matchingGoal.matchingGoal.common.auth.JwtToken;
 import matchingGoal.matchingGoal.common.auth.JwtTokenProvider;
 import matchingGoal.matchingGoal.common.service.RedisService;
 import matchingGoal.matchingGoal.member.dto.SignInDto;
-import matchingGoal.matchingGoal.member.dto.UpdatePwDto;
 import matchingGoal.matchingGoal.member.dto.WithdrawMemberDto;
 import matchingGoal.matchingGoal.member.exception.*;
 import matchingGoal.matchingGoal.common.type.ErrorCode;
@@ -29,6 +28,7 @@ public class AuthService {
     private final BCryptPasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
     private final RedisService redisService;
+    private final MemberService memberService;
     private final String TOKEN_PREFIX = "RT_";
 
     /**
@@ -44,7 +44,7 @@ public class AuthService {
             throw new AlreadyRegisteredEmailException(ErrorCode.DUPLICATED_EMAIL);
 
         // 닉네임 중복 확인
-        if (! isDuplicatedNickname(registerDto.getNickname()))
+        if (! memberService.isDuplicatedNickname(registerDto.getNickname()))
             throw new DuplicatedNicknameException(ErrorCode.DUPLICATED_NICKNAME);
 
         Member member = Member.builder()
@@ -125,28 +125,6 @@ public class AuthService {
         jwtTokenProvider.setBlacklist(email);
 
         return "로그아웃 완료";
-    }
-
-    /**
-     * 닉네임 중복 체크
-     * @param nickname - 닉네임
-     * @return 중복 닉네임 존재시, false 반환
-     */
-    public Boolean isDuplicatedNickname(String nickname) {
-        return memberRepository.findByNickname(nickname).isEmpty();
-    }
-
-    /**
-     * 비밀번호 변경
-     * @param updatePwDto - 회원 ID, 새로운 Password
-     * @return "변경완료"
-     */
-    public String updatePassword(UpdatePwDto updatePwDto) {
-        Member member = memberRepository.findById(updatePwDto.getId())
-                .orElseThrow(() -> new MemberNotFoundException(ErrorCode.MEMBER_NOT_EXISTS));
-
-        member.setPassword(updatePwDto.getNewPassword());
-        return "변경완료";
     }
 
 }
