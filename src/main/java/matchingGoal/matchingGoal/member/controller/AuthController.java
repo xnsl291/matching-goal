@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 import matchingGoal.matchingGoal.common.auth.JwtToken;
 import matchingGoal.matchingGoal.member.dto.MemberRegisterDto;
 import matchingGoal.matchingGoal.member.dto.SignInDto;
-import matchingGoal.matchingGoal.member.dto.WithdrawMemberDto;
+import matchingGoal.matchingGoal.member.dto.GetPasswordDto;
 import matchingGoal.matchingGoal.member.service.AuthService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -33,13 +33,14 @@ public class AuthController {
 
     /**
      * 회원탈퇴
-     * @param withdrawMemberDto - 회원 ID, Password
+     * @param token - 토큰
+     * @param getPasswordDto - 회원 ID, Password
      * @return "탈퇴 완료"
      */
     @DeleteMapping("/withdraw")
     //TODO: memberId는 token에서 얻어오는 방식으로 변경
-    public ResponseEntity<String> withdrawMember(@Valid @RequestBody WithdrawMemberDto withdrawMemberDto) {
-        return ResponseEntity.ok().body(authService.withdrawMember(withdrawMemberDto));
+    public ResponseEntity<String> withdrawMember(@RequestHeader(name = AUTH_HEADER) String token, @Valid @RequestBody GetPasswordDto getPasswordDto) {
+        return ResponseEntity.ok().body(authService.withdrawMember(token, getPasswordDto));
     }
 
     /**

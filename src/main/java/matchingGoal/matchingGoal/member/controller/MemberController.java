@@ -4,7 +4,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import matchingGoal.matchingGoal.common.annotation.Nickname;
-import matchingGoal.matchingGoal.member.dto.UpdatePwDto;
+import matchingGoal.matchingGoal.member.dto.GetPasswordDto;
 import matchingGoal.matchingGoal.member.service.MemberService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @RequestMapping("/api")
 public class MemberController {
-
+    private static final String AUTH_HEADER = "Authorization";
     private final MemberService memberService;
 
     /**
@@ -28,11 +28,12 @@ public class MemberController {
 
     /**
      * 비밀번호 변경
-     * @param updatePwDto - 회원 ID, 새로운 Password
+     * @param token - 토큰
+     * @param dto - 새로운 Password
      * @return "변경완료"
      */
     @PatchMapping("members/password")
-    public ResponseEntity<String> updatePassword(@Valid @RequestBody UpdatePwDto updatePwDto) {
-        return ResponseEntity.ok().body(memberService.updatePassword(updatePwDto));
+    public ResponseEntity<String> updatePassword(@RequestHeader(name = AUTH_HEADER) String token, @Valid @RequestBody GetPasswordDto dto) {
+        return ResponseEntity.ok().body(memberService.updatePassword(token, dto));
     }
 }
