@@ -33,7 +33,7 @@ public class BoardResponseDto {
   private LocalDate date;
   private LocalTime time;
 
-  public static BoardResponseDto convertToDto(MatchingBoard matchingBoard) {
+  public static BoardResponseDto of(MatchingBoard matchingBoard) {
     return BoardResponseDto.builder()
         .id(matchingBoard.getId())
         .memberId(matchingBoard.getMember().getId())

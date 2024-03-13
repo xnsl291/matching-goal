@@ -16,7 +16,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import matchingGoal.matchingGoal.matching.domain.StatusType;
-import matchingGoal.matchingGoal.matching.dto.UpdateBoardRequestDto;
+import matchingGoal.matchingGoal.matching.dto.UpdateBoardDto;
 import matchingGoal.matchingGoal.member.model.entity.Member;
 
 @Entity
@@ -58,7 +58,7 @@ public class MatchingBoard {
   @OneToOne(mappedBy = "board", cascade = CascadeType.ALL)
   private Game game;
 
-  public void update(UpdateBoardRequestDto requestDto) {
+  public void update(UpdateBoardDto requestDto) {
     this.title = requestDto.getTitle();
     this.content = requestDto.getContent();
     this.modifiedDate = LocalDateTime.now();

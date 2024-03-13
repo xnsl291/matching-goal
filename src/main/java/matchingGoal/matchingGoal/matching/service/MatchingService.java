@@ -3,7 +3,11 @@ package matchingGoal.matchingGoal.matching.service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import matchingGoal.matchingGoal.matching.dto.RequestMatchingDto;
 import matchingGoal.matchingGoal.matching.exception.AlreadyRequestException;
 import matchingGoal.matchingGoal.matching.exception.SelfRequestException;
 import matchingGoal.matchingGoal.common.type.ErrorCode;
@@ -13,8 +17,7 @@ import matchingGoal.matchingGoal.matching.domain.entity.MatchingBoard;
 import matchingGoal.matchingGoal.matching.domain.entity.MatchingRequest;
 import matchingGoal.matchingGoal.matching.dto.BoardRequestDto;
 import matchingGoal.matchingGoal.matching.dto.BoardResponseDto;
-import matchingGoal.matchingGoal.matching.dto.UpdateBoardRequestDto;
-import matchingGoal.matchingGoal.matching.exception.NotFoundGameException;
+import matchingGoal.matchingGoal.matching.dto.UpdateBoardDto;
 import matchingGoal.matchingGoal.matching.exception.NotFoundMemberException;
 import matchingGoal.matchingGoal.matching.exception.NotFoundPostException;
 import matchingGoal.matchingGoal.matching.repository.GameRepository;
@@ -76,7 +79,7 @@ public class MatchingService {
     MatchingBoard matchingBoard = boardRepository.findById(id)
         .orElseThrow(() -> new NotFoundPostException(ErrorCode.POST_NOT_FOUND));
 
-    return BoardResponseDto.convertToDto(matchingBoard);
+    return BoardResponseDto.of(matchingBoard);
   }
 
   /**
@@ -85,7 +88,7 @@ public class MatchingService {
    * @param requestDto - 게시글 수정 dto
    * @return "게시글 수정 완료"
    */
-  public String updateBoard(Long id, UpdateBoardRequestDto requestDto) {
+  public String updateBoard(Long id, UpdateBoardDto requestDto) {
     MatchingBoard matchingBoard = boardRepository.findById(id)
         .orElseThrow(() -> new NotFoundPostException(ErrorCode.POST_NOT_FOUND));
 
@@ -128,7 +131,7 @@ public class MatchingService {
       throw new SelfRequestException(ErrorCode.SELF_REQUEST);
     }
 
-    if (requestRepository.existsByBoardIdAndMemberId(matchingBoard, member)) {
+    if (requestRepository.existsByBoardIdAndMemberId(id, memberId)) {
       throw new AlreadyRequestException(ErrorCode.ALREADY_REQUEST_MATCHING);
     }
 
@@ -136,10 +139,24 @@ public class MatchingService {
         .board(matchingBoard)
         .member(member)
         .isAccepted(Boolean.FALSE)
+        .createdDate(LocalDateTime.now())
         .build();
     requestRepository.save(matchingRequest);
 
     return "매칭 신청 완료";
+  }
+
+  /**
+   * 매칭 신청한 팀 리스트 조회
+   * @param id - 게시글 id
+   * @return 매칭 신청 목록
+   */
+  public List<RequestMatchingDto> getRequestList(Long id) {
+    List<MatchingRequest> requestList = requestRepository.findByBoardId(id);
+
+    return requestList.stream().map(RequestMatchingDto::of)
+        .sorted(Comparator.comparing(RequestMatchingDto::getCreatedDate))
+        .collect(Collectors.toList());
   }
 
 }

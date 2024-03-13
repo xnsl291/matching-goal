@@ -1,7 +1,6 @@
 package matchingGoal.matchingGoal.matching.repository;
 
-import java.util.Optional;
-import matchingGoal.matchingGoal.matching.domain.entity.Game;
+import java.util.List;
 import matchingGoal.matchingGoal.matching.domain.entity.MatchingBoard;
 import matchingGoal.matchingGoal.matching.domain.entity.MatchingRequest;
 import matchingGoal.matchingGoal.member.model.entity.Member;
@@ -11,7 +10,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface MatchingRequestRepository extends JpaRepository<MatchingRequest, Long> {
 
-  boolean findByBoardIdAndMemberId(MatchingBoard matchingBoard, Member member);
+  boolean existsByBoardIdAndMemberId(Long id, Long id1);
 
-  boolean existsByBoardIdAndMemberId(MatchingBoard matchingBoard, Member member);
+  List<MatchingRequest> findByBoardId(Long id);
 }

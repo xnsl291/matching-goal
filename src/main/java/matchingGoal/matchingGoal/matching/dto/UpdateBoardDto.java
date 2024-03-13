@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class UpdateBoardRequestDto {
+public class UpdateBoardDto {
 
   @NotBlank(message = "제목을 입력해주세요")
   private String title;
