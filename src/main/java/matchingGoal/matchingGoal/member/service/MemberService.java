@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import matchingGoal.matchingGoal.common.auth.JwtTokenProvider;
 import matchingGoal.matchingGoal.common.type.ErrorCode;
 import matchingGoal.matchingGoal.member.dto.GetPasswordDto;
+import matchingGoal.matchingGoal.member.dto.UpdateMemberInfoDto;
 import matchingGoal.matchingGoal.member.exception.InvalidTokenException;
 import matchingGoal.matchingGoal.member.exception.MemberNotFoundException;
 import matchingGoal.matchingGoal.member.exception.WithdrawnMemberAccessException;
@@ -70,5 +71,24 @@ public class MemberService {
 
         return member;
     }
+
+    /**
+     * 개인 정보 수정
+     * @param token - 토큰
+     * @param updateDto - 정보 수정 dto (이름, 닉네임, 소개, 지역, 이미지)
+     * @return "수정완료"
+     */
+    @Transactional
+    public String editMemberInfo(String token, UpdateMemberInfoDto updateDto) {
+        Member member = getMemberInfo(token);
+
+        member.setName(updateDto.getName());
+        member.setNickname(updateDto.getNickname());
+        member.setIntroduction(updateDto.getIntroduction());
+        member.setRegion(updateDto.getRegion());
+        member.setImageId(updateDto.getImageId());
+        return "수정완료";
+    }
+
 
 }

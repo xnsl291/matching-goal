@@ -24,17 +24,22 @@ public class Member{
     @Column(unique = true)
     private String email;
 
+    @Setter
     private Long imageId;
 
+    @Setter
     private String name;
 
     @Setter
     private String password;
 
+    @Setter
     private String nickname;
 
+    @Setter
     private String introduction;
 
+    @Setter
     private String region;
 
     @CreatedDate

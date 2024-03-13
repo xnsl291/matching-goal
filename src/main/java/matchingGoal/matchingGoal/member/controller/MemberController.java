@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import matchingGoal.matchingGoal.common.annotation.Nickname;
 import matchingGoal.matchingGoal.member.dto.GetPasswordDto;
+import matchingGoal.matchingGoal.member.dto.UpdateMemberInfoDto;
 import matchingGoal.matchingGoal.member.model.entity.Member;
 import matchingGoal.matchingGoal.member.service.MemberService;
 import org.springframework.http.ResponseEntity;
@@ -46,5 +47,16 @@ public class MemberController {
     @GetMapping("/")
     public ResponseEntity<Member> getMemberInfo(@RequestHeader(name = AUTH_HEADER) String token) {
         return ResponseEntity.ok().body(memberService.getMemberInfo(token));
+    }
+
+    /**
+     * 개인 정보 수정
+     * @param token - 토큰
+     * @param updateDto - 정보 수정 dto (이름, 닉네임, 소개, 지역, 이미지)
+     * @return "수정완료"
+     */
+    @PatchMapping("/")
+    public ResponseEntity<String> editMemberInfo(@RequestHeader(name = AUTH_HEADER) String token, @Valid UpdateMemberInfoDto updateDto) {
+        return ResponseEntity.ok().body(memberService.editMemberInfo(token,updateDto));
     }
 }
