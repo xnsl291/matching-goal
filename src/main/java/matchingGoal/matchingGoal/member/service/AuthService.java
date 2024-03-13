@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import matchingGoal.matchingGoal.common.auth.JwtToken;
 import matchingGoal.matchingGoal.common.auth.JwtTokenProvider;
-import matchingGoal.matchingGoal.common.util.RedisUtil;
+import matchingGoal.matchingGoal.common.service.RedisService;
 import matchingGoal.matchingGoal.member.dto.SignInDto;
 import matchingGoal.matchingGoal.member.dto.UpdatePwDto;
 import matchingGoal.matchingGoal.member.dto.WithdrawMemberDto;
@@ -28,17 +28,8 @@ public class AuthService {
     private final MemberRepository memberRepository;
     private final BCryptPasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
-    private final RedisUtil redisUtil;
+    private final RedisService redisService;
     private final String TOKEN_PREFIX = "RT_";
-
-    /**
-     * 비밀번호 포맷 검증
-     * @param password - 비밀번호
-     * @return 포맷 일치 여부
-     */
-    public boolean checkPwFormat(String password){
-        return password.matches("^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d!@#$%^&*]{10,}$");
-    }
 
     /**
      * 회원가입
@@ -53,12 +44,8 @@ public class AuthService {
             throw new AlreadyRegisteredEmailException(ErrorCode.DUPLICATED_EMAIL);
 
         // 닉네임 중복 확인
-        if (! checkNickname(registerDto.getNickname()))
+        if (! isDuplicatedNickname(registerDto.getNickname()))
             throw new DuplicatedNicknameException(ErrorCode.DUPLICATED_NICKNAME);
-
-        // 비밀번호 포맷 검증 : 10자 이상, 알파벳 & 숫자 필수, 특수문자( !@#$%^&*) 입력 가능
-        if (! checkPwFormat(registerDto.getPassword()))
-            throw new InvalidPasswordFormatException(ErrorCode.INVALID_PASSWORD_FORMAT);
 
         Member member = Member.builder()
                 .name(registerDto.getName())
@@ -76,7 +63,7 @@ public class AuthService {
 
     /**
      * 회원 탈퇴
-     * @param withdrawMemberDto - 회원 ID, PW
+     * @param withdrawMemberDto - 회원 ID, Password
      * @return "탈퇴 완료"
      */
     @Transactional
@@ -130,7 +117,7 @@ public class AuthService {
             throw new InvalidTokenException(ErrorCode.EXPIRED_TOKEN);
 
         String email = jwtTokenProvider.getEmail(token);
-        if (redisUtil.getData(TOKEN_PREFIX + email) == null) {
+        if (redisService.getData(TOKEN_PREFIX + email) == null) {
             throw new InvalidTokenException(ErrorCode.INVALID_TOKEN);
         }
 
@@ -145,20 +132,19 @@ public class AuthService {
      * @param nickname - 닉네임
      * @return 중복 닉네임 존재시, false 반환
      */
-    public Boolean checkNickname(String nickname) {
+    public Boolean isDuplicatedNickname(String nickname) {
         return memberRepository.findByNickname(nickname).isEmpty();
     }
 
     /**
      * 비밀번호 변경
-     * @param updatePwDto - 회원 ID, 새로운 PW
+     * @param updatePwDto - 회원 ID, 새로운 Password
      * @return "변경완료"
      */
     public String updatePassword(UpdatePwDto updatePwDto) {
-        Member member = memberRepository.findById(updatePwDto.getId()).orElseThrow(() -> new MemberNotFoundException(ErrorCode.MEMBER_NOT_EXISTS));
+        Member member = memberRepository.findById(updatePwDto.getId())
+                .orElseThrow(() -> new MemberNotFoundException(ErrorCode.MEMBER_NOT_EXISTS));
 
-        if (! checkPwFormat(updatePwDto.getNewPassword()))
-            throw new InvalidPasswordFormatException(ErrorCode.INVALID_PASSWORD_FORMAT);
         member.setPassword(updatePwDto.getNewPassword());
         return "변경완료";
     }

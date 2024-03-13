@@ -40,7 +40,7 @@ public class AuthController {
 
     /**
      * 회원탈퇴
-     * @param withdrawMemberDto - 회원 ID, PW
+     * @param withdrawMemberDto - 회원 ID, Password
      * @return "탈퇴 완료"
      */
     @DeleteMapping("/withdraw")
@@ -75,17 +75,17 @@ public class AuthController {
      * @return 중복여부 (중복 시, false)
      */
     @PostMapping("/checkNickname")
-    public ResponseEntity<Boolean> checkNickname(@NotBlank @Nickname @RequestParam String nickname) {
-        return ResponseEntity.ok().body(authService.checkNickname(nickname));
+    public ResponseEntity<Boolean> isDuplicatedNickname(@NotBlank @Nickname @RequestParam String nickname) {
+        return ResponseEntity.ok().body(authService.isDuplicatedNickname(nickname));
     }
 
     /**
      * 비밀번호 변경
-     * @param updatePwDto - 회원 ID, 새로운 PW
+     * @param updatePwDto - 회원 ID, 새로운 Password
      * @return "변경완료"
      */
     @PatchMapping("/password")
-    public ResponseEntity<String> changePassword(@Valid @RequestBody UpdatePwDto updatePwDto) {
+    public ResponseEntity<String> updatePassword(@Valid @RequestBody UpdatePwDto updatePwDto) {
         return ResponseEntity.ok().body(authService.updatePassword(updatePwDto));
     }
 
@@ -95,7 +95,7 @@ public class AuthController {
      * @return 발송성공여부
      */
     @GetMapping(value = "/mails/send-verification")
-    public ResponseEntity<Boolean> verifyMail(@NotBlank @Email  @RequestParam String email) {
+    public ResponseEntity<Boolean> sendVerificationMail(@NotBlank @Email  @RequestParam String email) {
         return ResponseEntity.ok().body(mailService.sendVerificationMail(email));
     }
 
