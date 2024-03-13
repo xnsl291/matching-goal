@@ -2,13 +2,10 @@ package matchingGoal.matchingGoal.member.controller;
 
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
-import matchingGoal.matchingGoal.common.annotation.Nickname;
 import matchingGoal.matchingGoal.common.auth.JwtToken;
 import matchingGoal.matchingGoal.member.dto.MemberRegisterDto;
 import matchingGoal.matchingGoal.member.dto.SignInDto;
-import matchingGoal.matchingGoal.member.dto.UpdatePwDto;
 import matchingGoal.matchingGoal.member.dto.WithdrawMemberDto;
 import matchingGoal.matchingGoal.member.service.AuthService;
 import org.springframework.http.ResponseEntity;
@@ -63,25 +60,5 @@ public class AuthController {
     @PostMapping("/sign-out")
     public ResponseEntity<String> signOut(@RequestHeader(name = AUTH_HEADER) String token) {
         return ResponseEntity.ok(authService.signOut(token));
-    }
-
-    /**
-     * 중복된 닉네임이 존재하는지 확인
-     * @param nickname - 닉네임
-     * @return 중복여부 (중복 시, false)
-     */
-    @PostMapping("/checkNickname")
-    public ResponseEntity<Boolean> isDuplicatedNickname(@NotBlank @Nickname @RequestParam String nickname) {
-        return ResponseEntity.ok().body(authService.isDuplicatedNickname(nickname));
-    }
-
-    /**
-     * 비밀번호 변경
-     * @param updatePwDto - 회원 ID, 새로운 Password
-     * @return "변경완료"
-     */
-    @PatchMapping("/password")
-    public ResponseEntity<String> updatePassword(@Valid @RequestBody UpdatePwDto updatePwDto) {
-        return ResponseEntity.ok().body(authService.updatePassword(updatePwDto));
     }
 }
