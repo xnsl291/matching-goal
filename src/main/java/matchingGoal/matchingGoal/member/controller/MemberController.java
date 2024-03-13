@@ -21,7 +21,7 @@ public class MemberController {
      * @param nickname - 닉네임
      * @return 중복여부 (중복 시, false)
      */
-    @PostMapping("members/checkNickname")
+    @PostMapping("/members/checkNickname")
     public ResponseEntity<Boolean> isDuplicatedNickname(@NotBlank @Nickname @RequestParam String nickname) {
         return ResponseEntity.ok().body(memberService.isDuplicatedNickname(nickname));
     }
@@ -29,10 +29,10 @@ public class MemberController {
     /**
      * 비밀번호 변경
      * @param token - 토큰
-     * @param dto - 새로운 Password
+     * @param dto - 새로운 비밀번호
      * @return "변경완료"
      */
-    @PatchMapping("members/password")
+    @PatchMapping("/members/password")
     public ResponseEntity<String> updatePassword(@RequestHeader(name = AUTH_HEADER) String token, @Valid @RequestBody GetPasswordDto dto) {
         return ResponseEntity.ok().body(memberService.updatePassword(token, dto));
     }

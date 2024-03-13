@@ -21,6 +21,7 @@ public enum ErrorCode {
 
     // member
     MEMBER_NOT_EXISTS(HttpStatus.NOT_FOUND,"사용자를 찾을 수 없습니다"),
+    IMAGE_NOT_EXISTS(HttpStatus.NOT_FOUND,"이미지를 찾을 수 없습니다"),
     DUPLICATED_EMAIL(HttpStatus.BAD_REQUEST, "이미 등록된 이메일 입니다"),
     DUPLICATED_NICKNAME(HttpStatus.BAD_REQUEST,"중복된 닉네임 입니다"),
     INVALID_PASSWORD_FORMAT(HttpStatus.BAD_REQUEST,"비밀번호의 형식이 올바르지 않습니다"),

@@ -1,10 +1,11 @@
-package matchingGoal.matchingGoal.member.model.entity;
+package matchingGoal.matchingGoal.image.model.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import java.math.BigInteger;
 import java.time.LocalDateTime;
 
 @Entity
@@ -13,36 +14,17 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Member{
-
+public class Image{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true)
-    private String email;
+    private String original_name;
 
-    private Long imageId;
+    private String saved_name;
 
-    private String name;
-
-    @Setter
-    private String password;
-
-    private String nickname;
-
-    private String introduction;
-
-    private String region;
+    private BigInteger size;
 
     @CreatedDate
     private LocalDateTime createdDate;
-
-    @Builder.Default
-    @Setter
-    private boolean isDeleted = false;
-
-    @Setter
-    private LocalDateTime deletedDate;
-
 }
