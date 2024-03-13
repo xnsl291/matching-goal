@@ -3,8 +3,11 @@ package matchingGoal.matchingGoal.member.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import matchingGoal.matchingGoal.common.auth.JwtTokenProvider;
+import matchingGoal.matchingGoal.common.type.ErrorCode;
 import matchingGoal.matchingGoal.member.dto.GetPasswordDto;
+import matchingGoal.matchingGoal.member.exception.InvalidTokenException;
 import matchingGoal.matchingGoal.member.exception.MemberNotFoundException;
+import matchingGoal.matchingGoal.member.exception.WithdrawnMemberAccessException;
 import matchingGoal.matchingGoal.member.model.entity.Member;
 import matchingGoal.matchingGoal.member.repository.MemberRepository;
 import org.springframework.stereotype.Service;
@@ -48,6 +51,24 @@ public class MemberService {
         Long memberId = jwtTokenProvider.getId(token);
         return  memberRepository.findById(memberId)
                 .orElseThrow(MemberNotFoundException::new);
+    }
+
+    /**
+     * 개인 정보 조회
+     * @param token - 토큰
+     * @return Member
+     */
+    public Member getMemberInfo(String token) {
+        if(!jwtTokenProvider.validateToken(token))
+            throw new InvalidTokenException();
+
+        String email = jwtTokenProvider.getEmail(token);
+        Member member = memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new);
+
+        if (member.isDeleted())
+            throw new WithdrawnMemberAccessException();
+
+        return member;
     }
 
 }

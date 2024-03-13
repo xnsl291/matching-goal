@@ -5,13 +5,14 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import matchingGoal.matchingGoal.common.annotation.Nickname;
 import matchingGoal.matchingGoal.member.dto.GetPasswordDto;
+import matchingGoal.matchingGoal.member.model.entity.Member;
 import matchingGoal.matchingGoal.member.service.MemberService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api")
+@RequestMapping("/api/members")
 public class MemberController {
     private static final String AUTH_HEADER = "Authorization";
     private final MemberService memberService;
@@ -21,7 +22,7 @@ public class MemberController {
      * @param nickname - 닉네임
      * @return 중복여부 (중복 시, false)
      */
-    @PostMapping("/members/checkNickname")
+    @PostMapping("/checkNickname")
     public ResponseEntity<Boolean> isDuplicatedNickname(@NotBlank @Nickname @RequestParam String nickname) {
         return ResponseEntity.ok().body(memberService.isDuplicatedNickname(nickname));
     }
@@ -35,5 +36,15 @@ public class MemberController {
     @PatchMapping("/members/password")
     public ResponseEntity<String> updatePassword(@RequestHeader(name = AUTH_HEADER) String token, @Valid @RequestBody GetPasswordDto dto) {
         return ResponseEntity.ok().body(memberService.updatePassword(token, dto));
+    }
+
+    /**
+     * 개인 정보 조회
+     * @param token - 토큰
+     * @return Member
+     */
+    @GetMapping("/")
+    public ResponseEntity<Member> getMemberInfo(@RequestHeader(name = AUTH_HEADER) String token) {
+        return ResponseEntity.ok().body(memberService.getMemberInfo(token));
     }
 }
