@@ -75,8 +75,8 @@ public class AuthController {
      * @return 중복여부 (중복 시, false)
      */
     @PostMapping("/checkNickname")
-    public ResponseEntity<Boolean> checkNickname(@NotBlank @Nickname @RequestParam String nickname) {
-        return ResponseEntity.ok().body(authService.checkNickname(nickname));
+    public ResponseEntity<Boolean> isDuplicatedNickname(@NotBlank @Nickname @RequestParam String nickname) {
+        return ResponseEntity.ok().body(authService.isDuplicatedNickname(nickname));
     }
 
     /**

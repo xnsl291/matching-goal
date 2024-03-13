@@ -65,10 +65,10 @@ class AuthServiceTest {
     }
 
     @Test
-    void checknickname(){
+    void checkDuplicatednickname(){
         String name1 = "test FC";
         String name2 = "new FC";
-        System.out.println(name1 +" : " + authService.checkNickname(name1));
-        System.out.println(name2 + " : " + authService.checkNickname(name2));
+        System.out.println(name1 +" : " + authService.isDuplicatedNickname(name1));
+        System.out.println(name2 + " : " + authService.isDuplicatedNickname(name2));
     }
 }

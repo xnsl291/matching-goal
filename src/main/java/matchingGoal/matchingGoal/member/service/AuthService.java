@@ -44,7 +44,7 @@ public class AuthService {
             throw new AlreadyRegisteredEmailException(ErrorCode.DUPLICATED_EMAIL);
 
         // 닉네임 중복 확인
-        if (! checkNickname(registerDto.getNickname()))
+        if (! isDuplicatedNickname(registerDto.getNickname()))
             throw new DuplicatedNicknameException(ErrorCode.DUPLICATED_NICKNAME);
 
         Member member = Member.builder()
@@ -132,7 +132,7 @@ public class AuthService {
      * @param nickname - 닉네임
      * @return 중복 닉네임 존재시, false 반환
      */
-    public Boolean checkNickname(String nickname) {
+    public Boolean isDuplicatedNickname(String nickname) {
         return memberRepository.findByNickname(nickname).isEmpty();
     }
 
