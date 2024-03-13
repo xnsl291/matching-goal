@@ -22,15 +22,14 @@ import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
 @Slf4j
 public class AuthService {
-    private final MemberRepository memberRepository;
     private final BCryptPasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
-    private final RedisService redisService;
-    private final MemberService memberService;
     private final ImageService imageService;
+    private final MemberRepository memberRepository;
+    private final MemberService memberService;
+    private final RedisService redisService;
     private final String TOKEN_PREFIX = "RT_";
 
     /**
@@ -38,7 +37,6 @@ public class AuthService {
      * @param registerDto - 회원가입 dto
      * @return "회원가입 성공"
      */
-    @Transactional
     public String registerMember(MemberRegisterDto registerDto) {
 
         // 이메일 중복 확인
@@ -69,7 +67,6 @@ public class AuthService {
      * @param getPasswordDto - 비밀번호
      * @return "탈퇴 완료"
      */
-    @Transactional
     public String withdrawMember(String token, GetPasswordDto getPasswordDto) {
         Member member = memberService.getMemberByToken(token);
 
@@ -89,7 +86,6 @@ public class AuthService {
      * @param signInDto - 회원 ID, 비밀번호
      * @return SignInResponse - accessToken, refreshToken, id, nickname, imageUrl
      */
-    @Transactional
     public SignInResponse signIn(SignInDto signInDto) {
         Member member = memberRepository.findByEmail(signInDto.getEmail()).orElseThrow(MemberNotFoundException::new);
 
@@ -121,7 +117,6 @@ public class AuthService {
      * @param token - 토큰
      * @return "로그아웃 완료"
      */
-    @Transactional
     public String signOut(String token) {
 
         if(!jwtTokenProvider.validateToken(token))
