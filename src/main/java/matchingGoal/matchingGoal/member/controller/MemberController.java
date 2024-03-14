@@ -4,9 +4,9 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import matchingGoal.matchingGoal.common.annotation.Nickname;
-import matchingGoal.matchingGoal.member.dto.GetPasswordDto;
 import matchingGoal.matchingGoal.member.dto.OtherMemberInfoResponse;
 import matchingGoal.matchingGoal.member.dto.UpdateMemberInfoDto;
+import matchingGoal.matchingGoal.member.dto.UpdatePasswordDto;
 import matchingGoal.matchingGoal.member.model.entity.Member;
 import matchingGoal.matchingGoal.member.service.MemberService;
 import org.springframework.http.ResponseEntity;
@@ -35,8 +35,8 @@ public class MemberController {
      * @param dto - 새로운 비밀번호
      * @return "변경완료"
      */
-    @PatchMapping("/members/password")
-    public ResponseEntity<String> updatePassword(@RequestHeader(name = AUTH_HEADER) String token, @Valid @RequestBody GetPasswordDto dto) {
+    @PatchMapping("/password")
+    public ResponseEntity<String> updatePassword(@RequestHeader(name = AUTH_HEADER) String token, @Valid @RequestBody UpdatePasswordDto dto) {
         return ResponseEntity.ok().body(memberService.updatePassword(token, dto));
     }
 
