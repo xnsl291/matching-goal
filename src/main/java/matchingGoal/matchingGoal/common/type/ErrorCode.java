@@ -31,7 +31,9 @@ public enum ErrorCode {
     MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 회원입니다."),
     SELF_REQUEST(HttpStatus.BAD_REQUEST,"모집글 작성자가 신청할 수 없습니다."),
     ALREADY_REQUEST_MATCHING(HttpStatus.BAD_REQUEST,"이미 신청한 모집글입니다."),
-    ;
+    REQUEST_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 신청건입니다."),
+    ALREADY_COMPLETED_MATCHING(HttpStatus.BAD_REQUEST, "이미 매칭 완료된 게시글입니다."),
+    DELETED_POST(HttpStatus.BAD_REQUEST, "삭제된 게시글입니다.");
     private final HttpStatus status;
 
     private final String description;

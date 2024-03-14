@@ -44,4 +44,14 @@ public class Game {
 
   private LocalTime time;
 
+  private Boolean isDeleted;
+
+  public void delete() {
+    this.isDeleted = true;
+  }
+
+  public void setOpponent(Member member) {
+    this.team2 = member;
+  }
+
 }

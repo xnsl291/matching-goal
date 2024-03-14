@@ -1,6 +1,5 @@
 package matchingGoal.matchingGoal.matching.domain.entity;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -9,8 +8,10 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import java.time.LocalDateTime;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -55,8 +56,11 @@ public class MatchingBoard {
 
   private LocalDateTime modifiedDate;
 
-  @OneToOne(mappedBy = "board", cascade = CascadeType.ALL)
+  @OneToOne(mappedBy = "board")
   private Game game;
+
+  @OneToMany(mappedBy = "board")
+  private List<MatchingRequest> matchingRequest;
 
   public void update(UpdateBoardDto requestDto) {
     this.title = requestDto.getTitle();
@@ -64,4 +68,12 @@ public class MatchingBoard {
     this.modifiedDate = LocalDateTime.now();
   }
 
+  public void delete() {
+    this.isDeleted = true;
+    this.deletedDate = LocalDateTime.now();
+  }
+
+  public void acceptMatching() {
+    this.status = StatusType.매칭완료;
+  }
 }

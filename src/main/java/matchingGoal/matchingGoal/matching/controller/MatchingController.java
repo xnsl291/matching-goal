@@ -9,7 +9,6 @@ import matchingGoal.matchingGoal.matching.dto.RequestMatchingDto;
 import matchingGoal.matchingGoal.matching.dto.UpdateBoardDto;
 import matchingGoal.matchingGoal.matching.service.MatchingService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -40,10 +39,9 @@ public class MatchingController {
     return ResponseEntity.ok(matchingService.updateBoard(id, requestDto));
   }
 
-  @DeleteMapping("/{id}")
+  @PatchMapping("/delete/{id}")
   public ResponseEntity<String> deleteBoard(@PathVariable Long id) {
     return ResponseEntity.ok(matchingService.deleteBoard(id));
-
   }
 
   @PostMapping("/{id}/request/{memberId}")
@@ -54,6 +52,16 @@ public class MatchingController {
   @GetMapping("/{id}/request-list")
   public ResponseEntity<List<RequestMatchingDto>> getRequestList(@PathVariable Long id) {
     return ResponseEntity.ok(matchingService.getRequestList(id));
+  }
+
+  @PostMapping("/{id}/accept")
+  public ResponseEntity<String> acceptRequest(@PathVariable Long id) {
+    return ResponseEntity.ok(matchingService.acceptRequest(id));
+  }
+
+  @PostMapping("/{id}/refuse")
+  public ResponseEntity<String> refuseRequest(@PathVariable Long id) {
+    return ResponseEntity.ok(matchingService.refuseRequest(id));
   }
 
 }
