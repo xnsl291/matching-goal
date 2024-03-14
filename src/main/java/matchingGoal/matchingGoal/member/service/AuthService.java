@@ -128,7 +128,7 @@ public class AuthService {
         }
 
         // 블랙 리스트에 추가(로그아웃)
-        jwtTokenProvider.setBlacklist(email);
+        jwtTokenProvider.setBlacklist(token);
 
         return "로그아웃 완료";
     }
