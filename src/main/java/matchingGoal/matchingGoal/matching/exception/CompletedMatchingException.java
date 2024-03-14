@@ -1,14 +1,14 @@
-package matchingGoal.matchingGoal.common.exception;
+package matchingGoal.matchingGoal.matching.exception;
 
 import lombok.Getter;
 import matchingGoal.matchingGoal.common.type.ErrorCode;
 
 @Getter
-public class AlreadyRequestException extends RuntimeException {
+public class CompletedMatchingException extends RuntimeException {
 
     private final ErrorCode errorCode;
 
-    public AlreadyRequestException(ErrorCode errorCode) {
+    public CompletedMatchingException(ErrorCode errorCode) {
         super(errorCode.getDescription());
         this.errorCode = errorCode;
     }

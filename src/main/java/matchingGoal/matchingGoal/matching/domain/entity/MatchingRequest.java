@@ -6,17 +6,16 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import matchingGoal.matchingGoal.member.model.entity.Member;
 
 @Entity
 @Builder
 @Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class MatchingRequest {
@@ -27,12 +26,22 @@ public class MatchingRequest {
 
   @ManyToOne
   @JoinColumn(name = "board_id")
-  private MatchingBoard boardId;
+  private MatchingBoard board;
 
   @ManyToOne
   @JoinColumn(name = "member_id")
-  private Member memberId;
+  private Member member;
 
   private Boolean isAccepted;
+
+  private LocalDateTime createdDate;
+
+  public void accept() {
+    this.isAccepted = true;
+  }
+
+  public void refuse() {
+    this.isAccepted = false;
+  }
 
 }

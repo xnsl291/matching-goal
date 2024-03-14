@@ -13,13 +13,11 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import matchingGoal.matchingGoal.member.model.entity.Member;
 
 @Entity
 @Builder
 @Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class Game {
@@ -30,20 +28,30 @@ public class Game {
 
   @OneToOne
   @JoinColumn(name = "board_id")
-  private MatchingBoard boardId;
+  private MatchingBoard board;
 
   @ManyToOne
   @JoinColumn(name = "team1_id")
-  private Member team1Id;
+  private Member team1;
 
   @ManyToOne
   @JoinColumn(name = "team2_id")
-  private Member team2Id;
+  private Member team2;
 
   private String stadiumName;
 
   private LocalDate date;
 
   private LocalTime time;
+
+  private Boolean isDeleted;
+
+  public void delete() {
+    this.isDeleted = true;
+  }
+
+  public void setOpponent(Member member) {
+    this.team2 = member;
+  }
 
 }
