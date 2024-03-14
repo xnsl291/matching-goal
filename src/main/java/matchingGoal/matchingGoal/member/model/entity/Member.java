@@ -1,11 +1,11 @@
 package matchingGoal.matchingGoal.member.model.entity;
 
+
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.DynamicUpdate;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
-import java.time.LocalDateTime;
 
 @Entity
 @EntityListeners(AuditingEntityListener.class)
@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@DynamicUpdate
 public class Member{
 
     @Id
@@ -22,17 +23,22 @@ public class Member{
     @Column(unique = true)
     private String email;
 
-    private Long imgId;
+    @Setter
+    private Long imageId;
 
+    @Setter
     private String name;
 
     @Setter
     private String password;
 
+    @Setter
     private String nickname;
 
+    @Setter
     private String introduction;
 
+    @Setter
     private String region;
 
     @CreatedDate
