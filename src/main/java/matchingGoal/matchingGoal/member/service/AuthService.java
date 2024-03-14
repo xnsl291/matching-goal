@@ -15,6 +15,7 @@ import matchingGoal.matchingGoal.member.model.entity.Member;
 import matchingGoal.matchingGoal.member.repository.MemberRepository;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
@@ -66,11 +67,12 @@ public class AuthService {
      * @param getPasswordDto - 비밀번호
      * @return "탈퇴 완료"
      */
+    @Transactional
     public String withdrawMember(String token, GetPasswordDto getPasswordDto) {
         Member member = memberService.getMemberByToken(token);
 
         // 탈퇴 전 비밀번호 재확인
-        if (!member.getPassword().equals(getPasswordDto.getPassword())) {
+        if (!passwordEncoder.matches(getPasswordDto.getPassword(), member.getPassword())) {
             throw new UnmatchedPasswordException();
         }
 
@@ -118,8 +120,7 @@ public class AuthService {
      * @return "로그아웃 완료"
      */
     public String signOut(String token) {
-        if(!jwtTokenProvider.validateToken(token))
-            throw new InvalidTokenException();
+        jwtTokenProvider.validateToken(token);
 
         String email = jwtTokenProvider.getEmail(token);
 
