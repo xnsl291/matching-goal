@@ -16,6 +16,7 @@ import matchingGoal.matchingGoal.chat.entity.ChatMessage;
 public class ChatMessageDto {
   private String chatRoomId;
   private long memberId;
+  private String nickname;
   private String message;
   private LocalDateTime createdDate;
 
@@ -23,6 +24,7 @@ public class ChatMessageDto {
     return ChatMessageDto.builder()
         .chatRoomId(entity.getChatRoomId())
         .memberId(entity.getMemberId())
+        .nickname(entity.getNickname())
         .message(entity.getMessage())
         .createdDate(entity.getCreatedDate())
         .build();

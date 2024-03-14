@@ -22,9 +22,9 @@ public class ChatMessageController {
 
   }
 
-  @RabbitListener(queues = CHAT_QUEUE_NAME)
-  public void receive(ChatMessageDto chat) {
-    System.out.println("recieved : " + chat.getMessage());
-  }
+//  @RabbitListener(queues = CHAT_QUEUE_NAME)
+//  public void receive(ChatMessageDto chat) {
+//    System.out.println("recieved : " + chat.getMessage());
+//  }
 
 }

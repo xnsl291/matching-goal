@@ -27,7 +27,7 @@ public class RequestMatchingDto {
         .createdDate(matchingRequest.getCreatedDate())
         .memberId(member.getId())
         .nickname(member.getNickname())
-        .memberImg(member.getImgId())
+        .memberImg(member.getImageId())
         .build();
   }
 }

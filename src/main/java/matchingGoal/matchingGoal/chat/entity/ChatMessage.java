@@ -34,6 +34,8 @@ public class ChatMessage {
   @JoinColumn(name = "memberId", insertable = false, updatable = false)
   private long memberId;
 
+  @JoinColumn(name = "nickname", insertable = false, updatable = false)
+  private String nickname;
   private String message;
   @CreatedDate
   private LocalDateTime createdDate;
@@ -44,6 +46,7 @@ public class ChatMessage {
         .message(dto.getMessage())
         .chatRoomId(dto.getChatRoomId())
         .memberId(dto.getMemberId())
+        .nickname(dto.getNickname())
         .build();
   }
 
