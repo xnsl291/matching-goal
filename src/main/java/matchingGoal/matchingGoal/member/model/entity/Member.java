@@ -1,27 +1,19 @@
 package matchingGoal.matchingGoal.member.model.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EntityListeners;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import java.time.LocalDateTime;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+
+import jakarta.persistence.*;
+import lombok.*;
+import org.hibernate.annotations.DynamicUpdate;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Entity
 @EntityListeners(AuditingEntityListener.class)
 @Getter
-@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@DynamicUpdate
 public class Member{
 
     @Id
@@ -31,24 +23,32 @@ public class Member{
     @Column(unique = true)
     private String email;
 
-    private Long imgId;
+    @Setter
+    private Long imageId;
 
+    @Setter
     private String name;
 
+    @Setter
     private String password;
 
+    @Setter
     private String nickname;
 
+    @Setter
     private String introduction;
 
+    @Setter
     private String region;
 
     @CreatedDate
     private LocalDateTime createdDate;
 
     @Builder.Default
+    @Setter
     private boolean isDeleted = false;
 
+    @Setter
     private LocalDateTime deletedDate;
 
 }

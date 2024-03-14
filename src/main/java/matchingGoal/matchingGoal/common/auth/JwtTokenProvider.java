@@ -4,8 +4,7 @@ import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import matchingGoal.matchingGoal.common.type.ErrorCode;
-import matchingGoal.matchingGoal.common.util.RedisUtil;
+import matchingGoal.matchingGoal.common.service.RedisService;
 import matchingGoal.matchingGoal.member.exception.InvalidTokenException;
 import org.springframework.stereotype.Component;
 
@@ -19,7 +18,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class JwtTokenProvider {
 
-    private final RedisUtil redisUtil;
+    private final RedisService redisService;
     private static final String BEARER_TYPE = "Bearer ";
     private static final String BLACK_TOKEN_PREFIX = "BLACK: ";
     private static final Long accessTokenExpirationTimeInSeconds = 30 * 60 * 1000L;
@@ -56,30 +55,30 @@ public class JwtTokenProvider {
     }
 
     public void saveRefreshToken(String email, String token){
-        redisUtil.setData(getRefreshTokenKey(email), token, refreshTokenExpirationTimeInSeconds);
+        redisService.setData(getRefreshTokenKey(email), token, refreshTokenExpirationTimeInSeconds);
     }
 
     public void deleteToken(String email) {
         String rtKey = getRefreshTokenKey(email);
-        if (redisUtil.getData(rtKey) == null)
-            throw new InvalidTokenException(ErrorCode.INVALID_TOKEN);
+        if (redisService.getData(rtKey) == null)
+            throw new InvalidTokenException();
 
-        redisUtil.deleteData(rtKey);
+        redisService.deleteData(rtKey);
     }
 
     public void setBlacklist(String token) {
-        redisUtil.setData(BLACK_TOKEN_PREFIX + getEmail(token), token, refreshTokenExpirationTimeInSeconds);
+        redisService.setData(BLACK_TOKEN_PREFIX + getEmail(token), token, refreshTokenExpirationTimeInSeconds);
     }
 
     public boolean validateToken(String token) {
         try {
-            if(redisUtil.getData(BLACK_TOKEN_PREFIX + getEmail(token)) != null )
+            if(redisService.getData(BLACK_TOKEN_PREFIX + getEmail(token)) != null )
                 return false;
 
             Jwts.parser().setSigningKey(secretKey).parseClaimsJws(getRawToken(token));
             return true;
         } catch (Exception e) {
-            throw new InvalidTokenException(ErrorCode.INVALID_TOKEN);
+            throw new InvalidTokenException();
         }
     }
 
@@ -97,6 +96,10 @@ public class JwtTokenProvider {
     }
 
     public  Long getId(String token){
-        return Long.valueOf(Jwts.parser().setSigningKey(secretKey).parseClaimsJws(getRawToken(token)).getBody().getId());
+        return Jwts.parser()
+                .setSigningKey(secretKey)
+                .parseClaimsJws(getRawToken(token))
+                .getBody()
+                .get("id", Long.class);
     }
 }

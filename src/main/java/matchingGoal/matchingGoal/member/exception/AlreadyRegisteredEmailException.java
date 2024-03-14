@@ -8,7 +8,7 @@ import matchingGoal.matchingGoal.common.type.ErrorCode;
 public class AlreadyRegisteredEmailException extends CustomException {
     private final ErrorCode errorCode;
 
-    public AlreadyRegisteredEmailException(ErrorCode errorCode) {
-        this.errorCode = errorCode;
+    public AlreadyRegisteredEmailException() {
+        this.errorCode = ErrorCode.ALREADY_REGISTERED_EMAIL;
     }
 }

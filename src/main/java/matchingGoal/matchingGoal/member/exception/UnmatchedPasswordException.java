@@ -8,7 +8,7 @@ import matchingGoal.matchingGoal.common.type.ErrorCode;
 public class UnmatchedPasswordException extends CustomException {
     private final ErrorCode errorCode;
 
-    public UnmatchedPasswordException(ErrorCode errorCode) {
-        this.errorCode = errorCode;
+    public UnmatchedPasswordException() {
+        this.errorCode = ErrorCode.WRONG_PASSWORD;
     }
 }
