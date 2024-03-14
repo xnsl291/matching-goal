@@ -16,6 +16,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import matchingGoal.matchingGoal.image.model.entity.Image;
 import matchingGoal.matchingGoal.matching.domain.StatusType;
 import matchingGoal.matchingGoal.matching.dto.UpdateBoardDto;
 import matchingGoal.matchingGoal.member.model.entity.Member;
@@ -34,8 +35,6 @@ public class MatchingBoard {
   @ManyToOne
   @JoinColumn(name = "member_id")
   private Member member;
-
-//  private Long imgId;
 
   private String region;
 
@@ -56,6 +55,10 @@ public class MatchingBoard {
 
   private LocalDateTime modifiedDate;
 
+  @OneToMany
+  @JoinColumn(name = "board_id")
+  private List<Image> imgList;
+
   @OneToOne(mappedBy = "board")
   private Game game;
 
@@ -66,6 +69,10 @@ public class MatchingBoard {
     this.title = requestDto.getTitle();
     this.content = requestDto.getContent();
     this.modifiedDate = LocalDateTime.now();
+  }
+
+  public void updateImg(List<Image> images) {
+    this.imgList = images;
   }
 
   public void delete() {
