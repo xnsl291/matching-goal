@@ -1,4 +1,4 @@
-package matchingGoal.matchingGoal.config;
+package matchingGoal.matchingGoal.common.config;
 
 import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.ObjectMapper;

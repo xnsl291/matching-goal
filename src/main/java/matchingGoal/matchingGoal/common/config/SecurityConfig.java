@@ -67,11 +67,11 @@ public class SecurityConfig {
                 }
 
             }))
-            .authorizeHttpRequests((requests) -> requests
-                .requestMatchers("/").authenticated()
-                .requestMatchers("/api/auth/sign-in", "api/**").permitAll())
-            .formLogin(Customizer.withDefaults())
-            .httpBasic(Customizer.withDefaults())
+            .authorizeHttpRequests((requests) -> requests.anyRequest().permitAll())
+//                .requestMatchers("/**").authenticated()
+//                .requestMatchers("/api/auth/sign-in", "api/**").permitAll())
+//            .formLogin(Customizer.withDefaults())
+//            .httpBasic(Customizer.withDefaults())
             .build();
     }
 }

@@ -34,7 +34,7 @@ public class MemberRegisterDto {
     @NotBlank(message = "지역을 입력해주세요")
     private String region;
 
-    @NotBlank(message = "이미지가 누락되었습니다")
-    @Positive
+//    @NotBlank(message = "이미지가 누락되었습니다")
+//    @Positive
     private Long imgId;
 }

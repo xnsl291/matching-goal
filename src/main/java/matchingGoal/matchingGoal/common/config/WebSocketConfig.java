@@ -1,4 +1,4 @@
-package matchingGoal.matchingGoal.config;
+package matchingGoal.matchingGoal.common.config;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
