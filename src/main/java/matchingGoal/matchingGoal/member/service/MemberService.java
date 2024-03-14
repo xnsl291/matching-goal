@@ -8,6 +8,7 @@ import matchingGoal.matchingGoal.member.dto.OtherMemberInfoResponse;
 import matchingGoal.matchingGoal.member.dto.UpdateMemberInfoDto;
 import matchingGoal.matchingGoal.member.dto.UpdatePasswordDto;
 import matchingGoal.matchingGoal.member.exception.MemberNotFoundException;
+import matchingGoal.matchingGoal.member.exception.PasswordSameAsBeforeException;
 import matchingGoal.matchingGoal.member.exception.UnmatchedPasswordException;
 import matchingGoal.matchingGoal.member.exception.WithdrawnMemberAccessException;
 import matchingGoal.matchingGoal.member.model.entity.Member;
@@ -44,6 +45,10 @@ public class MemberService {
     public String updatePassword(String token, UpdatePasswordDto passwordDto) {
         Member member = getMemberByToken(token);
         isMatchedPassword(passwordDto.getOldPassword(), member.getPassword());
+
+        if(passwordDto.getOldPassword().equals(passwordDto.getNewPassword()))
+            throw new PasswordSameAsBeforeException();
+
         member.setPassword(passwordEncoder.encode(passwordDto.getNewPassword()));
         return "변경완료";
     }

@@ -54,7 +54,7 @@ public class AuthService {
                 .nickname(registerDto.getNickname())
                 .introduction(registerDto.getIntroduction())
                 .region(registerDto.getRegion())
-                .imageId(registerDto.getImageId())
+                //.imageId(registerDto.getImageId())
                 .build();
 
         memberRepository.save(member);
@@ -72,9 +72,7 @@ public class AuthService {
         Member member = memberService.getMemberByToken(token);
 
         // 탈퇴 전 비밀번호 재확인
-        if (!passwordEncoder.matches(getPasswordDto.getPassword(), member.getPassword())) {
-            throw new UnmatchedPasswordException();
-        }
+        memberService.isMatchedPassword(getPasswordDto.getPassword(), member.getPassword());
 
         member.setDeleted(true);
         member.setDeletedDate(LocalDateTime.now());
@@ -91,10 +89,7 @@ public class AuthService {
         Member member = memberRepository.findByEmail(signInDto.getEmail()).orElseThrow(MemberNotFoundException::new);
 
         // 비밀번호 체크
-        boolean isMatch = passwordEncoder.matches(signInDto.getPassword(),member.getPassword());
-        if (!isMatch) {
-            throw new UnmatchedPasswordException();
-        }
+        memberService.isMatchedPassword(signInDto.getPassword(),member.getPassword());
 
         if(member.isDeleted())
             throw new WithdrawnMemberAccessException();
@@ -133,5 +128,4 @@ public class AuthService {
 
         return "로그아웃 완료";
     }
-
 }
