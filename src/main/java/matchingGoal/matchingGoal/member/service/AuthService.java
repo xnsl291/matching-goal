@@ -15,7 +15,6 @@ import matchingGoal.matchingGoal.member.model.entity.Member;
 import matchingGoal.matchingGoal.member.repository.MemberRepository;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
@@ -102,14 +101,15 @@ public class AuthService {
         JwtToken tokens = jwtTokenProvider.generateToken(member.getId(), member.getEmail());
 
         //프로필이미지
-        String imageUrl = imageService.getImageUrl(member.getImageId());
+        //String imageUrl = imageService.getImageUrl(member.getImageId());
 
         return SignInResponse.builder()
                 .accessToken(tokens.getAccessToken())
                 .refreshToken(tokens.getRefreshToken())
                 .id(member.getId())
                 .nickname(member.getNickname())
-                .imageUrl(imageUrl).build();
+                //.imageUrl(imageUrl)
+                .build();
     }
 
     /**
@@ -118,13 +118,13 @@ public class AuthService {
      * @return "로그아웃 완료"
      */
     public String signOut(String token) {
-
         if(!jwtTokenProvider.validateToken(token))
             throw new InvalidTokenException();
 
         String email = jwtTokenProvider.getEmail(token);
+
         if (redisService.getData(TOKEN_PREFIX + email) == null) {
-            throw new InvalidTokenException();
+            throw new ExpiredTokenException();
         }
 
         // 블랙 리스트에 추가(로그아웃)
