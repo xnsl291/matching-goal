@@ -3,6 +3,7 @@ package matchingGoal.matchingGoal.matching.service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -10,6 +11,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import matchingGoal.matchingGoal.common.type.ErrorCode;
+import matchingGoal.matchingGoal.image.model.entity.Image;
+import matchingGoal.matchingGoal.image.repository.ImageRepository;
 import matchingGoal.matchingGoal.matching.domain.StatusType;
 import matchingGoal.matchingGoal.matching.domain.entity.Game;
 import matchingGoal.matchingGoal.matching.domain.entity.MatchingBoard;
@@ -40,6 +43,7 @@ public class MatchingService {
   private final GameRepository gameRepository;
   private final MemberRepository memberRepository;
   private final MatchingRequestRepository requestRepository;
+  private final ImageRepository imageRepository;
 
   /**
    * 게시글 작성
@@ -49,6 +53,8 @@ public class MatchingService {
     Member member = memberRepository.findById(requestDto.getMemberId())
         .orElseThrow(() -> new NotFoundMemberException(ErrorCode.MEMBER_NOT_FOUND));
 
+    List<Image> images = findImagesById(requestDto.getImgList());
+
     MatchingBoard matchingBoard = MatchingBoard.builder()
         .member(member)
         .region(requestDto.getRegion())
@@ -57,6 +63,7 @@ public class MatchingService {
         .status(StatusType.모집중)
         .createdDate(LocalDateTime.now())
         .isDeleted(false)
+        .imgList(images)
         .build();
     MatchingBoard savedBoard = boardRepository.save(matchingBoard);
 
@@ -104,6 +111,8 @@ public class MatchingService {
       throw new DeletedPostException(ErrorCode.DELETED_POST);
     }
 
+    List<Image> images = findImagesById(requestDto.getImgList());
+    matchingBoard.updateImg(images);
     matchingBoard.update(requestDto);
     boardRepository.save(matchingBoard);
 
@@ -263,6 +272,19 @@ public class MatchingService {
     Long memberId = request.getMember().getId();
 
     return requestRepository.findSameTimeRequests(memberId, date, time, id);
+  }
+
+  private List<Image> findImagesById(List<Long> imgList) {
+    List<Image> images = new ArrayList<>();
+
+    if (imgList != null) {
+      for (Long id : imgList) {
+        Optional<Image> optionalImage = imageRepository.findById(id);
+        optionalImage.ifPresent(images::add);
+      }
+    }
+
+    return images;
   }
 
 }

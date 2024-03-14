@@ -2,6 +2,7 @@ package matchingGoal.matchingGoal.matching.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -15,7 +16,7 @@ public class BoardRequestDto {
 
   private Long memberId;
 
-//  private Long imgId;
+  private List<Long> imgList;
   
   @NotBlank(message = "지역을 입력해주세요")
   private String region;
