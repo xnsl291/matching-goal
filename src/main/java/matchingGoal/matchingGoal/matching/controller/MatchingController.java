@@ -25,7 +25,7 @@ public class MatchingController {
   private final MatchingService matchingService;
 
   @PostMapping("/write")
-  public ResponseEntity<String> createBoard(@Valid @RequestBody BoardRequestDto requestDto) {
+  public ResponseEntity<BoardResponseDto> createBoard(@Valid @RequestBody BoardRequestDto requestDto) {
     return ResponseEntity.ok(matchingService.createBoard(requestDto));
   }
 
@@ -35,12 +35,12 @@ public class MatchingController {
   }
 
   @PatchMapping("/{id}")
-  public ResponseEntity<String> updateBoard(@PathVariable Long id, @Valid @RequestBody UpdateBoardDto requestDto) {
+  public ResponseEntity<BoardResponseDto> updateBoard(@PathVariable Long id, @Valid @RequestBody UpdateBoardDto requestDto) {
     return ResponseEntity.ok(matchingService.updateBoard(id, requestDto));
   }
 
   @PatchMapping("/delete/{id}")
-  public ResponseEntity<String> deleteBoard(@PathVariable Long id) {
+  public ResponseEntity<Long> deleteBoard(@PathVariable Long id) {
     return ResponseEntity.ok(matchingService.deleteBoard(id));
   }
 
