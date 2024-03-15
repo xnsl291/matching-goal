@@ -30,7 +30,7 @@ public class BoardResponseDto {
   private LocalDateTime modifiedDate;
   private Integer viewCount;
   private StatusType status;
-//  private Integer requestCount;
+  private Integer requestCount;
   private String region;
   private String stadium;
   private LocalDate date;
@@ -51,11 +51,14 @@ public class BoardResponseDto {
         .modifiedDate(matchingBoard.getModifiedDate())
         .viewCount(matchingBoard.getViewCount())
         .status(matchingBoard.getStatus())
-//        .requestCount()
         .region(matchingBoard.getRegion())
         .stadium(matchingBoard.getGame().getStadiumName())
         .date(matchingBoard.getGame().getDate())
         .time(matchingBoard.getGame().getTime())
         .build();
+  }
+
+  public void setRequestCount(Integer requestCount) {
+    this.requestCount = requestCount;
   }
 }
