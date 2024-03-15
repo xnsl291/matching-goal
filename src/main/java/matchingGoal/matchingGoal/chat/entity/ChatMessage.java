@@ -5,7 +5,6 @@ import jakarta.persistence.EntityListeners;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -27,14 +26,8 @@ public class ChatMessage {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private long id;
-
-  @JoinColumn(insertable = false, updatable = false)
   private String chatRoomId;
-
-  @JoinColumn(name = "memberId", insertable = false, updatable = false)
   private long memberId;
-
-  @JoinColumn(name = "nickname", insertable = false, updatable = false)
   private String nickname;
   private String message;
   @CreatedDate
