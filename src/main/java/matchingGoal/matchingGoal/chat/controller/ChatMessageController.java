@@ -15,6 +15,7 @@ public class ChatMessageController {
 
   private final static String CHAT_QUEUE_NAME = "chat.queue";
   private final ChatMessageService chatMessageService;
+
   @MessageMapping("chat.message.{chatRoomId}")
   public void send(@Payload ChatMessageDto chat, @DestinationVariable String chatRoomId) {
 

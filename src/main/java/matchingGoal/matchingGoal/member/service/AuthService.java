@@ -97,8 +97,6 @@ public class AuthService {
         JwtToken tokens = jwtTokenProvider.generateToken(member.getId(), member.getEmail());
 
         //프로필이미지
-        //String imageUrl = imageService.getImageUrl(member.getImageId());
-
         return SignInResponse.builder()
                 .accessToken(tokens.getAccessToken())
                 .refreshToken(tokens.getRefreshToken())
