@@ -83,4 +83,8 @@ public class MatchingBoard {
   public void acceptMatching() {
     this.status = StatusType.매칭완료;
   }
+
+  public void setGame(Game game) {
+    this.game = game;
+  }
 }

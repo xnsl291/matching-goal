@@ -49,7 +49,7 @@ public class MatchingService {
    * 게시글 작성
    * @param requestDto - 게시글 작성 dto
    */
-  public String createBoard(BoardRequestDto requestDto) {
+  public BoardResponseDto createBoard(BoardRequestDto requestDto) {
     Member member = memberRepository.findById(requestDto.getMemberId())
         .orElseThrow(() -> new NotFoundMemberException(ErrorCode.MEMBER_NOT_FOUND));
 
@@ -78,7 +78,10 @@ public class MatchingService {
         .build();
     gameRepository.save(game);
 
-    return "게시글 등록 완료";
+    savedBoard.setGame(game);
+    MatchingBoard board = boardRepository.save(savedBoard);
+
+    return BoardResponseDto.of(board);
   }
 
   /**
@@ -103,7 +106,7 @@ public class MatchingService {
    * @param requestDto - 게시글 수정 dto
    * @return "게시글 수정 완료"
    */
-  public String updateBoard(Long id, UpdateBoardDto requestDto) {
+  public BoardResponseDto updateBoard(Long id, UpdateBoardDto requestDto) {
     MatchingBoard matchingBoard = boardRepository.findById(id)
         .orElseThrow(() -> new NotFoundPostException(ErrorCode.POST_NOT_FOUND));
 
@@ -116,7 +119,7 @@ public class MatchingService {
     matchingBoard.update(requestDto);
     boardRepository.save(matchingBoard);
 
-    return "게시글 수정 완료";
+    return BoardResponseDto.of(matchingBoard);
   }
 
   /**
@@ -124,7 +127,7 @@ public class MatchingService {
    * @param id - 게시글 id
    * @return "게시글 삭제 완료"
    */
-  public String deleteBoard(Long id) {
+  public Long deleteBoard(Long id) {
     MatchingBoard matchingBoard = boardRepository.findById(id)
         .orElseThrow(() -> new NotFoundPostException(ErrorCode.POST_NOT_FOUND));
 
@@ -149,7 +152,7 @@ public class MatchingService {
     matchingBoard.getGame().delete();
     boardRepository.save(matchingBoard);
 
-    return "게시글 삭제 완료";
+    return matchingBoard.getId();
   }
 
   /**
