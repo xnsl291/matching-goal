@@ -48,6 +48,7 @@ public class MatchingService {
   /**
    * 게시글 작성
    * @param requestDto - 게시글 작성 dto
+   * @return 게시글 조회 dto
    */
   public BoardResponseDto createBoard(BoardRequestDto requestDto) {
     Member member = memberRepository.findById(requestDto.getMemberId())
@@ -60,9 +61,10 @@ public class MatchingService {
         .region(requestDto.getRegion())
         .title(requestDto.getTitle())
         .content(requestDto.getContent())
-        .status(StatusType.모집중)
+        .status(StatusType.OPEN)
         .createdDate(LocalDateTime.now())
         .isDeleted(false)
+        .viewCount(0)
         .imgList(images)
         .build();
     MatchingBoard savedBoard = boardRepository.save(matchingBoard);
@@ -87,11 +89,13 @@ public class MatchingService {
   /**
    * 게시글 조회
    * @param id - 게시글 id
-   * @return 게시글 dto
+   * @return 게시글 조회 dto
    */
   public BoardResponseDto getBoardById(Long id) {
     MatchingBoard matchingBoard = boardRepository.findById(id)
         .orElseThrow(() -> new NotFoundPostException(ErrorCode.POST_NOT_FOUND));
+
+    boardRepository.increaseViewCountById(id);
 
     if (matchingBoard.getIsDeleted()) {
       throw new DeletedPostException(ErrorCode.DELETED_POST);
@@ -107,7 +111,7 @@ public class MatchingService {
    * 게시글 수정
    * @param id - 게시글 id
    * @param requestDto - 게시글 수정 dto
-   * @return "게시글 수정 완료"
+   * @return 게시글 조회 dto
    */
   public BoardResponseDto updateBoard(Long id, UpdateBoardDto requestDto) {
     MatchingBoard matchingBoard = boardRepository.findById(id)
@@ -128,7 +132,7 @@ public class MatchingService {
   /**
    * 게시글 삭제
    * @param id - 게시글 id
-   * @return "게시글 삭제 완료"
+   * @return 게시글 id
    */
   public Long deleteBoard(Long id) {
     MatchingBoard matchingBoard = boardRepository.findById(id)
@@ -138,7 +142,7 @@ public class MatchingService {
       throw new DeletedPostException(ErrorCode.DELETED_POST);
     }
 
-    if (matchingBoard.getStatus() == StatusType.매칭완료) {
+    if (matchingBoard.getStatus() == StatusType.CLOSED) {
       throw new CompletedMatchingException(ErrorCode.ALREADY_COMPLETED_MATCHING);
     }
 
@@ -171,7 +175,7 @@ public class MatchingService {
       throw new DeletedPostException(ErrorCode.DELETED_POST);
     }
 
-    if (matchingBoard.getStatus() == StatusType.매칭완료) {
+    if (matchingBoard.getStatus() == StatusType.CLOSED) {
       throw new CompletedMatchingException(ErrorCode.ALREADY_COMPLETED_MATCHING);
     }
 
@@ -216,7 +220,7 @@ public class MatchingService {
     MatchingRequest request = requestRepository.findById(id)
         .orElseThrow(() -> new NotFoundRequestException(ErrorCode.REQUEST_NOT_FOUND));
 
-    if (request.getBoard().getStatus() == StatusType.매칭완료) {
+    if (request.getBoard().getStatus() == StatusType.CLOSED) {
       throw new CompletedMatchingException(ErrorCode.ALREADY_COMPLETED_MATCHING);
     }
 
@@ -250,7 +254,7 @@ public class MatchingService {
     MatchingRequest request = requestRepository.findById(id)
         .orElseThrow(() -> new NotFoundRequestException(ErrorCode.REQUEST_NOT_FOUND));
 
-    if (request.getBoard().getStatus() == StatusType.매칭완료) {
+    if (request.getBoard().getStatus() == StatusType.CLOSED) {
       throw new CompletedMatchingException(ErrorCode.ALREADY_COMPLETED_MATCHING);
     }
 
