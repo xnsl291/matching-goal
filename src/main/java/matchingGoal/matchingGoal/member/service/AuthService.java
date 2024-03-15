@@ -15,7 +15,6 @@ import matchingGoal.matchingGoal.member.model.entity.Member;
 import matchingGoal.matchingGoal.member.repository.MemberRepository;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
@@ -102,14 +101,14 @@ public class AuthService {
         JwtToken tokens = jwtTokenProvider.generateToken(member.getId(), member.getEmail());
 
         //프로필이미지
-        String imageUrl = imageService.getImageUrl(member.getImageId());
+//        String imageUrl = imageService.getImageUrl(member.getImageId());
 
         return SignInResponse.builder()
                 .accessToken(tokens.getAccessToken())
                 .refreshToken(tokens.getRefreshToken())
                 .id(member.getId())
-                .nickname(member.getNickname())
-                .imageUrl(imageUrl).build();
+                .nickname(member.getNickname()).build();
+//                .imageUrl(imageUrl).build();
     }
 
     /**

@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @RequiredArgsConstructor
 public class ChatMessageService {
+
   private final ChatMessageRepository chatMessageRepository;
   private final RabbitTemplate rabbitTemplate;
   private final static String CHAT_EXCHANGE_NAME = "chat.exchange";

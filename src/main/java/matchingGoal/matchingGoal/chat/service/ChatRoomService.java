@@ -17,7 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class ChatRoomService{
+public class ChatRoomService {
 
   private final ChatRoomRepository chatRoomRepository;
   private final MemberRepository memberRepository;
