@@ -40,8 +40,8 @@ public class ChatRoom {
   @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
   @Default
   @JoinTable(name = "chatRoomMembers",
-      joinColumns = @JoinColumn(name = "chatRoomId"),
-      inverseJoinColumns = @JoinColumn(name = "memberId"))
+      joinColumns = @JoinColumn(name = "chatRoom"),
+      inverseJoinColumns = @JoinColumn(name = "member"))
   private Set<Member> chatRoomMembers = new HashSet<>();
   @CreatedDate
   private LocalDateTime createdDate;
