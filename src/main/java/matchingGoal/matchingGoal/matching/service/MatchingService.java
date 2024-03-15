@@ -81,7 +81,7 @@ public class MatchingService {
     savedBoard.setGame(game);
     MatchingBoard board = boardRepository.save(savedBoard);
 
-    return BoardResponseDto.of(board);
+    return getBoardById(board.getId());
   }
 
   /**
@@ -97,7 +97,10 @@ public class MatchingService {
       throw new DeletedPostException(ErrorCode.DELETED_POST);
     }
 
-    return BoardResponseDto.of(matchingBoard);
+    BoardResponseDto boardResponseDto = BoardResponseDto.of(matchingBoard);
+    boardResponseDto.setRequestCount(countRequestsByBoard(matchingBoard.getMember()));
+
+    return boardResponseDto;
   }
 
   /**
@@ -119,7 +122,7 @@ public class MatchingService {
     matchingBoard.update(requestDto);
     boardRepository.save(matchingBoard);
 
-    return BoardResponseDto.of(matchingBoard);
+    return getBoardById(matchingBoard.getId());
   }
 
   /**
@@ -139,13 +142,10 @@ public class MatchingService {
       throw new CompletedMatchingException(ErrorCode.ALREADY_COMPLETED_MATCHING);
     }
 
-    Optional<List<MatchingRequest>> optionalList = requestRepository.findByBoardId(id);
-    if (optionalList.isPresent()) {
-      List<MatchingRequest> requests = optionalList.get();
-      for (MatchingRequest request : requests) {
-        request.refuse();
-        requestRepository.save(request);
-      }
+    List<MatchingRequest> requests = requestRepository.findByBoardId(id).orElse(Collections.emptyList());
+    for (MatchingRequest request : requests) {
+      request.refuse();
+      requestRepository.save(request);
     }
 
     matchingBoard.delete();
@@ -225,22 +225,17 @@ public class MatchingService {
     request.getBoard().getGame().setOpponent(request.getMember());
     requestRepository.save(request);
 
-    Optional<List<MatchingRequest>> optionalList1 = requestRepository.findOtherRequestsByIdAndBoardId(id, request.getBoard().getId());
-    if (optionalList1.isPresent()) {
-      List<MatchingRequest> otherRequests = optionalList1.get();
-      for (MatchingRequest req : otherRequests) {
-        req.refuse();
-        requestRepository.save(req);
-      }
+    List<MatchingRequest> otherRequests = requestRepository.findOtherRequestsByIdAndBoardId(id, request.getBoard().getId())
+        .orElse(Collections.emptyList());
+    for (MatchingRequest req : otherRequests) {
+      req.refuse();
+      requestRepository.save(req);
     }
 
-    Optional<List<MatchingRequest>> optionalList2 = findSameTimeRequests(id);
-    if (optionalList2.isPresent()) {
-      List<MatchingRequest> sameTimeRequests = optionalList2.get();
-      for (MatchingRequest req : sameTimeRequests) {
-        req.refuse();
-        requestRepository.save(req);
-      }
+    List<MatchingRequest> sameTimeRequests = findSameTimeRequests(id).orElse(Collections.emptyList());
+    for (MatchingRequest req : sameTimeRequests) {
+      req.refuse();
+      requestRepository.save(req);
     }
 
     return "신청 수락 완료";
@@ -288,6 +283,20 @@ public class MatchingService {
     }
 
     return images;
+  }
+
+  private Integer countRequestsByBoard(Member member) {
+    List<MatchingBoard> boards = boardRepository.findByMemberId(member.getId())
+        .orElse(Collections.emptyList());
+
+    int count = 0;
+    for (MatchingBoard each : boards) {
+      if (each.getMatchingRequest() != null) {
+        count += each.getMatchingRequest().size();
+      }
+    }
+
+    return count;
   }
 
 }
