@@ -107,8 +107,9 @@ public class AuthService {
                 .accessToken(tokens.getAccessToken())
                 .refreshToken(tokens.getRefreshToken())
                 .id(member.getId())
-                .nickname(member.getNickname()).build();
-//                .imageUrl(imageUrl).build();
+                .nickname(member.getNickname())
+//                .imageUrl(imageUrl)
+            .build();
     }
 
     /**

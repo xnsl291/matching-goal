@@ -81,7 +81,7 @@ public class MatchingBoard {
   }
 
   public void acceptMatching() {
-    this.status = StatusType.매칭완료;
+    this.status = StatusType.CLOSED;
   }
 
   public void setGame(Game game) {

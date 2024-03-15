@@ -12,7 +12,6 @@ import matchingGoal.matchingGoal.chat.repository.ChatRoomRepository;
 import matchingGoal.matchingGoal.member.model.entity.Member;
 import matchingGoal.matchingGoal.member.repository.MemberRepository;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Slf4j
@@ -25,7 +24,6 @@ public class ChatRoomService {
   private final ChatMessageRepository chatMessageRepository;
 
 
-  @Transactional
   public String createChatRoom(long hostId, long guestId) {
     Member host = getMember(hostId);
     Member guest = getMember(guestId);
@@ -46,7 +44,6 @@ public class ChatRoomService {
     return room.getId();
   }
 
-  @Transactional
   public void addMembers(String chatRoomId, List<Member> members) {
     ChatRoom room = chatRoomRepository.findById(chatRoomId).orElseThrow(RuntimeException::new);
     room.addMembers(members);
