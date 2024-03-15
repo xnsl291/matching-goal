@@ -1,4 +1,4 @@
-package matchingGoal.matchingGoal.config;
+package matchingGoal.matchingGoal.common.config;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,6 +29,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
   @Override
   public void registerStompEndpoints(StompEndpointRegistry registry) {
     registry.addEndpoint("/ws")
+//        .setAllowedOrigins("*");
         .setAllowedOriginPatterns("*");
   }
 

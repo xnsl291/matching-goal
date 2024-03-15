@@ -6,5 +6,6 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum StatusType {
-  모집중, 매칭완료
+  OPEN, CLOSED
+
 }
