@@ -1,8 +1,6 @@
 package matchingGoal.matchingGoal.matching.controller;
 
 import jakarta.validation.Valid;
-import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import matchingGoal.matchingGoal.matching.dto.BoardRequestDto;

@@ -25,7 +25,6 @@ import matchingGoal.matchingGoal.matching.dto.UpdateBoardDto;
 import matchingGoal.matchingGoal.matching.exception.AlreadyRequestException;
 import matchingGoal.matchingGoal.matching.exception.CompletedMatchingException;
 import matchingGoal.matchingGoal.matching.exception.DeletedPostException;
-import matchingGoal.matchingGoal.matching.exception.IllegalSearchTypeException;
 import matchingGoal.matchingGoal.matching.exception.NotFoundMemberException;
 import matchingGoal.matchingGoal.matching.exception.NotFoundPostException;
 import matchingGoal.matchingGoal.matching.exception.NotFoundRequestException;
