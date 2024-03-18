@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import matchingGoal.matchingGoal.common.auth.JwtTokenProvider;
 import matchingGoal.matchingGoal.image.service.ImageService;
-import matchingGoal.matchingGoal.member.dto.OtherMemberInfoResponse;
+import matchingGoal.matchingGoal.member.dto.SimplerInfoResponse;
 import matchingGoal.matchingGoal.member.dto.UpdateMemberInfoDto;
 import matchingGoal.matchingGoal.member.dto.UpdatePasswordDto;
 import matchingGoal.matchingGoal.member.exception.MemberNotFoundException;
@@ -43,7 +43,7 @@ public class MemberService {
      */
     @Transactional
     public String updatePassword(String token, UpdatePasswordDto passwordDto) {
-        Member member = getMemberByToken(token);
+        Member member = getMemberInfo(token);
         isMatchedPassword(passwordDto.getOldPassword(), member.getPassword());
 
         if(passwordDto.getOldPassword().equals(passwordDto.getNewPassword()))
@@ -73,19 +73,8 @@ public class MemberService {
      * @param token - 토큰
      * @return Member
      */
-    public Member getMemberByToken(String token){
+    public Member getMemberInfo(String token){
         jwtTokenProvider.validateToken(token);
-        System.out.println("---------pass");
-//        System.out.println(">>>>>>>>>  "+ );
-
-//        Long id  = jwtTokenProvider.getId(token);
-//        Member member = memberRepository.findById(id)
-//                .orElseThrow(MemberNotFoundException::new);
-//
-//        if (member.isDeleted())
-//            throw new WithdrawnMemberAccessException();
-//        System.out.println(member.toString());
-//        return member;
         return getMemberById(jwtTokenProvider.getId(token));
     }
 
@@ -97,13 +86,12 @@ public class MemberService {
      */
     @Transactional
     public String editMemberInfo(String token, UpdateMemberInfoDto updateDto) {
-        Member member = getMemberByToken(token);
+        Member member = getMemberInfo(token);
 
         member.setName(updateDto.getName());
         member.setNickname(updateDto.getNickname());
         member.setIntroduction(updateDto.getIntroduction());
         member.setRegion(updateDto.getRegion());
-        member.setImageId(updateDto.getImageId());
         return "수정완료";
     }
 
@@ -112,11 +100,11 @@ public class MemberService {
      * @param id - 조회하고 싶은 회원 ID
      * @return OtherMemberInfoResponse - 닉네임, 소개, 지역, 이미지url
      */
-    public OtherMemberInfoResponse getOtherMemberInfo(Long id) {
+    public SimplerInfoResponse getSimpleUserinfo(Long id) {
         Member member = getMemberById(id);
         String imageUrl = imageService.getImageUrl(member.getImageId());
 
-        return OtherMemberInfoResponse.builder()
+        return SimplerInfoResponse.builder()
                 .nickname(member.getNickname())
                 .introduction(member.getIntroduction())
                 .region(member.getRegion())

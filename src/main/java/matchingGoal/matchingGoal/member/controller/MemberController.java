@@ -4,7 +4,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import matchingGoal.matchingGoal.common.annotation.Nickname;
-import matchingGoal.matchingGoal.member.dto.OtherMemberInfoResponse;
+import matchingGoal.matchingGoal.member.dto.SimplerInfoResponse;
 import matchingGoal.matchingGoal.member.dto.UpdateMemberInfoDto;
 import matchingGoal.matchingGoal.member.dto.UpdatePasswordDto;
 import matchingGoal.matchingGoal.member.model.entity.Member;
@@ -47,7 +47,7 @@ public class MemberController {
      */
     @GetMapping("/mypage")
     public ResponseEntity<Member> getMemberInfo(@RequestHeader(name = AUTH_HEADER) String token) {
-        return ResponseEntity.ok().body(memberService.getMemberByToken(token));
+        return ResponseEntity.ok().body(memberService.getMemberInfo(token));
     }
     /**
      * 개인 정보 수정
@@ -66,8 +66,8 @@ public class MemberController {
      * @return OtherMemberInfoResponse - 닉네임, 소개, 지역, 이미지url
      */
     @GetMapping("/{memberId}")
-    public ResponseEntity<OtherMemberInfoResponse> getOtherMemberInfo(@PathVariable("memberId") Long memberId) {
-        return ResponseEntity.ok().body(memberService.getOtherMemberInfo(memberId));
+    public ResponseEntity<SimplerInfoResponse> getSimpleUserinfo(@PathVariable("memberId") Long memberId) {
+        return ResponseEntity.ok().body(memberService.getSimpleUserinfo(memberId));
     }
 
 }

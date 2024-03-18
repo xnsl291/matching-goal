@@ -69,7 +69,7 @@ public class AuthService {
      */
     @Transactional
     public String withdrawMember(String token, GetPasswordDto getPasswordDto) {
-        Member member = memberService.getMemberByToken(token);
+        Member member = memberService.getMemberInfo(token);
 
         // 탈퇴 전 비밀번호 재확인
         memberService.isMatchedPassword(getPasswordDto.getPassword(), member.getPassword());

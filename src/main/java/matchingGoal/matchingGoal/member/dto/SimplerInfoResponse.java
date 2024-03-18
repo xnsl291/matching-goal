@@ -7,7 +7,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class OtherMemberInfoResponse {
+public class SimplerInfoResponse {
 
     private String nickname;
 
