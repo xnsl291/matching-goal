@@ -1,5 +1,6 @@
 package matchingGoal.matchingGoal.member.service;
 
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import matchingGoal.matchingGoal.common.auth.JwtToken;
@@ -25,7 +26,6 @@ import java.time.LocalDateTime;
 public class AuthService {
     private final BCryptPasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
-    private final ImageService imageService;
     private final MemberRepository memberRepository;
     private final MemberService memberService;
     private final RedisService redisService;
