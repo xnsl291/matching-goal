@@ -1,17 +1,15 @@
 package matchingGoal.matchingGoal.common.auth;
 
 import io.jsonwebtoken.*;
-import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import matchingGoal.matchingGoal.common.service.RedisService;
+import matchingGoal.matchingGoal.member.exception.ExpiredTokenException;
 import matchingGoal.matchingGoal.member.exception.InvalidTokenException;
 import org.springframework.stereotype.Component;
 
-import javax.crypto.SecretKey;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+
 
 @Slf4j
 @Component
@@ -19,42 +17,91 @@ import java.util.Map;
 public class JwtTokenProvider {
 
     private final RedisService redisService;
-    private static final String BEARER_TYPE = "Bearer ";
     private static final String BLACK_TOKEN_PREFIX = "BLACK: ";
     private static final Long accessTokenExpirationTimeInSeconds = 30 * 60 * 1000L;
     private static final Long refreshTokenExpirationTimeInSeconds = 7 * 24 * 60 * 60 * 1000L;
-    private final SecretKey secretKey = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+
+    private final String key = "236979CB6F1AD6B6A6184A31E6BE37DB3818CC36871E26235DD67DCFE4041492";
+
+    public JwtToken generateToken(Long id, String email, String nickname) {
+        long now = (new Date()).getTime();
+
+        String accessToken = Jwts.builder()
+                .setId(id.toString())
+                .setSubject(email)
+                .setAudience(nickname)
+                .setExpiration(new Date(now + accessTokenExpirationTimeInSeconds))
+                .signWith(SignatureAlgorithm.HS256, key)
+                .compact();
+
+        String refreshToken = Jwts.builder()
+                .setId(id.toString())
+                .setSubject(email)
+                .setAudience(nickname)
+                .setExpiration(new Date(now + refreshTokenExpirationTimeInSeconds))
+                .signWith(SignatureAlgorithm.HS256, key)
+                .compact();
+
+        saveRefreshToken(email, refreshToken);  //redis key : RT_{email}
+
+        return new JwtToken(accessToken,refreshToken);
+    }
+
+
+    public void validateToken(String token) {
+        try {
+            // 로그아웃한 토큰일 경우
+            if (redisService.getData(BLACK_TOKEN_PREFIX + getEmail(token)) != null)
+                throw new ExpiredTokenException();
+
+        } catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException e) {
+            log.info("Invalid JWT Token", e);
+        } catch (ExpiredJwtException e) {
+            log.info("Expired JWT Token", e);
+        } catch (UnsupportedJwtException e) {
+            log.info("Unsupported JWT Token", e);
+        } catch (IllegalArgumentException e) {
+            log.info("JWT claims string is empty.", e);
+        }
+    }
+
+    public String getEmail(String token) {
+        try {
+            return Jwts.parser().setSigningKey(key)
+                    .parseClaimsJws(token).getBody()
+                    .getSubject()
+                    ;
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+    }
+
+    public Long getId(String token) {
+        try{
+            return Long.valueOf(parseClaims(token)
+                    .getId());
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+    }
+
+    private Claims parseClaims(String token) {
+        try {
+            return Jwts.parser().setSigningKey(key)
+                    .parseClaimsJws(token).getBody();
+        } catch (ExpiredJwtException e) {
+            return e.getClaims();
+        }
+    }
+
 
     private String getRefreshTokenKey(String email) {
         return "RT_" + email;
     }
 
-    public JwtToken generateToken(Long id, String email ){
-        long now = System.currentTimeMillis();
-
-        Map<String, Object> claims = new HashMap<>();
-        claims.put("id", id.toString());
-        claims.put("email", email);
-
-        String accessToken = Jwts.builder()
-                .setSubject(email)
-                .setClaims(claims)
-                .setExpiration(new Date(now + accessTokenExpirationTimeInSeconds))
-                .signWith(secretKey, SignatureAlgorithm.HS256)
-                .compact();
-
-        String refreshToken = Jwts.builder()
-                .setSubject(email)
-                .setClaims(claims)
-                .setExpiration(new Date(now + refreshTokenExpirationTimeInSeconds))
-                .signWith(secretKey, SignatureAlgorithm.HS256)
-                .compact();
-
-        saveRefreshToken(email, refreshToken);  //redis key : RT_{email}
-        return new JwtToken(accessToken,refreshToken);
-    }
-
-    public void saveRefreshToken(String email, String token){
+    public void saveRefreshToken(String email, String token) {
         redisService.setData(getRefreshTokenKey(email), token, refreshTokenExpirationTimeInSeconds);
     }
 
@@ -68,38 +115,5 @@ public class JwtTokenProvider {
 
     public void setBlacklist(String token) {
         redisService.setData(BLACK_TOKEN_PREFIX + getEmail(token), token, refreshTokenExpirationTimeInSeconds);
-    }
-
-    public boolean validateToken(String token) {
-        try {
-            if(redisService.getData(BLACK_TOKEN_PREFIX + getEmail(token)) != null )
-                return false;
-
-            Jwts.parser().setSigningKey(secretKey).parseClaimsJws(getRawToken(token));
-            return true;
-        } catch (Exception e) {
-            throw new InvalidTokenException();
-        }
-    }
-
-    public String getRawToken(String token) {
-        if (token != null && token.startsWith(BEARER_TYPE)) {
-            return token.substring(7);
-        }
-        return token;
-    }
-
-    public String getEmail(String token) {
-        return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(getRawToken(token)).getBody()
-                .get("email")
-                .toString();
-    }
-
-    public  Long getId(String token){
-        return Jwts.parser()
-                .setSigningKey(secretKey)
-                .parseClaimsJws(getRawToken(token))
-                .getBody()
-                .get("id", Long.class);
     }
 }

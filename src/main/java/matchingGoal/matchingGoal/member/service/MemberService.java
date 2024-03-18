@@ -4,14 +4,16 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import matchingGoal.matchingGoal.common.auth.JwtTokenProvider;
 import matchingGoal.matchingGoal.image.service.ImageService;
-import matchingGoal.matchingGoal.member.dto.GetPasswordDto;
-import matchingGoal.matchingGoal.member.dto.OtherMemberInfoResponse;
+import matchingGoal.matchingGoal.member.dto.SimplerInfoResponse;
 import matchingGoal.matchingGoal.member.dto.UpdateMemberInfoDto;
-import matchingGoal.matchingGoal.member.exception.InvalidTokenException;
+import matchingGoal.matchingGoal.member.dto.UpdatePasswordDto;
 import matchingGoal.matchingGoal.member.exception.MemberNotFoundException;
+import matchingGoal.matchingGoal.member.exception.PasswordSameAsBeforeException;
+import matchingGoal.matchingGoal.member.exception.UnmatchedPasswordException;
 import matchingGoal.matchingGoal.member.exception.WithdrawnMemberAccessException;
 import matchingGoal.matchingGoal.member.model.entity.Member;
 import matchingGoal.matchingGoal.member.repository.MemberRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class MemberService {
     private final MemberRepository memberRepository;
     private final JwtTokenProvider jwtTokenProvider;
+    private final PasswordEncoder passwordEncoder;
     private final ImageService imageService;
 
     /**
@@ -35,13 +38,18 @@ public class MemberService {
     /**
      * 비밀번호 변경
      * @param token - 토큰
-     * @param getPasswordDto - 비밀번호
+     * @param passwordDto - 기존 비밀번호, 새로운 비밀번호
      * @return "변경완료"
      */
     @Transactional
-    public String updatePassword(String token, GetPasswordDto getPasswordDto) {
-        Member member = getMemberByToken(token);
-        member.setPassword(getPasswordDto.getPassword());
+    public String updatePassword(String token, UpdatePasswordDto passwordDto) {
+        Member member = getMemberInfo(token);
+        isMatchedPassword(passwordDto.getOldPassword(), member.getPassword());
+
+        if(passwordDto.getOldPassword().equals(passwordDto.getNewPassword()))
+            throw new PasswordSameAsBeforeException();
+
+        member.setPassword(passwordEncoder.encode(passwordDto.getNewPassword()));
         return "변경완료";
     }
 
@@ -65,10 +73,8 @@ public class MemberService {
      * @param token - 토큰
      * @return Member
      */
-    public Member getMemberByToken(String token){
-        if(!jwtTokenProvider.validateToken(token))
-            throw new InvalidTokenException();
-
+    public Member getMemberInfo(String token){
+        jwtTokenProvider.validateToken(token);
         return getMemberById(jwtTokenProvider.getId(token));
     }
 
@@ -80,13 +86,12 @@ public class MemberService {
      */
     @Transactional
     public String editMemberInfo(String token, UpdateMemberInfoDto updateDto) {
-        Member member = getMemberByToken(token);
+        Member member = getMemberInfo(token);
 
         member.setName(updateDto.getName());
         member.setNickname(updateDto.getNickname());
         member.setIntroduction(updateDto.getIntroduction());
         member.setRegion(updateDto.getRegion());
-        member.setImageId(updateDto.getImageId());
         return "수정완료";
     }
 
@@ -95,15 +100,26 @@ public class MemberService {
      * @param id - 조회하고 싶은 회원 ID
      * @return OtherMemberInfoResponse - 닉네임, 소개, 지역, 이미지url
      */
-    public OtherMemberInfoResponse getOtherMemberInfo(Long id) {
+    public SimplerInfoResponse getSimpleUserinfo(Long id) {
         Member member = getMemberById(id);
         String imageUrl = imageService.getImageUrl(member.getImageId());
 
-        return OtherMemberInfoResponse.builder()
+        return SimplerInfoResponse.builder()
                 .nickname(member.getNickname())
                 .introduction(member.getIntroduction())
                 .region(member.getRegion())
                 .imageUrl(imageUrl)
                 .build();
+    }
+
+    /**
+     * 암호화된 비밀번호와 암호화되지 비밀번호 비교
+     * @param rawPassword - 암호화되지 않은 비밀번호
+     * @param encodedPassword - 암호화 된 비밀번호
+     */
+    public void isMatchedPassword(String rawPassword, String encodedPassword){
+        boolean isMatch = passwordEncoder.matches(rawPassword,encodedPassword);
+        if (!isMatch)
+            throw new UnmatchedPasswordException();
     }
 }

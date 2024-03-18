@@ -21,9 +21,13 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @EnableRabbit
 public class RabbitConfig {
-  private static final String CHAT_QUEUE_NAME = "chat.queue";
-  private static final String CHAT_EXCHANGE_NAME = "chat.exchange";
-  private static final String ROUTING_KEY = "room.*";
+  public static final String CHAT_QUEUE_NAME = "chat.queue";
+  public static final String CHAT_EXCHANGE_NAME = "chat.exchange";
+  public static final String CHAT_ROUTING_KEY = "room.*";
+
+  public static final String ALARM_QUEUE_NAME = "alarm.queue";
+  public static final String ALARM_EXCHANGE = "alarm.exchange";
+  public static final String ALARM_ROUTING_KEY = "memberId.*";
 
   @Value("${spring.rabbitmq.username}")
   private String rabbitUser;
@@ -38,16 +42,28 @@ public class RabbitConfig {
 
   //Queue 등록
   @Bean
-  public Queue queue() { return new Queue(CHAT_QUEUE_NAME, true);}
+  public Queue chatQueue() { return new Queue(CHAT_QUEUE_NAME, true);}
 
   //Exchange 등록
   @Bean
   public TopicExchange exchange() { return new TopicExchange(CHAT_EXCHANGE_NAME, true, false);}
 
+
   //Exchange, Queue 바인딩
   @Bean
-  public Binding binding(Queue queue, TopicExchange exchange) {
-    return BindingBuilder.bind(queue).to(exchange).with(ROUTING_KEY);
+  public Binding chatBinding(Queue chatQueue, TopicExchange exchange) {
+    return BindingBuilder.bind(chatQueue).to(exchange).with(CHAT_ROUTING_KEY);
+  }
+
+  @Bean
+  public Queue alarmQueue() { return new Queue(ALARM_QUEUE_NAME, true);}
+  @Bean
+  public TopicExchange alarmExchange() {
+    return new TopicExchange(ALARM_EXCHANGE);
+  }
+  @Bean
+  public Binding alarmBinding (Queue alarmQueue, TopicExchange exchange) {
+    return BindingBuilder.bind(alarmQueue).to(exchange).with(ALARM_ROUTING_KEY);
   }
 
   @Bean
@@ -63,7 +79,7 @@ public class RabbitConfig {
   public RabbitTemplate rabbitTemplate(){
     RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory());
     rabbitTemplate.setMessageConverter(jsonMessageConverter());
-    rabbitTemplate.setRoutingKey(ROUTING_KEY);
+    rabbitTemplate.setRoutingKey(CHAT_ROUTING_KEY);
     return rabbitTemplate;
   }
 

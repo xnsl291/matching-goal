@@ -4,9 +4,9 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import matchingGoal.matchingGoal.common.annotation.Nickname;
-import matchingGoal.matchingGoal.member.dto.GetPasswordDto;
-import matchingGoal.matchingGoal.member.dto.OtherMemberInfoResponse;
+import matchingGoal.matchingGoal.member.dto.SimplerInfoResponse;
 import matchingGoal.matchingGoal.member.dto.UpdateMemberInfoDto;
+import matchingGoal.matchingGoal.member.dto.UpdatePasswordDto;
 import matchingGoal.matchingGoal.member.model.entity.Member;
 import matchingGoal.matchingGoal.member.service.MemberService;
 import org.springframework.http.ResponseEntity;
@@ -35,8 +35,8 @@ public class MemberController {
      * @param dto - 새로운 비밀번호
      * @return "변경완료"
      */
-    @PatchMapping("/members/password")
-    public ResponseEntity<String> updatePassword(@RequestHeader(name = AUTH_HEADER) String token, @Valid @RequestBody GetPasswordDto dto) {
+    @PatchMapping("/password")
+    public ResponseEntity<String> updatePassword(@RequestHeader(name = AUTH_HEADER) String token, @Valid @RequestBody UpdatePasswordDto dto) {
         return ResponseEntity.ok().body(memberService.updatePassword(token, dto));
     }
 
@@ -45,9 +45,9 @@ public class MemberController {
      * @param token - 토큰
      * @return Member
      */
-    @GetMapping("/")
+    @GetMapping("/mypage")
     public ResponseEntity<Member> getMemberInfo(@RequestHeader(name = AUTH_HEADER) String token) {
-        return ResponseEntity.ok().body(memberService.getMemberByToken(token));
+        return ResponseEntity.ok().body(memberService.getMemberInfo(token));
     }
     /**
      * 개인 정보 수정
@@ -55,7 +55,7 @@ public class MemberController {
      * @param updateDto - 정보 수정 dto (이름, 닉네임, 소개, 지역, 이미지)
      * @return "수정완료"
      */
-    @PatchMapping("/")
+    @PatchMapping("/mypage")
     public ResponseEntity<String> editMemberInfo(@RequestHeader(name = AUTH_HEADER) String token, @Valid UpdateMemberInfoDto updateDto) {
         return ResponseEntity.ok().body(memberService.editMemberInfo(token,updateDto));
     }
@@ -66,8 +66,8 @@ public class MemberController {
      * @return OtherMemberInfoResponse - 닉네임, 소개, 지역, 이미지url
      */
     @GetMapping("/{memberId}")
-    public ResponseEntity<OtherMemberInfoResponse> getOtherMemberInfo(@PathVariable("memberId") Long memberId) {
-        return ResponseEntity.ok().body(memberService.getOtherMemberInfo(memberId));
+    public ResponseEntity<SimplerInfoResponse> getSimpleUserinfo(@PathVariable("memberId") Long memberId) {
+        return ResponseEntity.ok().body(memberService.getSimpleUserinfo(memberId));
     }
 
 }

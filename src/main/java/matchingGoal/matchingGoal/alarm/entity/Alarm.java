@@ -1,7 +1,7 @@
-package matchingGoal.matchingGoal.chat.entity;
+package matchingGoal.matchingGoal.alarm.entity;
 
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EntityListeners;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -10,37 +10,35 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-import matchingGoal.matchingGoal.chat.dto.ChatMessageDto;
+import matchingGoal.matchingGoal.alarm.dto.AlarmDto;
 import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Entity
 @Builder
 @Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@EntityListeners(AuditingEntityListener.class)
-public class ChatMessage {
+public class Alarm {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private long id;
-  private String chatRoomId;
   private long memberId;
-  private String nickname;
+  @Convert(converter = AlarmTypeAttributeConverter.class)
+  private String type;
+  private long contentId;
   private String message;
+  private boolean checkedOut;
   @CreatedDate
   private LocalDateTime createdDate;
 
-  public static ChatMessage fromDto(ChatMessageDto dto) {
-
-    return ChatMessage.builder()
-        .message(dto.getMessage())
-        .chatRoomId(dto.getChatRoomId())
+  public static Alarm fromDto(AlarmDto dto) {
+    return Alarm.builder()
         .memberId(dto.getMemberId())
-        .nickname(dto.getNickname())
+        .type(dto.getType())
+        .contentId(dto.getContentId())
+        .message(dto.getMessage())
+        .checkedOut(dto.isCheckedOut())
         .build();
   }
-
 }
+

@@ -15,6 +15,7 @@ public class ChatMessageController {
 
   private final static String CHAT_QUEUE_NAME = "chat.queue";
   private final ChatMessageService chatMessageService;
+
   @MessageMapping("chat.message.{chatRoomId}")
   public void send(@Payload ChatMessageDto chat, @DestinationVariable String chatRoomId) {
 
@@ -22,9 +23,9 @@ public class ChatMessageController {
 
   }
 
-//  @RabbitListener(queues = CHAT_QUEUE_NAME)
-//  public void receive(ChatMessageDto chat) {
-//    System.out.println("recieved : " + chat.getMessage());
-//  }
+  @RabbitListener(queues = CHAT_QUEUE_NAME)
+  public void receive(ChatMessageDto chat) {
+    System.out.println("recieved : " + chat.getMessage());
+  }
 
 }

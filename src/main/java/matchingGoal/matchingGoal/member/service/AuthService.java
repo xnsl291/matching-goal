@@ -1,5 +1,6 @@
 package matchingGoal.matchingGoal.member.service;
 
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import matchingGoal.matchingGoal.common.auth.JwtToken;
@@ -15,7 +16,6 @@ import matchingGoal.matchingGoal.member.model.entity.Member;
 import matchingGoal.matchingGoal.member.repository.MemberRepository;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
@@ -26,7 +26,6 @@ import java.time.LocalDateTime;
 public class AuthService {
     private final BCryptPasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
-    private final ImageService imageService;
     private final MemberRepository memberRepository;
     private final MemberService memberService;
     private final RedisService redisService;
@@ -54,7 +53,7 @@ public class AuthService {
                 .nickname(registerDto.getNickname())
                 .introduction(registerDto.getIntroduction())
                 .region(registerDto.getRegion())
-                .imageId(registerDto.getImageId())
+                //.imageId(registerDto.getImageId())
                 .build();
 
         memberRepository.save(member);
@@ -67,13 +66,12 @@ public class AuthService {
      * @param getPasswordDto - 비밀번호
      * @return "탈퇴 완료"
      */
+    @Transactional
     public String withdrawMember(String token, GetPasswordDto getPasswordDto) {
-        Member member = memberService.getMemberByToken(token);
+        Member member = memberService.getMemberInfo(token);
 
         // 탈퇴 전 비밀번호 재확인
-        if (!member.getPassword().equals(getPasswordDto.getPassword())) {
-            throw new UnmatchedPasswordException();
-        }
+        memberService.isMatchedPassword(getPasswordDto.getPassword(), member.getPassword());
 
         member.setDeleted(true);
         member.setDeletedDate(LocalDateTime.now());
@@ -90,26 +88,22 @@ public class AuthService {
         Member member = memberRepository.findByEmail(signInDto.getEmail()).orElseThrow(MemberNotFoundException::new);
 
         // 비밀번호 체크
-        boolean isMatch = passwordEncoder.matches(signInDto.getPassword(),member.getPassword());
-        if (!isMatch) {
-            throw new UnmatchedPasswordException();
-        }
+        memberService.isMatchedPassword(signInDto.getPassword(),member.getPassword());
 
         if(member.isDeleted())
             throw new WithdrawnMemberAccessException();
 
         // 토큰 발행
-        JwtToken tokens = jwtTokenProvider.generateToken(member.getId(), member.getEmail());
+        JwtToken tokens = jwtTokenProvider.generateToken(member.getId(), member.getEmail(), member.getNickname());
 
         //프로필이미지
-        String imageUrl = imageService.getImageUrl(member.getImageId());
-
         return SignInResponse.builder()
                 .accessToken(tokens.getAccessToken())
                 .refreshToken(tokens.getRefreshToken())
                 .id(member.getId())
                 .nickname(member.getNickname())
-                .imageUrl(imageUrl).build();
+                //.imageUrl(imageUrl)
+                .build();
     }
 
     /**
@@ -118,19 +112,17 @@ public class AuthService {
      * @return "로그아웃 완료"
      */
     public String signOut(String token) {
-
-        if(!jwtTokenProvider.validateToken(token))
-            throw new InvalidTokenException();
+        jwtTokenProvider.validateToken(token);
 
         String email = jwtTokenProvider.getEmail(token);
+
         if (redisService.getData(TOKEN_PREFIX + email) == null) {
-            throw new InvalidTokenException();
+            throw new ExpiredTokenException();
         }
 
         // 블랙 리스트에 추가(로그아웃)
-        jwtTokenProvider.setBlacklist(email);
+        jwtTokenProvider.setBlacklist(token);
 
         return "로그아웃 완료";
     }
-
 }
