@@ -32,7 +32,11 @@ public class ImageService {
      * @return 이미지 URL
      */
     public String getImageUrl(Long id){
-        Image image = imageRepository.findById(id).orElseThrow(NotFoundImageException::new);
-        return getFolderPath(image.getCreatedDate()) + image.getSaved_name();
+        try{
+            Image image = imageRepository.findById(id).orElseThrow(NotFoundImageException::new);
+            return getFolderPath(image.getCreatedDate()) + image.getSaved_name();
+        }catch (RuntimeException e){
+            return null;
+        }
     }
 }
