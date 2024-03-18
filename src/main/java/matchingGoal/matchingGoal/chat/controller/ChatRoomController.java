@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -25,9 +26,12 @@ public class ChatRoomController {
   private final JwtTokenProvider jwtTokenProvider;
 
   @PostMapping("/personal")
-  public ResponseEntity<?> createChatRoom(@RequestHeader(value = "authorization") String token,
+  public ResponseEntity<?> createChatRoom(@RequestHeader(value = "authorization") String token, @RequestBody
       CreateChatRoomRequest request) {
+    token = token.substring(7);
+    System.out.println(token);
     long hostId = jwtTokenProvider.getId(token);
+    System.out.println(hostId + "    " + request.getMemberId());
     String result = chatRoomService.createChatRoom(hostId, request.getMemberId());
 
     return ResponseEntity.ok(result);
@@ -36,6 +40,7 @@ public class ChatRoomController {
 
   @GetMapping("/list")
   public ResponseEntity<?> myChats(@RequestHeader(value = "authorization") String token) {
+    token = token.substring(7);
     long userId = jwtTokenProvider.getId(token);
     List<ChatRoomListResponse> result = chatRoomService.myChat(userId);
 

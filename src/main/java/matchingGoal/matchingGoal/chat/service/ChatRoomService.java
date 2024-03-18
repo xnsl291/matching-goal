@@ -35,10 +35,8 @@ public class ChatRoomService {
 
     ChatRoom room = ChatRoom.create();
 
-    room.addMembers(members);
-
     chatRoomRepository.save(room);
-
+    room.addMembers(members);
     log.info(room.getId());
 
     return room.getId();
