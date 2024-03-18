@@ -45,7 +45,7 @@ public class MemberController {
      * @param token - 토큰
      * @return Member
      */
-    @GetMapping("/")
+    @GetMapping("/mypage")
     public ResponseEntity<Member> getMemberInfo(@RequestHeader(name = AUTH_HEADER) String token) {
         return ResponseEntity.ok().body(memberService.getMemberByToken(token));
     }
@@ -55,7 +55,7 @@ public class MemberController {
      * @param updateDto - 정보 수정 dto (이름, 닉네임, 소개, 지역, 이미지)
      * @return "수정완료"
      */
-    @PatchMapping("/")
+    @PatchMapping("/mypage")
     public ResponseEntity<String> editMemberInfo(@RequestHeader(name = AUTH_HEADER) String token, @Valid UpdateMemberInfoDto updateDto) {
         return ResponseEntity.ok().body(memberService.editMemberInfo(token,updateDto));
     }
