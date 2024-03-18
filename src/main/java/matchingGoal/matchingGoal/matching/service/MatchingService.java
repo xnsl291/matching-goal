@@ -25,13 +25,13 @@ import matchingGoal.matchingGoal.matching.dto.UpdateBoardDto;
 import matchingGoal.matchingGoal.matching.exception.AlreadyRequestException;
 import matchingGoal.matchingGoal.matching.exception.CompletedMatchingException;
 import matchingGoal.matchingGoal.matching.exception.DeletedPostException;
-import matchingGoal.matchingGoal.matching.exception.IllegalSearchTypeException;
 import matchingGoal.matchingGoal.matching.exception.NotFoundMemberException;
 import matchingGoal.matchingGoal.matching.exception.NotFoundPostException;
 import matchingGoal.matchingGoal.matching.exception.NotFoundRequestException;
 import matchingGoal.matchingGoal.matching.exception.SelfRequestException;
 import matchingGoal.matchingGoal.matching.repository.GameRepository;
 import matchingGoal.matchingGoal.matching.repository.MatchingBoardRepository;
+import matchingGoal.matchingGoal.matching.repository.MatchingBoardSpecification;
 import matchingGoal.matchingGoal.matching.repository.MatchingRequestRepository;
 import matchingGoal.matchingGoal.member.model.entity.Member;
 import matchingGoal.matchingGoal.member.repository.MemberRepository;
@@ -93,19 +93,26 @@ public class MatchingService {
     return getBoardById(board.getId());
   }
 
-  public List<ListBoardDto> getBoardList(
+  public Page<ListBoardDto> getBoardList(
       Integer page, String keyword, String type, String sort, String sortDirection, String date, String time) {
 
-    // 페이지번호
+    LocalDate parsedDate = (date != null) ? LocalDate.parse(date) : null;
+    LocalTime parsedTime = (time != null) ? LocalTime.parse(time) : null;
+
+    Pageable pageable = creatPageable(page, sort, sortDirection);
+    Page<MatchingBoard> boardPage = boardRepository.findAll(MatchingBoardSpecification.search(keyword, type, parsedDate, parsedTime), pageable);
+
+    return boardPage.map(this::convertToDto);
+  }
+
+  private Pageable creatPageable(Integer page, String sort, String sortDirection) {
     int pageNum = (page != null && page >= 0) ? page : 0;
 
-    // 정렬 방향
     Sort.Direction direction = Direction.DESC;
     if (sortDirection.equals("asc")) {
       direction = Direction.ASC;
     }
 
-    // 정렬 기준
     String sortType = "createdDate";
     switch (sort) {
       case "time":
@@ -115,35 +122,7 @@ public class MatchingService {
         break;
     }
 
-    // 페이징
-    Pageable pageable = PageRequest.of(pageNum, 10, Sort.by(direction, sortType));
-
-    LocalDate parsedDate = (date != null) ? LocalDate.parse(date) : null;
-    LocalTime parsedTime = (time != null) ? LocalTime.parse(time) : null;
-
-    Page<ListBoardDto> boardPage;
-
-    if (keyword != null && !keyword.isEmpty()) {
-      switch (type) {
-        case "title":
-          boardPage = boardRepository.findByTitleContaining(keyword, pageable).map(this::convertToDto);
-          break;
-        case "writer":
-          List<Member> members = memberRepository.findByNicknameContaining(keyword);
-          List<Long> memberIds = members.stream().map(Member::getId).collect(Collectors.toList());
-          boardPage = boardRepository.findByMemberIdIn(memberIds, pageable).map(this::convertToDto);
-          break;
-        case "region":
-          boardPage = boardRepository.findByRegionContaining(keyword, pageable).map(this::convertToDto);
-          break;
-        default:
-          throw new IllegalSearchTypeException(ErrorCode.ILLEGAL_SEARCH_TYPE);
-      }
-    } else {
-      boardPage = boardRepository.findAll(pageable).map(this::convertToDto);
-    }
-
-    return boardPage.toList();
+    return PageRequest.of(pageNum, 10, Sort.by(direction, sortType));
   }
 
   private ListBoardDto convertToDto(MatchingBoard matchingBoard) {
