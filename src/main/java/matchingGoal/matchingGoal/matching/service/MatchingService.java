@@ -3,27 +3,37 @@ package matchingGoal.matchingGoal.matching.service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
-import matchingGoal.matchingGoal.common.exception.AlreadyRequestException;
-import matchingGoal.matchingGoal.common.exception.SelfRequestException;
 import matchingGoal.matchingGoal.common.type.ErrorCode;
+import matchingGoal.matchingGoal.image.model.entity.Image;
+import matchingGoal.matchingGoal.image.repository.ImageRepository;
 import matchingGoal.matchingGoal.matching.domain.StatusType;
 import matchingGoal.matchingGoal.matching.domain.entity.Game;
 import matchingGoal.matchingGoal.matching.domain.entity.MatchingBoard;
 import matchingGoal.matchingGoal.matching.domain.entity.MatchingRequest;
 import matchingGoal.matchingGoal.matching.dto.BoardRequestDto;
 import matchingGoal.matchingGoal.matching.dto.BoardResponseDto;
-import matchingGoal.matchingGoal.matching.dto.UpdateBoardRequestDto;
-import matchingGoal.matchingGoal.matching.exception.NotFoundGameException;
+import matchingGoal.matchingGoal.matching.dto.RequestMatchingDto;
+import matchingGoal.matchingGoal.matching.dto.UpdateBoardDto;
+import matchingGoal.matchingGoal.matching.exception.AlreadyRequestException;
+import matchingGoal.matchingGoal.matching.exception.CompletedMatchingException;
+import matchingGoal.matchingGoal.matching.exception.DeletedPostException;
 import matchingGoal.matchingGoal.matching.exception.NotFoundMemberException;
 import matchingGoal.matchingGoal.matching.exception.NotFoundPostException;
+import matchingGoal.matchingGoal.matching.exception.NotFoundRequestException;
+import matchingGoal.matchingGoal.matching.exception.SelfRequestException;
 import matchingGoal.matchingGoal.matching.repository.GameRepository;
 import matchingGoal.matchingGoal.matching.repository.MatchingBoardRepository;
 import matchingGoal.matchingGoal.matching.repository.MatchingRequestRepository;
 import matchingGoal.matchingGoal.member.model.entity.Member;
 import matchingGoal.matchingGoal.member.repository.MemberRepository;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -33,95 +43,264 @@ public class MatchingService {
   private final GameRepository gameRepository;
   private final MemberRepository memberRepository;
   private final MatchingRequestRepository requestRepository;
+  private final ImageRepository imageRepository;
 
   /**
    * 게시글 작성
-   * @param requestDto - 게시글작성 dto
+   * @param requestDto - 게시글 작성 dto
+   * @return 게시글 조회 dto
    */
-  @Transactional
   public BoardResponseDto createBoard(BoardRequestDto requestDto) {
     Member member = memberRepository.findById(requestDto.getMemberId())
         .orElseThrow(() -> new NotFoundMemberException(ErrorCode.MEMBER_NOT_FOUND));
 
+    List<Image> images = findImagesById(requestDto.getImgList());
+
     MatchingBoard matchingBoard = MatchingBoard.builder()
-        .memberId(member)
+        .member(member)
         .region(requestDto.getRegion())
         .title(requestDto.getTitle())
         .content(requestDto.getContent())
-        .status(StatusType.모집중)
+        .status(StatusType.OPEN)
         .createdDate(LocalDateTime.now())
-        .isDeleted(Boolean.FALSE)
+        .isDeleted(false)
+        .viewCount(0)
+        .imgList(images)
         .build();
     MatchingBoard savedBoard = boardRepository.save(matchingBoard);
 
     Game game = Game.builder()
-        .boardId(savedBoard)
-        .team1Id(member)
-        .team2Id(null)
+        .board(savedBoard)
+        .team1(member)
+        .team2(null)
         .stadiumName(requestDto.getStadium())
         .date(LocalDate.parse(requestDto.getDate()))
         .time(LocalTime.parse(requestDto.getTime()))
+        .isDeleted(false)
         .build();
     gameRepository.save(game);
 
-    return BoardResponseDto.convertToDto(savedBoard, game);
+    savedBoard.setGame(game);
+    MatchingBoard board = boardRepository.save(savedBoard);
+
+    return getBoardById(board.getId());
   }
 
+  /**
+   * 게시글 조회
+   * @param id - 게시글 id
+   * @return 게시글 조회 dto
+   */
   public BoardResponseDto getBoardById(Long id) {
     MatchingBoard matchingBoard = boardRepository.findById(id)
         .orElseThrow(() -> new NotFoundPostException(ErrorCode.POST_NOT_FOUND));
-    Game game = gameRepository.findByBoardId_Id(id)
-        .orElseThrow(() -> new NotFoundGameException(ErrorCode.GAME_NOT_FOUND));
 
-    return BoardResponseDto.convertToDto(matchingBoard, game);
+    boardRepository.increaseViewCountById(id);
+
+    if (matchingBoard.getIsDeleted()) {
+      throw new DeletedPostException(ErrorCode.DELETED_POST);
+    }
+
+    BoardResponseDto boardResponseDto = BoardResponseDto.of(matchingBoard);
+    boardResponseDto.setRequestCount(countRequestsByBoard(matchingBoard.getMember()));
+
+    return boardResponseDto;
   }
 
+  /**
+   * 게시글 수정
+   * @param id - 게시글 id
+   * @param requestDto - 게시글 수정 dto
+   * @return 게시글 조회 dto
+   */
+  public BoardResponseDto updateBoard(Long id, UpdateBoardDto requestDto) {
+    MatchingBoard matchingBoard = boardRepository.findById(id)
+        .orElseThrow(() -> new NotFoundPostException(ErrorCode.POST_NOT_FOUND));
+
+    if (matchingBoard.getIsDeleted()) {
+      throw new DeletedPostException(ErrorCode.DELETED_POST);
+    }
+
+    List<Image> images = findImagesById(requestDto.getImgList());
+    matchingBoard.updateImg(images);
+    matchingBoard.update(requestDto);
+    boardRepository.save(matchingBoard);
+
+    return getBoardById(matchingBoard.getId());
+  }
+
+  /**
+   * 게시글 삭제
+   * @param id - 게시글 id
+   * @return 게시글 id
+   */
+  public Long deleteBoard(Long id) {
+    MatchingBoard matchingBoard = boardRepository.findById(id)
+        .orElseThrow(() -> new NotFoundPostException(ErrorCode.POST_NOT_FOUND));
+
+    if (matchingBoard.getIsDeleted()) {
+      throw new DeletedPostException(ErrorCode.DELETED_POST);
+    }
+
+    if (matchingBoard.getStatus() == StatusType.CLOSED) {
+      throw new CompletedMatchingException(ErrorCode.ALREADY_COMPLETED_MATCHING);
+    }
+
+    List<MatchingRequest> requests = requestRepository.findByBoardId(id).orElse(Collections.emptyList());
+    for (MatchingRequest request : requests) {
+      request.refuse();
+      requestRepository.save(request);
+    }
+
+    matchingBoard.delete();
+    matchingBoard.getGame().delete();
+    boardRepository.save(matchingBoard);
+
+    return matchingBoard.getId();
+  }
+
+  /**
+   * 경기 매칭 신청
+   * @param id - 게시글 id
+   * @param memberId - 신청자 id
+   * @return "매칭 신청 완료"
+   */
   public String requestMatching(Long id, Long memberId) {
     MatchingBoard matchingBoard = boardRepository.findById(id)
         .orElseThrow(() -> new NotFoundPostException(ErrorCode.POST_NOT_FOUND));
     Member member = memberRepository.findById(memberId)
         .orElseThrow(() -> new NotFoundMemberException(ErrorCode.MEMBER_NOT_FOUND));
 
-    if (matchingBoard.getMemberId() == member) {
+    if (matchingBoard.getIsDeleted()) {
+      throw new DeletedPostException(ErrorCode.DELETED_POST);
+    }
+
+    if (matchingBoard.getStatus() == StatusType.CLOSED) {
+      throw new CompletedMatchingException(ErrorCode.ALREADY_COMPLETED_MATCHING);
+    }
+
+    if (matchingBoard.getMember() == member) {
       throw new SelfRequestException(ErrorCode.SELF_REQUEST);
     }
 
-    if (requestRepository.existsByBoardIdAndMemberId(matchingBoard, member)) {
+    if (requestRepository.existsByBoardIdAndMemberId(id, memberId)) {
       throw new AlreadyRequestException(ErrorCode.ALREADY_REQUEST_MATCHING);
     }
 
     MatchingRequest matchingRequest = MatchingRequest.builder()
-        .boardId(matchingBoard)
-        .memberId(member)
-        .isAccepted(Boolean.FALSE)
+        .board(matchingBoard)
+        .member(member)
+        .createdDate(LocalDateTime.now())
         .build();
     requestRepository.save(matchingRequest);
 
     return "매칭 신청 완료";
-   
   }
 
-  public String updateBoard(Long id, UpdateBoardRequestDto requestDto) {
-    MatchingBoard matchingBoard = boardRepository.findById(id)
-        .orElseThrow(() -> new NotFoundPostException(ErrorCode.POST_NOT_FOUND));
+  /**
+   * 매칭 신청한 팀 리스트 조회
+   * @param id - 게시글 id
+   * @return 매칭 신청 목록
+   */
+  public List<RequestMatchingDto> getRequestList(Long id) {
+    List<MatchingRequest> requestList = requestRepository.findByBoardId(id)
+        .orElse(Collections.emptyList());
 
-    matchingBoard.update(requestDto);
-
-    boardRepository.save(matchingBoard);
-
-    return "게시글 수정 완료";
+    return requestList.stream().map(RequestMatchingDto::of)
+        .sorted(Comparator.comparing(RequestMatchingDto::getCreatedDate))
+        .collect(Collectors.toList());
   }
 
-  @Transactional
-  public String deleteBoard(Long id) {
-    MatchingBoard matchingBoard = boardRepository.findById(id)
-        .orElseThrow(() -> new NotFoundPostException(ErrorCode.POST_NOT_FOUND));
-    Game game = gameRepository.findByBoardId_Id(id)
-        .orElseThrow(() -> new NotFoundGameException(ErrorCode.GAME_NOT_FOUND));
+  /**
+   * 매칭 신청 수락
+   * @param id - 매칭 신청 id
+   * @return "신청 수락 완료"
+   */
+  public String acceptRequest(Long id) {
+    MatchingRequest request = requestRepository.findById(id)
+        .orElseThrow(() -> new NotFoundRequestException(ErrorCode.REQUEST_NOT_FOUND));
 
-    gameRepository.delete(game);
-    boardRepository.delete(matchingBoard);
+    if (request.getBoard().getStatus() == StatusType.CLOSED) {
+      throw new CompletedMatchingException(ErrorCode.ALREADY_COMPLETED_MATCHING);
+    }
 
-    return "게시글 삭제 완료";
+    request.accept();
+    request.getBoard().acceptMatching();
+    request.getBoard().getGame().setOpponent(request.getMember());
+    requestRepository.save(request);
+
+    List<MatchingRequest> otherRequests = requestRepository.findOtherRequestsByIdAndBoardId(id, request.getBoard().getId())
+        .orElse(Collections.emptyList());
+    for (MatchingRequest req : otherRequests) {
+      req.refuse();
+      requestRepository.save(req);
+    }
+
+    List<MatchingRequest> sameTimeRequests = findSameTimeRequests(id).orElse(Collections.emptyList());
+    for (MatchingRequest req : sameTimeRequests) {
+      req.refuse();
+      requestRepository.save(req);
+    }
+
+    return "신청 수락 완료";
   }
+
+  /**
+   * 매칭 신청 거절
+   * @param id - 매칭 신청 id
+   * @return "신청 거절 완료"
+   */
+  public String refuseRequest(Long id) {
+    MatchingRequest request = requestRepository.findById(id)
+        .orElseThrow(() -> new NotFoundRequestException(ErrorCode.REQUEST_NOT_FOUND));
+
+    if (request.getBoard().getStatus() == StatusType.CLOSED) {
+      throw new CompletedMatchingException(ErrorCode.ALREADY_COMPLETED_MATCHING);
+    }
+
+    request.refuse();
+    requestRepository.save(request);
+
+    return "신청 거절 완료";
+  }
+
+  private Optional<List<MatchingRequest>> findSameTimeRequests(Long id) {
+    MatchingRequest request = requestRepository.findById(id)
+        .orElseThrow(() -> new NotFoundRequestException(ErrorCode.REQUEST_NOT_FOUND));
+
+    Game game = request.getBoard().getGame();
+    LocalDate date = game.getDate();
+    LocalTime time = game.getTime();
+    Long memberId = request.getMember().getId();
+
+    return requestRepository.findSameTimeRequests(memberId, date, time, id);
+  }
+
+  private List<Image> findImagesById(List<Long> imgList) {
+    List<Image> images = new ArrayList<>();
+
+    if (imgList != null) {
+      for (Long id : imgList) {
+        Optional<Image> optionalImage = imageRepository.findById(id);
+        optionalImage.ifPresent(images::add);
+      }
+    }
+
+    return images;
+  }
+
+  private Integer countRequestsByBoard(Member member) {
+    List<MatchingBoard> boards = boardRepository.findByMemberId(member.getId())
+        .orElse(Collections.emptyList());
+
+    int count = 0;
+    for (MatchingBoard each : boards) {
+      if (each.getMatchingRequest() != null) {
+        count += each.getMatchingRequest().size();
+      }
+    }
+
+    return count;
+  }
+
 }

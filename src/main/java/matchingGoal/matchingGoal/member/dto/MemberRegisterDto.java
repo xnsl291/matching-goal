@@ -36,4 +36,5 @@ public class MemberRegisterDto {
 
     @Positive
     private Long imageId;
+
 }
