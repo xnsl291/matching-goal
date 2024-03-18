@@ -2,7 +2,6 @@ package matchingGoal.matchingGoal.common.config;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.util.AntPathMatcher;
@@ -35,7 +34,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
   @Override
   public void configureMessageBroker(MessageBrokerRegistry reg) {
-    reg.enableStompBrokerRelay("/exchange")
+    reg.enableStompBrokerRelay("/exchange", "/alarm")
         .setClientLogin(rabbitUser)
         .setClientPasscode(rabbitPw)
         .setSystemLogin(rabbitUser)
@@ -45,7 +44,6 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         .setRelayPort(rabbitPort);
 //    reg.enableSimpleBroker("/sub");
     reg.setPathMatcher(new AntPathMatcher("."));
-
     reg.setApplicationDestinationPrefixes("/pub");
 
   }
