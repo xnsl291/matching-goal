@@ -95,7 +95,7 @@ public class AuthService {
             throw new WithdrawnMemberAccessException();
 
         // 토큰 발행
-        JwtToken tokens = jwtTokenProvider.generateToken(member.getId(), member.getEmail());
+        JwtToken tokens = jwtTokenProvider.generateToken(member.getId(), member.getEmail(), member.getNickname());
 
         //프로필이미지
         //String imageUrl = imageService.getImageUrl(member.getImageId());

@@ -75,6 +75,17 @@ public class MemberService {
      */
     public Member getMemberByToken(String token){
         jwtTokenProvider.validateToken(token);
+        System.out.println("---------pass");
+//        System.out.println(">>>>>>>>>  "+ );
+
+//        Long id  = jwtTokenProvider.getId(token);
+//        Member member = memberRepository.findById(id)
+//                .orElseThrow(MemberNotFoundException::new);
+//
+//        if (member.isDeleted())
+//            throw new WithdrawnMemberAccessException();
+//        System.out.println(member.toString());
+//        return member;
         return getMemberById(jwtTokenProvider.getId(token));
     }
 

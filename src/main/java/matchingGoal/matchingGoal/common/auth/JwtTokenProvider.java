@@ -23,19 +23,21 @@ public class JwtTokenProvider {
 
     private final String key = "236979CB6F1AD6B6A6184A31E6BE37DB3818CC36871E26235DD67DCFE4041492";
 
-    public JwtToken generateToken(Long id, String email) {
+    public JwtToken generateToken(Long id, String email, String nickname) {
         long now = (new Date()).getTime();
 
         String accessToken = Jwts.builder()
-                .setSubject(email)
                 .setId(id.toString())
+                .setSubject(email)
+                .setAudience(nickname)
                 .setExpiration(new Date(now + accessTokenExpirationTimeInSeconds))
                 .signWith(SignatureAlgorithm.HS256, key)
                 .compact();
 
         String refreshToken = Jwts.builder()
-                .setSubject(email)
                 .setId(id.toString())
+                .setSubject(email)
+                .setAudience(nickname)
                 .setExpiration(new Date(now + refreshTokenExpirationTimeInSeconds))
                 .signWith(SignatureAlgorithm.HS256, key)
                 .compact();
@@ -46,12 +48,11 @@ public class JwtTokenProvider {
     }
 
 
-    public boolean validateToken(String token) {
+    public void validateToken(String token) {
         try {
             // 로그아웃한 토큰일 경우
             if (redisService.getData(BLACK_TOKEN_PREFIX + getEmail(token)) != null)
                 throw new ExpiredTokenException();
-            return true;
 
         } catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException e) {
             log.info("Invalid JWT Token", e);
@@ -62,7 +63,6 @@ public class JwtTokenProvider {
         } catch (IllegalArgumentException e) {
             log.info("JWT claims string is empty.", e);
         }
-        return false;
     }
 
     public String getEmail(String token) {
