@@ -42,6 +42,8 @@ public class MatchingBoardSpecification {
         }
       }
 
+      predicates.add(criteriaBuilder.isFalse(root.get("isDeleted")));
+
       return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
     });
   }

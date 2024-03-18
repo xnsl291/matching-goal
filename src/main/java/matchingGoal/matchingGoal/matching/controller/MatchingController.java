@@ -11,6 +11,7 @@ import matchingGoal.matchingGoal.matching.dto.UpdateBoardDto;
 import matchingGoal.matchingGoal.matching.service.MatchingService;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -38,7 +39,7 @@ public class MatchingController {
       @RequestParam(required = false) String keyword,
       @RequestParam(required = false) String type,
       @RequestParam(defaultValue = "time") String sort,
-      @RequestParam(defaultValue = "desc") String sortDirection,
+      @RequestParam(name = "sort-direction", defaultValue = "desc") String sortDirection,
       @RequestParam(required = false) String date,
       @RequestParam(required = false) String time
   ) {
@@ -55,7 +56,7 @@ public class MatchingController {
     return ResponseEntity.ok(matchingService.updateBoard(id, requestDto));
   }
 
-  @PatchMapping("/delete/{id}")
+  @DeleteMapping("/{id}")
   public ResponseEntity<Long> deleteBoard(@PathVariable Long id) {
     return ResponseEntity.ok(matchingService.deleteBoard(id));
   }
