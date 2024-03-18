@@ -13,21 +13,23 @@ import matchingGoal.matchingGoal.alarm.entity.Alarm;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AlarmResponse {
+public class AlarmDto {
   private long id;
   private long memberId;
+  private String type;
+  private long contentId;
   private String message;
-  private String url;
   private boolean checkedOut;
   private LocalDateTime createdDate;
 
-  public AlarmResponse fromEntity (Alarm alarm){
+  public static AlarmDto fromEntity(Alarm alarm){
 
-    return AlarmResponse.builder()
+    return AlarmDto.builder()
         .id(alarm.getId())
         .memberId(alarm.getMemberId())
         .message(alarm.getMessage())
-        .url(alarm.getUrl())
+        .type(alarm.getType())
+        .contentId(alarm.getContentId())
         .checkedOut(alarm.isCheckedOut())
         .createdDate(alarm.getCreatedDate())
         .build();
