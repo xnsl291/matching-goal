@@ -1,10 +1,13 @@
 package matchingGoal.matchingGoal.matching.controller;
 
 import jakarta.validation.Valid;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import matchingGoal.matchingGoal.matching.dto.BoardRequestDto;
 import matchingGoal.matchingGoal.matching.dto.BoardResponseDto;
+import matchingGoal.matchingGoal.matching.dto.ListBoardDto;
 import matchingGoal.matchingGoal.matching.dto.RequestMatchingDto;
 import matchingGoal.matchingGoal.matching.dto.UpdateBoardDto;
 import matchingGoal.matchingGoal.matching.service.MatchingService;
@@ -15,6 +18,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -27,6 +31,19 @@ public class MatchingController {
   @PostMapping("/write")
   public ResponseEntity<BoardResponseDto> createBoard(@Valid @RequestBody BoardRequestDto requestDto) {
     return ResponseEntity.ok(matchingService.createBoard(requestDto));
+  }
+
+  @GetMapping("/list")
+  public List<ListBoardDto> getBoardList(
+      @RequestParam(defaultValue = "0") int page,
+      @RequestParam(required = false) String keyword,
+      @RequestParam(required = false) String type,
+      @RequestParam(defaultValue = "time") String sort,
+      @RequestParam(defaultValue = "desc") String sortDirection,
+      @RequestParam(required = false) String date,
+      @RequestParam(required = false) String time
+  ) {
+    return matchingService.getBoardList(page, keyword, type, sort, sortDirection, date, time);
   }
 
   @GetMapping("/{id}")

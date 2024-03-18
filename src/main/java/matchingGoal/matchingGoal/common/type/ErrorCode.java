@@ -36,8 +36,10 @@ public enum ErrorCode {
     REQUEST_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 신청건입니다."),
     ALREADY_COMPLETED_MATCHING(HttpStatus.BAD_REQUEST, "이미 매칭 완료된 게시글입니다."),
     DELETED_POST(HttpStatus.BAD_REQUEST, "삭제된 게시글입니다."),
-    ALREADY_REGISTERED_EMAIL(HttpStatus.BAD_REQUEST, "");
+    ILLEGAL_SEARCH_TYPE(HttpStatus.BAD_REQUEST, "잘못된 검색 타입입니다."),
 
+    ALREADY_REGISTERED_EMAIL(HttpStatus.BAD_REQUEST, "");
+    
     private final HttpStatus status;
     private final String description;
 }
