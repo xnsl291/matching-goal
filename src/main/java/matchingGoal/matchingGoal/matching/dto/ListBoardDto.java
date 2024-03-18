@@ -3,15 +3,11 @@ package matchingGoal.matchingGoal.matching.dto;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.List;
-import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import matchingGoal.matchingGoal.image.model.entity.Image;
 import matchingGoal.matchingGoal.matching.domain.StatusType;
-import matchingGoal.matchingGoal.matching.domain.entity.MatchingBoard;
 
 @Getter
 @NoArgsConstructor

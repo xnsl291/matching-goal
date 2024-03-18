@@ -1,8 +1,6 @@
 package matchingGoal.matchingGoal.matching.controller;
 
 import jakarta.validation.Valid;
-import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import matchingGoal.matchingGoal.matching.dto.BoardRequestDto;
@@ -11,6 +9,7 @@ import matchingGoal.matchingGoal.matching.dto.ListBoardDto;
 import matchingGoal.matchingGoal.matching.dto.RequestMatchingDto;
 import matchingGoal.matchingGoal.matching.dto.UpdateBoardDto;
 import matchingGoal.matchingGoal.matching.service.MatchingService;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -34,7 +33,7 @@ public class MatchingController {
   }
 
   @GetMapping("/list")
-  public List<ListBoardDto> getBoardList(
+  public Page<ListBoardDto> getBoardList(
       @RequestParam(defaultValue = "0") int page,
       @RequestParam(required = false) String keyword,
       @RequestParam(required = false) String type,
