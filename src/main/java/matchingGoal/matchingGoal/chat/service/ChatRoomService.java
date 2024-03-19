@@ -12,6 +12,7 @@ import matchingGoal.matchingGoal.chat.repository.ChatRoomRepository;
 import matchingGoal.matchingGoal.member.model.entity.Member;
 import matchingGoal.matchingGoal.member.repository.MemberRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Slf4j
@@ -55,7 +56,7 @@ public class ChatRoomService {
 
     return myChat.stream().map(ChatRoomListResponse::fromEntity).toList();
   }
-
+  @Transactional
   public void quit(long userId, String chatRoomId) {
 
     ChatRoom chatRoom = getChatRoom(chatRoomId);
