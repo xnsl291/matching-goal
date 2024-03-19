@@ -6,6 +6,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import matchingGoal.matchingGoal.common.type.ErrorCode;
 import matchingGoal.matchingGoal.matching.domain.entity.MatchingBoard;
 import matchingGoal.matchingGoal.matching.exception.IllegalSearchTypeException;
 import matchingGoal.matchingGoal.member.model.entity.Member;
@@ -46,6 +47,5 @@ public class MatchingBoardSpecification {
       return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
     });
   }
-
 
 }
