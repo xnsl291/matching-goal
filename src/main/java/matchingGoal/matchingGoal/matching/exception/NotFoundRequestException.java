@@ -8,8 +8,8 @@ import matchingGoal.matchingGoal.common.type.ErrorCode;
 public class NotFoundRequestException extends CustomException {
   private final ErrorCode errorCode;
 
-  public NotFoundRequestException(ErrorCode errorCode) {
-    this.errorCode = errorCode;
+  public NotFoundRequestException() {
+    this.errorCode = ErrorCode.REQUEST_NOT_FOUND;
   }
 
 }

@@ -38,13 +38,14 @@ public class MatchingBoardSpecification {
             predicates.add(criteriaBuilder.like(root.get("region"), "%" + keyword + "%"));
             break;
           default:
-            throw new IllegalSearchTypeException(ErrorCode.ILLEGAL_SEARCH_TYPE);
+            throw new IllegalSearchTypeException();
         }
       }
+
+      predicates.add(criteriaBuilder.isFalse(root.get("isDeleted")));
 
       return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
     });
   }
-
 
 }

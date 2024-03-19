@@ -9,8 +9,8 @@ public class IllegalSearchTypeException extends CustomException {
 
   private final ErrorCode errorCode;
 
-  public IllegalSearchTypeException(ErrorCode errorCode) {
-    this.errorCode = errorCode;
+  public IllegalSearchTypeException() {
+    this.errorCode = ErrorCode.ILLEGAL_SEARCH_TYPE;
   }
 
 }
