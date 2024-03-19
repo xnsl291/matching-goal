@@ -158,7 +158,7 @@ public class MatchingService {
     boardRepository.increaseViewCountById(id);
 
     if (matchingBoard.getIsDeleted()) {
-      throw new DeletedPostException(ErrorCode.DELETED_POST);
+      throw new DeletedPostException();
     }
 
     BoardResponseDto boardResponseDto = BoardResponseDto.of(matchingBoard);
@@ -177,7 +177,7 @@ public class MatchingService {
         .orElseThrow(() -> new NotFoundPostException(ErrorCode.POST_NOT_FOUND));
 
     if (matchingBoard.getIsDeleted()) {
-      throw new DeletedPostException(ErrorCode.DELETED_POST);
+      throw new DeletedPostException();
     }
 
     List<Image> images = findImagesById(requestDto.getImgList());
@@ -198,11 +198,11 @@ public class MatchingService {
         .orElseThrow(() -> new NotFoundPostException(ErrorCode.POST_NOT_FOUND));
 
     if (matchingBoard.getIsDeleted()) {
-      throw new DeletedPostException(ErrorCode.DELETED_POST);
+      throw new DeletedPostException();
     }
 
     if (matchingBoard.getStatus() == StatusType.CLOSED) {
-      throw new CompletedMatchingException(ErrorCode.ALREADY_COMPLETED_MATCHING);
+      throw new CompletedMatchingException();
     }
 
     List<MatchingRequest> requests = requestRepository.findByBoardId(id).orElse(Collections.emptyList());
@@ -231,19 +231,19 @@ public class MatchingService {
         .orElseThrow(() -> new NotFoundMemberException(ErrorCode.MEMBER_NOT_FOUND));
 
     if (matchingBoard.getIsDeleted()) {
-      throw new DeletedPostException(ErrorCode.DELETED_POST);
+      throw new DeletedPostException();
     }
 
     if (matchingBoard.getStatus() == StatusType.CLOSED) {
-      throw new CompletedMatchingException(ErrorCode.ALREADY_COMPLETED_MATCHING);
+      throw new CompletedMatchingException();
     }
 
     if (matchingBoard.getMember() == member) {
-      throw new SelfRequestException(ErrorCode.SELF_REQUEST);
+      throw new SelfRequestException();
     }
 
     if (requestRepository.existsByBoardIdAndMemberId(id, memberId)) {
-      throw new AlreadyRequestException(ErrorCode.ALREADY_REQUEST_MATCHING);
+      throw new AlreadyRequestException();
     }
 
     MatchingRequest matchingRequest = MatchingRequest.builder()
@@ -284,7 +284,7 @@ public class MatchingService {
         .orElseThrow(() -> new NotFoundRequestException(ErrorCode.REQUEST_NOT_FOUND));
 
     if (request.getBoard().getStatus() == StatusType.CLOSED) {
-      throw new CompletedMatchingException(ErrorCode.ALREADY_COMPLETED_MATCHING);
+      throw new CompletedMatchingException();
     }
 
     request.accept();
@@ -318,7 +318,7 @@ public class MatchingService {
         .orElseThrow(() -> new NotFoundRequestException(ErrorCode.REQUEST_NOT_FOUND));
 
     if (request.getBoard().getStatus() == StatusType.CLOSED) {
-      throw new CompletedMatchingException(ErrorCode.ALREADY_COMPLETED_MATCHING);
+      throw new CompletedMatchingException();
     }
 
     request.refuse();

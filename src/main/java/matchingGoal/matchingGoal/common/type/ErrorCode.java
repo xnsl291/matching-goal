@@ -26,6 +26,8 @@ public enum ErrorCode {
     DUPLICATED_NICKNAME(HttpStatus.BAD_REQUEST,"중복된 닉네임 입니다"),
     INVALID_PASSWORD_FORMAT(HttpStatus.BAD_REQUEST,"비밀번호의 형식이 올바르지 않습니다"),
     PASSWORD_NOT_UPDATED(HttpStatus.BAD_REQUEST, "새로운 비밀번호는 변경 전 비밀번호와 같을 수 없습니"),
+    ALREADY_REGISTERED_EMAIL(HttpStatus.BAD_REQUEST, ""),
+
 
     // matching
     POST_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 게시글입니다."),
@@ -36,10 +38,8 @@ public enum ErrorCode {
     REQUEST_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 신청건입니다."),
     ALREADY_COMPLETED_MATCHING(HttpStatus.BAD_REQUEST, "이미 매칭 완료된 게시글입니다."),
     DELETED_POST(HttpStatus.BAD_REQUEST, "삭제된 게시글입니다."),
-    ILLEGAL_SEARCH_TYPE(HttpStatus.BAD_REQUEST, "잘못된 검색 타입입니다."),
-  
-  
-    ALREADY_REGISTERED_EMAIL(HttpStatus.BAD_REQUEST, "");
+    ILLEGAL_SEARCH_TYPE(HttpStatus.BAD_REQUEST, "잘못된 검색 타입입니다.");
+    
 
     private final HttpStatus status;
     private final String description;
