@@ -11,6 +11,6 @@ public class NicknameValidator implements ConstraintValidator<Nickname,String> {
             return false;
         }
 
-        return string.matches("^(?=.*[a-zA-Z0-9가-힣])[a-zA-Z0-9가-힣]{2,20}$");
+        return string.matches("^[a-zA-Z0-9가-힣]{2,20}$");
     }
 }

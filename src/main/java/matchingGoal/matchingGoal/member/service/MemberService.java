@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import matchingGoal.matchingGoal.common.auth.JwtTokenProvider;
 import matchingGoal.matchingGoal.image.service.ImageService;
 import matchingGoal.matchingGoal.member.dto.SimplerInfoResponse;
-import matchingGoal.matchingGoal.member.dto.UpdateMemberInfoDto;
+import matchingGoal.matchingGoal.member.dto.UpdateMemberDto;
 import matchingGoal.matchingGoal.member.dto.UpdatePasswordDto;
 import matchingGoal.matchingGoal.member.exception.MemberNotFoundException;
 import matchingGoal.matchingGoal.member.exception.PasswordSameAsBeforeException;
@@ -81,11 +81,11 @@ public class MemberService {
     /**
      * 개인 정보 수정
      * @param token - 토큰
-     * @param updateDto - 정보 수정 dto (이름, 닉네임, 소개, 지역, 이미지)
+     * @param updateDto - 정보 수정 dto (이름, 닉네임, 소개, 지역)
      * @return "수정완료"
      */
     @Transactional
-    public String editMemberInfo(String token, UpdateMemberInfoDto updateDto) {
+    public String editMemberInfo(String token, UpdateMemberDto updateDto) {
         Member member = getMemberInfo(token);
 
         member.setName(updateDto.getName());
