@@ -99,7 +99,7 @@ public class AuthService {
                 .refreshToken(tokens.getRefreshToken())
                 .memberId(member.getId())
                 .nickname(member.getNickname())
-                //.imageUrl(imageUrl)
+                .email(member.getEmail())
                 .build();
     }
 
