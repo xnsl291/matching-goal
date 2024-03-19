@@ -6,7 +6,6 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
-import matchingGoal.matchingGoal.common.type.ErrorCode;
 import matchingGoal.matchingGoal.matching.domain.entity.MatchingBoard;
 import matchingGoal.matchingGoal.matching.exception.IllegalSearchTypeException;
 import matchingGoal.matchingGoal.member.model.entity.Member;
@@ -38,7 +37,7 @@ public class MatchingBoardSpecification {
             predicates.add(criteriaBuilder.like(root.get("region"), "%" + keyword + "%"));
             break;
           default:
-            throw new IllegalSearchTypeException(ErrorCode.ILLEGAL_SEARCH_TYPE);
+            throw new IllegalSearchTypeException();
         }
       }
 

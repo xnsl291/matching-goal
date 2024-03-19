@@ -8,8 +8,8 @@ import matchingGoal.matchingGoal.common.type.ErrorCode;
 public class NotFoundGameException extends CustomException {
   private final ErrorCode errorCode;
 
-  public NotFoundGameException(ErrorCode errorCode) {
-    this.errorCode = errorCode;
+  public NotFoundGameException() {
+    this.errorCode = ErrorCode.GAME_NOT_FOUND;
   }
 
 }
