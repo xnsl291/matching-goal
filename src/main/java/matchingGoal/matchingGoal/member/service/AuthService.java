@@ -6,12 +6,11 @@ import lombok.extern.slf4j.Slf4j;
 import matchingGoal.matchingGoal.common.auth.JwtToken;
 import matchingGoal.matchingGoal.common.auth.JwtTokenProvider;
 import matchingGoal.matchingGoal.common.service.RedisService;
-import matchingGoal.matchingGoal.image.service.ImageService;
 import matchingGoal.matchingGoal.member.dto.SignInDto;
 import matchingGoal.matchingGoal.member.dto.GetPasswordDto;
 import matchingGoal.matchingGoal.member.dto.SignInResponse;
 import matchingGoal.matchingGoal.member.exception.*;
-import matchingGoal.matchingGoal.member.dto.MemberRegisterDto;
+import matchingGoal.matchingGoal.member.dto.SignUpDto;
 import matchingGoal.matchingGoal.member.model.entity.Member;
 import matchingGoal.matchingGoal.member.repository.MemberRepository;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -36,7 +35,7 @@ public class AuthService {
      * @param registerDto - 회원가입 dto
      * @return "회원가입 성공"
      */
-    public String registerMember(MemberRegisterDto registerDto) {
+    public String registerMember(SignUpDto registerDto) {
 
         // 이메일 중복 확인
         if(memberRepository.findByEmail(registerDto.getEmail()).isPresent())

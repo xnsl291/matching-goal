@@ -12,7 +12,7 @@ import matchingGoal.matchingGoal.common.annotation.Password;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class MemberRegisterDto {
+public class SignUpDto {
 
     @NotBlank(message = "이름을 입력해주세요")
     private String name;
