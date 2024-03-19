@@ -6,12 +6,11 @@ import lombok.extern.slf4j.Slf4j;
 import matchingGoal.matchingGoal.common.auth.JwtToken;
 import matchingGoal.matchingGoal.common.auth.JwtTokenProvider;
 import matchingGoal.matchingGoal.common.service.RedisService;
-import matchingGoal.matchingGoal.image.service.ImageService;
 import matchingGoal.matchingGoal.member.dto.SignInDto;
 import matchingGoal.matchingGoal.member.dto.GetPasswordDto;
 import matchingGoal.matchingGoal.member.dto.SignInResponse;
 import matchingGoal.matchingGoal.member.exception.*;
-import matchingGoal.matchingGoal.member.dto.MemberRegisterDto;
+import matchingGoal.matchingGoal.member.dto.SignUpDto;
 import matchingGoal.matchingGoal.member.model.entity.Member;
 import matchingGoal.matchingGoal.member.repository.MemberRepository;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -28,15 +27,13 @@ public class AuthService {
     private final JwtTokenProvider jwtTokenProvider;
     private final MemberRepository memberRepository;
     private final MemberService memberService;
-    private final RedisService redisService;
-    private final String TOKEN_PREFIX = "RT_";
 
     /**
      * 회원가입
      * @param registerDto - 회원가입 dto
      * @return "회원가입 성공"
      */
-    public String registerMember(MemberRegisterDto registerDto) {
+    public String registerMember(SignUpDto registerDto) {
 
         // 이메일 중복 확인
         if(memberRepository.findByEmail(registerDto.getEmail()).isPresent())
@@ -100,7 +97,7 @@ public class AuthService {
         return SignInResponse.builder()
                 .accessToken(tokens.getAccessToken())
                 .refreshToken(tokens.getRefreshToken())
-                .id(member.getId())
+                .memberId(member.getId())
                 .nickname(member.getNickname())
                 //.imageUrl(imageUrl)
                 .build();
@@ -113,12 +110,6 @@ public class AuthService {
      */
     public String signOut(String token) {
         jwtTokenProvider.validateToken(token);
-
-        String email = jwtTokenProvider.getEmail(token);
-
-        if (redisService.getData(TOKEN_PREFIX + email) == null) {
-            throw new ExpiredTokenException();
-        }
 
         // 블랙 리스트에 추가(로그아웃)
         jwtTokenProvider.setBlacklist(token);
