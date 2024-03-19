@@ -100,7 +100,7 @@ public class AuthService {
         return SignInResponse.builder()
                 .accessToken(tokens.getAccessToken())
                 .refreshToken(tokens.getRefreshToken())
-                .id(member.getId())
+                .memberId(member.getId())
                 .nickname(member.getNickname())
                 //.imageUrl(imageUrl)
                 .build();
