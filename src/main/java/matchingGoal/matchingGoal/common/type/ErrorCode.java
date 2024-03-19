@@ -39,8 +39,9 @@ public enum ErrorCode {
     ALREADY_COMPLETED_MATCHING(HttpStatus.BAD_REQUEST, "이미 매칭 완료된 게시글입니다."),
     DELETED_POST(HttpStatus.BAD_REQUEST, "삭제된 게시글입니다."),
     ILLEGAL_SEARCH_TYPE(HttpStatus.BAD_REQUEST, "잘못된 검색 타입입니다.");
-    
 
+
+    
     private final HttpStatus status;
     private final String description;
 }

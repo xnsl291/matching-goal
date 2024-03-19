@@ -9,8 +9,8 @@ public class NotFoundMemberException extends CustomException {
 
   private final ErrorCode errorCode;
 
-  public NotFoundMemberException(ErrorCode errorCode) {
-    this.errorCode = errorCode;
+  public NotFoundMemberException() {
+    this.errorCode = ErrorCode.MEMBER_NOT_FOUND;
   }
 
 }

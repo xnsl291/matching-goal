@@ -25,4 +25,5 @@ public interface MatchingBoardRepository extends JpaRepository<MatchingBoard, Lo
   void increaseViewCountById(Long id);
 
   Page<MatchingBoard> findAll(Specification<MatchingBoard> spec, Pageable pageable);
+
 }

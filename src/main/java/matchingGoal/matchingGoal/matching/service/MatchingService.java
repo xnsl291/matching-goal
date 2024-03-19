@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
-import matchingGoal.matchingGoal.common.type.ErrorCode;
 import matchingGoal.matchingGoal.image.model.entity.Image;
 import matchingGoal.matchingGoal.image.repository.ImageRepository;
 import matchingGoal.matchingGoal.matching.domain.StatusType;
@@ -59,7 +58,7 @@ public class MatchingService {
    */
   public BoardResponseDto createBoard(BoardRequestDto requestDto) {
     Member member = memberRepository.findById(requestDto.getMemberId())
-        .orElseThrow(() -> new NotFoundMemberException(ErrorCode.MEMBER_NOT_FOUND));
+        .orElseThrow(() -> new NotFoundMemberException());
 
     List<Image> images = findImagesById(requestDto.getImgList());
 
@@ -153,7 +152,7 @@ public class MatchingService {
    */
   public BoardResponseDto getBoardById(Long id) {
     MatchingBoard matchingBoard = boardRepository.findById(id)
-        .orElseThrow(() -> new NotFoundPostException(ErrorCode.POST_NOT_FOUND));
+        .orElseThrow(() -> new NotFoundPostException());
 
     boardRepository.increaseViewCountById(id);
 
@@ -174,7 +173,7 @@ public class MatchingService {
    */
   public BoardResponseDto updateBoard(Long id, UpdateBoardDto requestDto) {
     MatchingBoard matchingBoard = boardRepository.findById(id)
-        .orElseThrow(() -> new NotFoundPostException(ErrorCode.POST_NOT_FOUND));
+        .orElseThrow(() -> new NotFoundPostException());
 
     if (matchingBoard.getIsDeleted()) {
       throw new DeletedPostException();
@@ -195,7 +194,7 @@ public class MatchingService {
    */
   public Long deleteBoard(Long id) {
     MatchingBoard matchingBoard = boardRepository.findById(id)
-        .orElseThrow(() -> new NotFoundPostException(ErrorCode.POST_NOT_FOUND));
+        .orElseThrow(() -> new NotFoundPostException());
 
     if (matchingBoard.getIsDeleted()) {
       throw new DeletedPostException();
@@ -226,9 +225,9 @@ public class MatchingService {
    */
   public String requestMatching(Long id, Long memberId) {
     MatchingBoard matchingBoard = boardRepository.findById(id)
-        .orElseThrow(() -> new NotFoundPostException(ErrorCode.POST_NOT_FOUND));
+        .orElseThrow(() -> new NotFoundPostException());
     Member member = memberRepository.findById(memberId)
-        .orElseThrow(() -> new NotFoundMemberException(ErrorCode.MEMBER_NOT_FOUND));
+        .orElseThrow(() -> new NotFoundMemberException());
 
     if (matchingBoard.getIsDeleted()) {
       throw new DeletedPostException();
@@ -281,7 +280,7 @@ public class MatchingService {
    */
   public String acceptRequest(Long id) {
     MatchingRequest request = requestRepository.findById(id)
-        .orElseThrow(() -> new NotFoundRequestException(ErrorCode.REQUEST_NOT_FOUND));
+        .orElseThrow(() -> new NotFoundRequestException());
 
     if (request.getBoard().getStatus() == StatusType.CLOSED) {
       throw new CompletedMatchingException();
@@ -315,7 +314,7 @@ public class MatchingService {
    */
   public String refuseRequest(Long id) {
     MatchingRequest request = requestRepository.findById(id)
-        .orElseThrow(() -> new NotFoundRequestException(ErrorCode.REQUEST_NOT_FOUND));
+        .orElseThrow(() -> new NotFoundRequestException());
 
     if (request.getBoard().getStatus() == StatusType.CLOSED) {
       throw new CompletedMatchingException();
@@ -329,7 +328,7 @@ public class MatchingService {
 
   private Optional<List<MatchingRequest>> findSameTimeRequests(Long id) {
     MatchingRequest request = requestRepository.findById(id)
-        .orElseThrow(() -> new NotFoundRequestException(ErrorCode.REQUEST_NOT_FOUND));
+        .orElseThrow(() -> new NotFoundRequestException());
 
     Game game = request.getBoard().getGame();
     LocalDate date = game.getDate();
