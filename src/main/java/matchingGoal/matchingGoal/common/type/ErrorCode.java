@@ -8,7 +8,7 @@ import org.springframework.http.HttpStatus;
 @Getter
 @AllArgsConstructor
 public enum ErrorCode {
-      
+
     //common
     INVALID_ARGUMENT(HttpStatus.BAD_REQUEST,"입력된 값이 올바르지 않습니다"),
 
@@ -17,7 +17,7 @@ public enum ErrorCode {
     WRONG_PASSWORD(HttpStatus.BAD_REQUEST, "비밀번호가 일치하지 않습니다"),
     INVALID_TOKEN(HttpStatus.NOT_FOUND, "토큰 정보를 찾을 수 없습니다"),
     WITHDRAWN_MEMBER(HttpStatus.BAD_REQUEST, "탈퇴한 사용자 입니다"),
-    EXPIRED_TOKEN(HttpStatus.BAD_REQUEST,"만료된 토큰입니다"),
+    EXPIRED_TOKEN(HttpStatus.UNAUTHORIZED,"만료된 토큰입니다"),
 
     // member
     MEMBER_NOT_EXISTS(HttpStatus.NOT_FOUND,"사용자를 찾을 수 없습니다"),

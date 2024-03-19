@@ -27,8 +27,6 @@ public class AuthService {
     private final JwtTokenProvider jwtTokenProvider;
     private final MemberRepository memberRepository;
     private final MemberService memberService;
-    private final RedisService redisService;
-    private final String TOKEN_PREFIX = "RT_";
 
     /**
      * 회원가입
@@ -112,12 +110,6 @@ public class AuthService {
      */
     public String signOut(String token) {
         jwtTokenProvider.validateToken(token);
-
-        String email = jwtTokenProvider.getEmail(token);
-
-        if (redisService.getData(TOKEN_PREFIX + email) == null) {
-            throw new ExpiredTokenException();
-        }
 
         // 블랙 리스트에 추가(로그아웃)
         jwtTokenProvider.setBlacklist(token);
