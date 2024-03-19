@@ -10,7 +10,7 @@ import matchingGoal.matchingGoal.common.annotation.Nickname;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class UpdateMemberInfoDto {
+public class UpdateMemberDto {
 
     @NotBlank(message = "이름을 입력해주세요")
     private String name;

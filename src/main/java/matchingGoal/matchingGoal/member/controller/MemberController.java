@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import matchingGoal.matchingGoal.common.annotation.Nickname;
 import matchingGoal.matchingGoal.member.dto.SimplerInfoResponse;
-import matchingGoal.matchingGoal.member.dto.UpdateMemberInfoDto;
+import matchingGoal.matchingGoal.member.dto.UpdateMemberDto;
 import matchingGoal.matchingGoal.member.dto.UpdatePasswordDto;
 import matchingGoal.matchingGoal.member.model.entity.Member;
 import matchingGoal.matchingGoal.member.service.MemberService;
@@ -56,7 +56,7 @@ public class MemberController {
      * @return "수정완료"
      */
     @PatchMapping("/mypage")
-    public ResponseEntity<String> editMemberInfo(@RequestHeader(name = AUTH_HEADER) String token, @Valid UpdateMemberInfoDto updateDto) {
+    public ResponseEntity<String> editMemberInfo(@RequestHeader(name = AUTH_HEADER) String token, @Valid @RequestBody UpdateMemberDto updateDto) {
         return ResponseEntity.ok().body(memberService.editMemberInfo(token,updateDto));
     }
 
