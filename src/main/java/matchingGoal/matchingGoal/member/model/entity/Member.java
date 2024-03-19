@@ -52,4 +52,7 @@ public class Member{
     @Setter
     private LocalDateTime deletedDate;
 
+    @Setter
+    private Integer requestCount;
+
 }
