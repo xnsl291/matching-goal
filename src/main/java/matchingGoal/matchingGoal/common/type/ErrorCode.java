@@ -28,6 +28,7 @@ public enum ErrorCode {
     PASSWORD_NOT_UPDATED(HttpStatus.BAD_REQUEST, "새로운 비밀번호는 변경 전 비밀번호와 같을 수 없습니"),
     ALREADY_REGISTERED_EMAIL(HttpStatus.BAD_REQUEST, ""),
 
+
     // matching
     POST_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 게시글입니다."),
     GAME_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 게임입니다."),
@@ -38,6 +39,7 @@ public enum ErrorCode {
     ALREADY_COMPLETED_MATCHING(HttpStatus.BAD_REQUEST, "이미 매칭 완료된 게시글입니다."),
     DELETED_POST(HttpStatus.BAD_REQUEST, "삭제된 게시글입니다."),
     ILLEGAL_SEARCH_TYPE(HttpStatus.BAD_REQUEST, "잘못된 검색 타입입니다.");
+
 
     
     private final HttpStatus status;
