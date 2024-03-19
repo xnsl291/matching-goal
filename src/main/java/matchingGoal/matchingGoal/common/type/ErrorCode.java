@@ -38,7 +38,12 @@ public enum ErrorCode {
     REQUEST_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 신청건입니다."),
     ALREADY_COMPLETED_MATCHING(HttpStatus.BAD_REQUEST, "이미 매칭 완료된 게시글입니다."),
     DELETED_POST(HttpStatus.BAD_REQUEST, "삭제된 게시글입니다."),
-    ILLEGAL_SEARCH_TYPE(HttpStatus.BAD_REQUEST, "잘못된 검색 타입입니다.");
+    ILLEGAL_SEARCH_TYPE(HttpStatus.BAD_REQUEST, "잘못된 검색 타입입니다."),
+    NO_PERMISSION(HttpStatus.BAD_REQUEST, "권한이 없습니다."),
+    ALREADY_RESULT_EXISTS(HttpStatus.BAD_REQUEST, "결과가 입력된 게임입니다."),
+    RESULT_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 경기 결과입니다."),
+    NON_PARTICIPATING_TEAM(HttpStatus.BAD_REQUEST, "참가하지 않은 팀입니다."),
+    ALREADY_ACCEPTED_RESULT(HttpStatus.BAD_REQUEST, "이미 수락된 경기 결과입니다.");
 
 
     
