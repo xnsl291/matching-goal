@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import matchingGoal.matchingGoal.common.annotation.Nickname;
 import matchingGoal.matchingGoal.member.dto.SimplerInfoResponse;
-import matchingGoal.matchingGoal.member.dto.UpdateMemberInfoDto;
+import matchingGoal.matchingGoal.member.dto.UpdateMemberDto;
 import matchingGoal.matchingGoal.member.dto.UpdatePasswordDto;
 import matchingGoal.matchingGoal.member.model.entity.Member;
 import matchingGoal.matchingGoal.member.service.MemberService;
@@ -21,7 +21,6 @@ public class MemberController {
 
     /**
      * 중복된 닉네임이 존재하는지 확인
-     * @param nickname - 닉네임
      * @return 중복여부 (중복 시, false)
      */
     @PostMapping("/checkNickname")
@@ -31,8 +30,7 @@ public class MemberController {
 
     /**
      * 비밀번호 변경
-     * @param token - 토큰
-     * @param dto - 새로운 비밀번호
+     * @param dto - 기존비밀번호, 새로운 비밀번호
      * @return "변경완료"
      */
     @PatchMapping("/password")
@@ -42,8 +40,6 @@ public class MemberController {
 
     /**
      * 개인 정보 조회
-     * @param token - 토큰
-     * @return Member
      */
     @GetMapping("/mypage")
     public ResponseEntity<Member> getMemberInfo(@RequestHeader(name = AUTH_HEADER) String token) {
@@ -51,12 +47,11 @@ public class MemberController {
     }
     /**
      * 개인 정보 수정
-     * @param token - 토큰
      * @param updateDto - 정보 수정 dto (이름, 닉네임, 소개, 지역, 이미지)
      * @return "수정완료"
      */
     @PatchMapping("/mypage")
-    public ResponseEntity<String> editMemberInfo(@RequestHeader(name = AUTH_HEADER) String token, @Valid UpdateMemberInfoDto updateDto) {
+    public ResponseEntity<String> editMemberInfo(@RequestHeader(name = AUTH_HEADER) String token, @Valid UpdateMemberDto updateDto) {
         return ResponseEntity.ok().body(memberService.editMemberInfo(token,updateDto));
     }
 
