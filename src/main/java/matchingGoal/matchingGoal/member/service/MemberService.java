@@ -24,7 +24,6 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final JwtTokenProvider jwtTokenProvider;
     private final PasswordEncoder passwordEncoder;
-    private final ImageService imageService;
 
     /**
      * 닉네임 중복 체크
@@ -94,15 +93,14 @@ public class MemberService {
      * @param memberId - 조회하고 싶은 회원 ID
      * @return OtherMemberInfoResponse - 닉네임, 소개, 지역, 이미지url
      */
-    public SimplerInfoResponse getSimpleUserinfo(Long memberId) {
-        Member member = getMemberById(memberId);
-        String imageUrl = imageService.getImageUrl(member.getImageId());
+    public SimplerInfoResponse getSimpleUserinfo(Long id) {
+        Member member = getMemberById(id);
 
         return SimplerInfoResponse.builder()
                 .nickname(member.getNickname())
                 .introduction(member.getIntroduction())
                 .region(member.getRegion())
-                .imageUrl(imageUrl)
+                .imageUrl(member.getImageUrl())
                 .build();
     }
 

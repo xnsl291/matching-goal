@@ -25,7 +25,7 @@ public class Member{
     private String email;
 
     @Setter
-    private Long imageId;
+    private String imageUrl;
 
     @Setter
     private String name;

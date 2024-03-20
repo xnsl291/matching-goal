@@ -5,7 +5,6 @@ import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import java.math.BigInteger;
 import java.time.LocalDateTime;
 
 @Entity
@@ -19,11 +18,11 @@ public class Image{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String original_name;
+    private String filePathName;
 
-    private String saved_name;
+    private String savedName;
 
-    private BigInteger size;
+    private long size;
 
     @CreatedDate
     private LocalDateTime createdDate;
