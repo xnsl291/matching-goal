@@ -3,14 +3,18 @@ package matchingGoal.matchingGoal.matching.service;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import matchingGoal.matchingGoal.common.auth.JwtTokenProvider;
+import matchingGoal.matchingGoal.matching.domain.StatusType;
 import matchingGoal.matchingGoal.matching.domain.entity.Comment;
 import matchingGoal.matchingGoal.matching.domain.entity.Game;
+import matchingGoal.matchingGoal.matching.domain.entity.GameCancel;
 import matchingGoal.matchingGoal.matching.domain.entity.Result;
+import matchingGoal.matchingGoal.matching.dto.CancelResponse;
 import matchingGoal.matchingGoal.matching.dto.CommentDto;
 import matchingGoal.matchingGoal.matching.dto.CommentResponse;
 import matchingGoal.matchingGoal.matching.dto.ResultDto;
 import matchingGoal.matchingGoal.matching.dto.ResultResponse;
 import matchingGoal.matchingGoal.matching.exception.AcceptedResultException;
+import matchingGoal.matchingGoal.matching.exception.CancelTimeException;
 import matchingGoal.matchingGoal.matching.exception.ExistingCommentException;
 import matchingGoal.matchingGoal.matching.exception.ExistingResultException;
 import matchingGoal.matchingGoal.matching.exception.NonParticipatingException;
@@ -19,6 +23,7 @@ import matchingGoal.matchingGoal.matching.exception.NotFoundMemberException;
 import matchingGoal.matchingGoal.matching.exception.NotFoundResultException;
 import matchingGoal.matchingGoal.matching.exception.PermissionException;
 import matchingGoal.matchingGoal.matching.repository.CommentRepository;
+import matchingGoal.matchingGoal.matching.repository.GameCancelRepository;
 import matchingGoal.matchingGoal.matching.repository.GameRepository;
 import matchingGoal.matchingGoal.matching.repository.ResultRepository;
 import matchingGoal.matchingGoal.member.model.entity.Member;
@@ -34,6 +39,7 @@ public class GameService {
   private final MemberRepository memberRepository;
   private final ResultRepository resultRepository;
   private final CommentRepository commentRepository;
+  private final GameCancelRepository cancelRepository;
   private final JwtTokenProvider jwtTokenProvider;
 
   public ResultResponse writeResult(String token, Long gameId, ResultDto resultDto) {
@@ -147,6 +153,32 @@ public class GameService {
     commentRepository.save(comment);
 
     return CommentResponse.of(comment);
+  }
+
+  public CancelResponse cancelGame(String token, Long gameId) {
+    Game game = gameRepository.findById(gameId)
+        .orElseThrow(NotFoundGameException::new);
+
+    Member member = getMemberByToken(token);
+    if (game.getTeam1() != member && game.getTeam2() != member) {
+      throw new PermissionException();
+    }
+
+    LocalDateTime gameDateTime = LocalDateTime.of(game.getDate(), game.getTime());
+    if (LocalDateTime.now().isAfter(gameDateTime.minusHours(24))) {
+      throw new CancelTimeException();
+    }
+
+    GameCancel cancel = GameCancel.builder()
+        .member(member)
+        .game(game)
+        .type(null)
+        .isAgreed(null)
+        .createdDate(LocalDateTime.now())
+        .build();
+    cancelRepository.save(cancel);
+
+    return CancelResponse.of(cancel);
   }
 
   private Member getMemberByToken(String token) {
