@@ -40,6 +40,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -58,7 +59,7 @@ public class MatchingService {
    */
   public BoardResponseDto createBoard(BoardRequestDto requestDto) {
     Member member = memberRepository.findById(requestDto.getMemberId())
-        .orElseThrow(() -> new NotFoundMemberException());
+        .orElseThrow(NotFoundMemberException::new);
 
     List<Image> images = findImagesById(requestDto.getImgList());
 
@@ -152,7 +153,7 @@ public class MatchingService {
    */
   public BoardResponseDto getBoardById(Long id) {
     MatchingBoard matchingBoard = boardRepository.findById(id)
-        .orElseThrow(() -> new NotFoundPostException());
+        .orElseThrow(NotFoundPostException::new);
 
     boardRepository.increaseViewCountById(id);
 
@@ -160,9 +161,7 @@ public class MatchingService {
       throw new DeletedPostException();
     }
 
-    BoardResponseDto boardResponseDto = BoardResponseDto.of(matchingBoard);
-
-    return boardResponseDto;
+    return BoardResponseDto.of(matchingBoard);
   }
 
   /**
@@ -171,9 +170,10 @@ public class MatchingService {
    * @param requestDto - 게시글 수정 dto
    * @return 게시글 조회 dto
    */
+  @Transactional
   public BoardResponseDto updateBoard(Long id, UpdateBoardDto requestDto) {
     MatchingBoard matchingBoard = boardRepository.findById(id)
-        .orElseThrow(() -> new NotFoundPostException());
+        .orElseThrow(NotFoundPostException::new);
 
     if (matchingBoard.getIsDeleted()) {
       throw new DeletedPostException();
@@ -182,7 +182,6 @@ public class MatchingService {
     List<Image> images = findImagesById(requestDto.getImgList());
     matchingBoard.updateImg(images);
     matchingBoard.update(requestDto);
-    boardRepository.save(matchingBoard);
 
     return getBoardById(matchingBoard.getId());
   }
@@ -192,9 +191,10 @@ public class MatchingService {
    * @param id - 게시글 id
    * @return 게시글 id
    */
+  @Transactional
   public Long deleteBoard(Long id) {
     MatchingBoard matchingBoard = boardRepository.findById(id)
-        .orElseThrow(() -> new NotFoundPostException());
+        .orElseThrow(NotFoundPostException::new);
 
     if (matchingBoard.getIsDeleted()) {
       throw new DeletedPostException();
@@ -207,12 +207,10 @@ public class MatchingService {
     List<MatchingRequest> requests = requestRepository.findByBoardId(id).orElse(Collections.emptyList());
     for (MatchingRequest request : requests) {
       request.refuse();
-      requestRepository.save(request);
     }
 
     matchingBoard.delete();
     matchingBoard.getGame().delete();
-    boardRepository.save(matchingBoard);
 
     return matchingBoard.getId();
   }
@@ -225,9 +223,9 @@ public class MatchingService {
    */
   public String requestMatching(Long id, Long memberId) {
     MatchingBoard matchingBoard = boardRepository.findById(id)
-        .orElseThrow(() -> new NotFoundPostException());
+        .orElseThrow(NotFoundPostException::new);
     Member member = memberRepository.findById(memberId)
-        .orElseThrow(() -> new NotFoundMemberException());
+        .orElseThrow(NotFoundMemberException::new);
 
     if (matchingBoard.getIsDeleted()) {
       throw new DeletedPostException();
@@ -278,9 +276,10 @@ public class MatchingService {
    * @param id - 매칭 신청 id
    * @return "신청 수락 완료"
    */
+  @Transactional
   public String acceptRequest(Long id) {
     MatchingRequest request = requestRepository.findById(id)
-        .orElseThrow(() -> new NotFoundRequestException());
+        .orElseThrow(NotFoundRequestException::new);
 
     if (request.getBoard().getStatus() == StatusType.CLOSED) {
       throw new CompletedMatchingException();
@@ -289,19 +288,16 @@ public class MatchingService {
     request.accept();
     request.getBoard().acceptMatching();
     request.getBoard().getGame().setOpponent(request.getMember());
-    requestRepository.save(request);
 
     List<MatchingRequest> otherRequests = requestRepository.findOtherRequestsByIdAndBoardId(id, request.getBoard().getId())
         .orElse(Collections.emptyList());
     for (MatchingRequest req : otherRequests) {
       req.refuse();
-      requestRepository.save(req);
     }
 
     List<MatchingRequest> sameTimeRequests = findSameTimeRequests(id).orElse(Collections.emptyList());
     for (MatchingRequest req : sameTimeRequests) {
       req.refuse();
-      requestRepository.save(req);
     }
 
     return "신청 수락 완료";
@@ -312,23 +308,23 @@ public class MatchingService {
    * @param id - 매칭 신청 id
    * @return "신청 거절 완료"
    */
+  @Transactional
   public String refuseRequest(Long id) {
     MatchingRequest request = requestRepository.findById(id)
-        .orElseThrow(() -> new NotFoundRequestException());
+        .orElseThrow(NotFoundRequestException::new);
 
     if (request.getBoard().getStatus() == StatusType.CLOSED) {
       throw new CompletedMatchingException();
     }
 
     request.refuse();
-    requestRepository.save(request);
 
     return "신청 거절 완료";
   }
 
   private Optional<List<MatchingRequest>> findSameTimeRequests(Long id) {
     MatchingRequest request = requestRepository.findById(id)
-        .orElseThrow(() -> new NotFoundRequestException());
+        .orElseThrow(NotFoundRequestException::new);
 
     Game game = request.getBoard().getGame();
     LocalDate date = game.getDate();

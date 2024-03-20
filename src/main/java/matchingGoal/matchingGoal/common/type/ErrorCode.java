@@ -43,7 +43,9 @@ public enum ErrorCode {
     ALREADY_RESULT_EXISTS(HttpStatus.BAD_REQUEST, "결과가 입력된 게임입니다."),
     RESULT_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 경기 결과입니다."),
     NON_PARTICIPATING_TEAM(HttpStatus.BAD_REQUEST, "참가하지 않은 팀입니다."),
-    ALREADY_ACCEPTED_RESULT(HttpStatus.BAD_REQUEST, "이미 수락된 경기 결과입니다.");
+    ALREADY_ACCEPTED_RESULT(HttpStatus.BAD_REQUEST, "이미 수락된 경기 결과입니다."),
+    ALREADY_COMMENT_EXISTS(HttpStatus.BAD_REQUEST, "한줄평이 입력된 게임입니다."),
+    CANCELLATION_TIME_OUT(HttpStatus.BAD_REQUEST, "취소 가능 시간이 지났습니다.");
 
 
     
