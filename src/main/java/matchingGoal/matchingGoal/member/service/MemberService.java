@@ -28,7 +28,6 @@ public class MemberService {
 
     /**
      * 닉네임 중복 체크
-     * @param nickname - 닉네임
      * @return 중복 닉네임 존재시, false 반환
      */
     public Boolean isDuplicatedNickname(String nickname) {
@@ -37,7 +36,6 @@ public class MemberService {
 
     /**
      * 비밀번호 변경
-     * @param token - 토큰
      * @param passwordDto - 기존 비밀번호, 새로운 비밀번호
      * @return "변경완료"
      */
@@ -55,11 +53,9 @@ public class MemberService {
 
     /**
      * 아이디를 사용하여 회원 정보 조회
-     * @param id - 회원 ID
-     * @return Member
      */
-    public Member getMemberById(Long id){
-        Member member = memberRepository.findById(id)
+    public Member getMemberById(Long memberId){
+        Member member = memberRepository.findById(memberId)
                 .orElseThrow(MemberNotFoundException::new);
 
         if (member.isDeleted())
@@ -70,8 +66,6 @@ public class MemberService {
 
     /**
      * 토큰을 사용하여 회원 정보 조회
-     * @param token - 토큰
-     * @return Member
      */
     public Member getMemberInfo(String token){
         jwtTokenProvider.validateToken(token);
@@ -97,11 +91,11 @@ public class MemberService {
 
     /**
      * 다른 회원 정보 조회
-     * @param id - 조회하고 싶은 회원 ID
+     * @param memberId - 조회하고 싶은 회원 ID
      * @return OtherMemberInfoResponse - 닉네임, 소개, 지역, 이미지url
      */
-    public SimplerInfoResponse getSimpleUserinfo(Long id) {
-        Member member = getMemberById(id);
+    public SimplerInfoResponse getSimpleUserinfo(Long memberId) {
+        Member member = getMemberById(memberId);
         String imageUrl = imageService.getImageUrl(member.getImageId());
 
         return SimplerInfoResponse.builder()

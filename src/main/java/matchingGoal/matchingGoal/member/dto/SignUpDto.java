@@ -2,7 +2,6 @@ package matchingGoal.matchingGoal.member.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Positive;
 import lombok.*;
 import matchingGoal.matchingGoal.common.annotation.Nickname;
 import matchingGoal.matchingGoal.common.annotation.Password;
@@ -33,8 +32,4 @@ public class SignUpDto {
 
     @NotBlank(message = "지역을 입력해주세요")
     private String region;
-
-    @Positive
-    private Long imageId;
-
 }

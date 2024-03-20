@@ -38,4 +38,4 @@ out/
 .vscode/
 
 application-secret.yml
-
+/src/resources/static/images/

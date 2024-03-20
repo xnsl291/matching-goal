@@ -50,7 +50,6 @@ public class AuthService {
                 .nickname(registerDto.getNickname())
                 .introduction(registerDto.getIntroduction())
                 .region(registerDto.getRegion())
-                //.imageId(registerDto.getImageId())
                 .build();
 
         memberRepository.save(member);
@@ -59,7 +58,6 @@ public class AuthService {
 
     /**
      * 회원 탈퇴
-     * @param token - 토큰
      * @param getPasswordDto - 비밀번호
      * @return "탈퇴 완료"
      */
@@ -79,7 +77,7 @@ public class AuthService {
     /**
      * 로그인
      * @param signInDto - 회원 ID, 비밀번호
-     * @return SignInResponse - accessToken, refreshToken, id, nickname, imageUrl
+     * @return SignInResponse - accessToken, refreshToken, id, nickname, email, imageUrl
      */
     public SignInResponse signIn(SignInDto signInDto) {
         Member member = memberRepository.findByEmail(signInDto.getEmail()).orElseThrow(MemberNotFoundException::new);
@@ -93,7 +91,6 @@ public class AuthService {
         // 토큰 발행
         JwtToken tokens = jwtTokenProvider.generateToken(member.getId(), member.getEmail(), member.getNickname());
 
-        //프로필이미지
         return SignInResponse.builder()
                 .accessToken(tokens.getAccessToken())
                 .refreshToken(tokens.getRefreshToken())
@@ -105,7 +102,6 @@ public class AuthService {
 
     /**
      * 로그아웃
-     * @param token - 토큰
      * @return "로그아웃 완료"
      */
     public String signOut(String token) {
