@@ -2,13 +2,10 @@ package matchingGoal.matchingGoal.image.service;
 
 import lombok.AllArgsConstructor;
 import matchingGoal.matchingGoal.common.auth.JwtTokenProvider;
-import matchingGoal.matchingGoal.image.dto.UploadImageResponse;
 import matchingGoal.matchingGoal.image.exception.InvalidFileFormatException;
 import matchingGoal.matchingGoal.image.exception.NotFoundImageException;
 import matchingGoal.matchingGoal.image.model.entity.Image;
 import matchingGoal.matchingGoal.image.repository.ImageRepository;
-import matchingGoal.matchingGoal.member.exception.MemberNotFoundException;
-import matchingGoal.matchingGoal.member.model.entity.Member;
 import matchingGoal.matchingGoal.member.repository.MemberRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,12 +25,9 @@ import java.util.UUID;
 @AllArgsConstructor
 public class ImageService {
     private final ImageRepository imageRepository;
-    private final MemberRepository memberRepository;
-    private final JwtTokenProvider jwtTokenProvider;
 
     /**
      * 이미지 폴더 위치 반환
-     *
      * @param date - 이미지 업로드일
      * @return 폴더 위치 (ex. [BASE_PATH]/2023/01/01/ "
      */
@@ -41,34 +35,15 @@ public class ImageService {
         String path = System.getProperty("user.dir") + "/src/main/resources/static/images/"
                 + date.format(DateTimeFormatter.ofPattern("yyyy/MM/dd"))
                 + "/";
-
         return path.replace("/", File.separator);
     }
 
     /**
-     * 이미지 URL 반환
-     *
-     * @return 이미지 URL
-     */
-    public String getImageUrl(Long imageId) {
-        try {
-            Image image = imageRepository.findById(imageId).orElseThrow(NotFoundImageException::new);
-            return getFolderPath(image.getCreatedDate().toLocalDate()) + image.getSavedName();
-        } catch (RuntimeException e) {
-            return null;
-        }
-    }
-
-    /**
      * 이미지 업로드
-     *
      * @return 이미지 url
      */
     @Transactional
-    public UploadImageResponse uploadProfileImage(String token, MultipartFile file) {
-        jwtTokenProvider.validateToken(token);
-        Member member = memberRepository.findById(jwtTokenProvider.getId(token)).orElseThrow(MemberNotFoundException::new);
-
+    public String uploadImage(MultipartFile file) {
         UUID uuid = UUID.randomUUID();
         String path = getFolderPath(LocalDate.now());
         String saveName = uuid + "_" + file.getOriginalFilename();
@@ -96,39 +71,23 @@ public class ImageService {
                 .filePathName(pathName)
                 .build();
         imageRepository.save(image);
-        member.setImageId(image.getId());
+
         // 저장된 파일 url 반환
-        return UploadImageResponse.builder().imageId(image.getId()).imageUrl(image.getFilePathName()).build();
+        return pathName;
     }
 
+    /**
+     * 이미지 삭제
+     * @return 완료여부
+     */
     @Transactional
-    public boolean removeProfileImage(String token) {
-        jwtTokenProvider.validateToken(token);
-        Member member = memberRepository.findById(jwtTokenProvider.getId(token)).orElseThrow(MemberNotFoundException::new);
-
-        Long imageId = member.getImageId();
-
-        String imagePath = getImageUrl(imageId);
-
-        System.out.println(">>>>" + member.getNickname() + " " + imageId + " " + imagePath);
-
+    public boolean removeImage(String imageUrl) {
 
         try {
-            member.setImageId(null);
-
-            // 파일 삭제
-            Path filePath = Paths.get(imagePath);
+            Path filePath = Paths.get(imageUrl);
             return Files.deleteIfExists(filePath);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
-
-//    public String uploadBoardImage(MultipartFile file) {
-//        return "";
-//    }
-
-//    public boolean removeImage(Long imageId) {
-//        return false;
-//    }
 }

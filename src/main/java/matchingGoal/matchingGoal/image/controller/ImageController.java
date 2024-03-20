@@ -15,14 +15,14 @@ public class ImageController {
     private final ImageService imageService;
     private static final String AUTH_HEADER = "Authorization";
 
-    @PostMapping("/profile")
-    public ResponseEntity<UploadImageResponse> uploadProfileImage(@RequestHeader(name = AUTH_HEADER) String token, @Valid @RequestParam("file") MultipartFile file){
-        return ResponseEntity.ok().body(imageService.uploadProfileImage(token, file));
+    @PostMapping("/upload")
+    public ResponseEntity<String> uploadImage( @Valid @RequestParam("file") MultipartFile file){
+        return ResponseEntity.ok().body(imageService.uploadImage(file));
     }
 
-    @DeleteMapping("/profile")
-    public ResponseEntity<Boolean> removeImage(@RequestHeader(name = AUTH_HEADER) String token){
-        return ResponseEntity.ok().body(imageService.removeProfileImage(token));
+    @DeleteMapping("/remove")
+    public ResponseEntity<Boolean> removeImage(@Valid @RequestParam("imageUrl") String imageUrl){
+        return ResponseEntity.ok().body(imageService.removeImage(imageUrl));
     }
 
 //    @PostMapping("/matching")

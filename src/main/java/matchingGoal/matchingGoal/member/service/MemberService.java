@@ -24,7 +24,6 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final JwtTokenProvider jwtTokenProvider;
     private final PasswordEncoder passwordEncoder;
-    private final ImageService imageService;
 
     /**
      * 닉네임 중복 체크
@@ -102,13 +101,12 @@ public class MemberService {
      */
     public SimplerInfoResponse getSimpleUserinfo(Long id) {
         Member member = getMemberById(id);
-        String imageUrl = imageService.getImageUrl(member.getImageId());
 
         return SimplerInfoResponse.builder()
                 .nickname(member.getNickname())
                 .introduction(member.getIntroduction())
                 .region(member.getRegion())
-                .imageUrl(imageUrl)
+                .imageUrl(member.getImageUrl())
                 .build();
     }
 
