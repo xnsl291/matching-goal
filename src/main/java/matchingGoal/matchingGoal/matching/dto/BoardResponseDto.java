@@ -51,6 +51,7 @@ public class BoardResponseDto {
         .modifiedDate(matchingBoard.getModifiedDate())
         .viewCount(matchingBoard.getViewCount())
         .status(matchingBoard.getStatus())
+        .requestCount(matchingBoard.getMember().getRequestCount())
         .region(matchingBoard.getRegion())
         .stadium(matchingBoard.getGame().getStadiumName())
         .date(matchingBoard.getGame().getDate())
@@ -58,7 +59,4 @@ public class BoardResponseDto {
         .build();
   }
 
-  public void setRequestCount(Integer requestCount) {
-    this.requestCount = requestCount;
-  }
 }

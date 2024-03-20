@@ -12,7 +12,9 @@ public class SignInResponse {
 
     private String refreshToken;
 
-    private Long id;
+    private Long memberId;
+
+    private String email;
 
     private String nickname;
 

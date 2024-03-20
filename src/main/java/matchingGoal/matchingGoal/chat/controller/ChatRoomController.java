@@ -29,9 +29,7 @@ public class ChatRoomController {
   public ResponseEntity<?> createChatRoom(@RequestHeader(value = "authorization") String token, @RequestBody
       CreateChatRoomRequest request) {
     token = token.substring(7);
-    System.out.println(token);
     long hostId = jwtTokenProvider.getId(token);
-    System.out.println(hostId + "    " + request.getMemberId());
     String result = chatRoomService.createChatRoom(hostId, request.getMemberId());
 
     return ResponseEntity.ok(result);

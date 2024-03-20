@@ -26,4 +26,14 @@ public class RedisService {
         Boolean keyExists = stringRedisTemplate.hasKey(email);
         return keyExists != null && keyExists;
     }
+
+    public void setBlackList(String key, String value, long durationInMinutes) {
+        stringRedisTemplate.opsForSet().add(key, value);
+        stringRedisTemplate.expire(key, durationInMinutes, TimeUnit.MINUTES);
+    }
+
+    public boolean hasKeyAndValue(String key, String value){
+        System.out.println(key +"  " + value);
+        return Boolean.TRUE.equals(stringRedisTemplate.opsForSet().isMember(key, value));
+    }
 }

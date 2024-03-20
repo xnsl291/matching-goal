@@ -5,12 +5,11 @@ import matchingGoal.matchingGoal.common.exception.CustomException;
 import matchingGoal.matchingGoal.common.type.ErrorCode;
 
 @Getter
-public class NotFoundMemberException extends CustomException {
-
+public class NotFoundResultException extends CustomException {
   private final ErrorCode errorCode;
 
-  public NotFoundMemberException() {
-    this.errorCode = ErrorCode.MEMBER_NOT_FOUND;
+  public NotFoundResultException() {
+    this.errorCode = ErrorCode.RESULT_NOT_FOUND;
   }
 
 }

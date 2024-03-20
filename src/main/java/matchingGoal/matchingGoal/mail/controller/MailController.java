@@ -18,7 +18,6 @@ public class MailController {
 
     /**
      * 인증메일 발송
-     * @param email - 이메일
      * @return 발송성공여부
      */
     @PostMapping(value = "/send-verification")

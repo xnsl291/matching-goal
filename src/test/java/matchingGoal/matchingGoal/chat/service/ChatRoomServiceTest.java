@@ -1,4 +1,4 @@
-package matchingGoal.matchingGoal.service.impl;
+package matchingGoal.matchingGoal.chat.service;
 
 
 
@@ -7,7 +7,6 @@ import java.util.List;
 import matchingGoal.matchingGoal.chat.entity.ChatRoom;
 import matchingGoal.matchingGoal.chat.dto.ChatRoomListResponse;
 import matchingGoal.matchingGoal.chat.repository.ChatRoomRepository;
-import matchingGoal.matchingGoal.chat.service.ChatRoomService;
 import matchingGoal.matchingGoal.member.model.entity.Member;
 import matchingGoal.matchingGoal.member.repository.MemberRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -17,7 +16,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
-class ChatRoomServiceImplTest {
+class ChatRoomServiceTest {
 
   @Autowired
   ChatRoomRepository chatRoomRepository;

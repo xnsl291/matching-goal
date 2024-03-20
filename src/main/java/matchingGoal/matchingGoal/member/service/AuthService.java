@@ -6,12 +6,11 @@ import lombok.extern.slf4j.Slf4j;
 import matchingGoal.matchingGoal.common.auth.JwtToken;
 import matchingGoal.matchingGoal.common.auth.JwtTokenProvider;
 import matchingGoal.matchingGoal.common.service.RedisService;
-import matchingGoal.matchingGoal.image.service.ImageService;
 import matchingGoal.matchingGoal.member.dto.SignInDto;
 import matchingGoal.matchingGoal.member.dto.GetPasswordDto;
 import matchingGoal.matchingGoal.member.dto.SignInResponse;
 import matchingGoal.matchingGoal.member.exception.*;
-import matchingGoal.matchingGoal.member.dto.MemberRegisterDto;
+import matchingGoal.matchingGoal.member.dto.SignUpDto;
 import matchingGoal.matchingGoal.member.model.entity.Member;
 import matchingGoal.matchingGoal.member.repository.MemberRepository;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -28,15 +27,13 @@ public class AuthService {
     private final JwtTokenProvider jwtTokenProvider;
     private final MemberRepository memberRepository;
     private final MemberService memberService;
-    private final RedisService redisService;
-    private final String TOKEN_PREFIX = "RT_";
 
     /**
      * 회원가입
      * @param registerDto - 회원가입 dto
      * @return "회원가입 성공"
      */
-    public String registerMember(MemberRegisterDto registerDto) {
+    public String registerMember(SignUpDto registerDto) {
 
         // 이메일 중복 확인
         if(memberRepository.findByEmail(registerDto.getEmail()).isPresent())
@@ -53,7 +50,6 @@ public class AuthService {
                 .nickname(registerDto.getNickname())
                 .introduction(registerDto.getIntroduction())
                 .region(registerDto.getRegion())
-                //.imageId(registerDto.getImageId())
                 .build();
 
         memberRepository.save(member);
@@ -62,7 +58,6 @@ public class AuthService {
 
     /**
      * 회원 탈퇴
-     * @param token - 토큰
      * @param getPasswordDto - 비밀번호
      * @return "탈퇴 완료"
      */
@@ -82,7 +77,7 @@ public class AuthService {
     /**
      * 로그인
      * @param signInDto - 회원 ID, 비밀번호
-     * @return SignInResponse - accessToken, refreshToken, id, nickname, imageUrl
+     * @return SignInResponse - accessToken, refreshToken, id, nickname, email, imageUrl
      */
     public SignInResponse signIn(SignInDto signInDto) {
         Member member = memberRepository.findByEmail(signInDto.getEmail()).orElseThrow(MemberNotFoundException::new);
@@ -96,29 +91,21 @@ public class AuthService {
         // 토큰 발행
         JwtToken tokens = jwtTokenProvider.generateToken(member.getId(), member.getEmail(), member.getNickname());
 
-        //프로필이미지
         return SignInResponse.builder()
                 .accessToken(tokens.getAccessToken())
                 .refreshToken(tokens.getRefreshToken())
-                .id(member.getId())
+                .memberId(member.getId())
                 .nickname(member.getNickname())
-                //.imageUrl(imageUrl)
+                .email(member.getEmail())
                 .build();
     }
 
     /**
      * 로그아웃
-     * @param token - 토큰
      * @return "로그아웃 완료"
      */
     public String signOut(String token) {
         jwtTokenProvider.validateToken(token);
-
-        String email = jwtTokenProvider.getEmail(token);
-
-        if (redisService.getData(TOKEN_PREFIX + email) == null) {
-            throw new ExpiredTokenException();
-        }
 
         // 블랙 리스트에 추가(로그아웃)
         jwtTokenProvider.setBlacklist(token);

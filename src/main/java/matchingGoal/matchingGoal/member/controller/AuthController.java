@@ -2,7 +2,7 @@ package matchingGoal.matchingGoal.member.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import matchingGoal.matchingGoal.member.dto.MemberRegisterDto;
+import matchingGoal.matchingGoal.member.dto.SignUpDto;
 import matchingGoal.matchingGoal.member.dto.SignInDto;
 import matchingGoal.matchingGoal.member.dto.GetPasswordDto;
 import matchingGoal.matchingGoal.member.dto.SignInResponse;
@@ -25,7 +25,7 @@ public class AuthController {
      * @return "회원가입 성공"
      */
     @PostMapping("/sign-up")
-    public ResponseEntity<String> registerMember(@Valid @RequestBody MemberRegisterDto registerDto) {
+    public ResponseEntity<String> registerMember(@Valid @RequestBody SignUpDto registerDto) {
         return ResponseEntity.ok().body(authService.registerMember(registerDto));
     }
 
@@ -43,7 +43,7 @@ public class AuthController {
     /**
      * 로그인
      * @param signInDto - 회원 ID, 비밀번호
-     * @return SignInResponse - accessToken, refreshToken, id, nickname, imageUrl
+     * @return SignInResponse - accessToken, refreshToken, id, nickname, email, imageUrl
      */
     @PostMapping("/sign-in")
     public ResponseEntity<SignInResponse> signIn(@Valid @RequestBody SignInDto signInDto) {
@@ -52,7 +52,6 @@ public class AuthController {
 
     /**
      * 로그아웃
-     * @param token - 토큰
      * @return "로그아웃 완료"
      */
     @PostMapping("/sign-out")

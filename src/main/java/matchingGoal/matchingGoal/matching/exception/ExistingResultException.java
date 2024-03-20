@@ -5,12 +5,12 @@ import matchingGoal.matchingGoal.common.exception.CustomException;
 import matchingGoal.matchingGoal.common.type.ErrorCode;
 
 @Getter
-public class CompletedMatchingException extends CustomException {
+public class ExistingResultException extends CustomException {
 
     private final ErrorCode errorCode;
 
-    public CompletedMatchingException() {
-        this.errorCode = ErrorCode.ALREADY_COMPLETED_MATCHING;
+    public ExistingResultException() {
+        this.errorCode = ErrorCode.ALREADY_RESULT_EXISTS;
     }
 
 }
