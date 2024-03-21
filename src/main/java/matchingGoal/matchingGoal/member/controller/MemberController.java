@@ -94,4 +94,12 @@ public class MemberController {
     public ResponseEntity<CommentHistoryResponse> getCommentHistory(@PathVariable("memberId") Long memberId) {
         return ResponseEntity.ok().body(memberService.getCommentHistory(memberId));
     }
+
+    /**
+     * 경기 전적 조회
+     */
+    @GetMapping("/{memberId}/simple-history")
+    public ResponseEntity<MatchStatisticResponse> getMatchStatistic(@PathVariable("memberId") Long memberId) {
+        return ResponseEntity.ok().body(memberService.getMatchStatistic(memberId));
+    }
 }

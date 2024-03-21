@@ -24,7 +24,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -195,4 +194,34 @@ public class MemberService {
                 .comments(commentDtoList)
                 .build();
     }
+
+    /**
+     * 경기 전적 조회
+     */
+    public MatchStatisticResponse getMatchStatistic(Long memberId){
+        List<MatchHistoryResponse> records = getMatchHistory(memberId);
+
+        int totalSize = records.size();
+        int win = 0, lose = 0, draw = 0;
+        double winRate = 0.0 ;
+
+        for (MatchHistoryResponse record : records){
+            if(record.isWin())
+                win += 1;
+
+            else{
+                if(record.getScore1() == record.getScore2())
+                    draw += 1;
+                else
+                    lose += 1;
+            }
+        }
+
+        if (totalSize != 0 )
+            winRate = (double) win / totalSize;
+
+        return new MatchStatisticResponse(winRate, totalSize, win , lose ,draw );
+    }
+
 }
+
