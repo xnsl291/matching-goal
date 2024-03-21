@@ -4,6 +4,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import matchingGoal.matchingGoal.common.auth.JwtTokenProvider;
 import matchingGoal.matchingGoal.image.service.ImageService;
+import matchingGoal.matchingGoal.matching.domain.entity.Game;
+import matchingGoal.matchingGoal.matching.repository.GameRepository;
+import matchingGoal.matchingGoal.member.dto.ScheduleResponse;
 import matchingGoal.matchingGoal.member.dto.SimplerInfoResponse;
 import matchingGoal.matchingGoal.member.dto.UpdateMemberDto;
 import matchingGoal.matchingGoal.member.dto.UpdatePasswordDto;
@@ -17,6 +20,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Stream;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -25,6 +33,7 @@ public class MemberService {
     private final JwtTokenProvider jwtTokenProvider;
     private final PasswordEncoder passwordEncoder;
     private final ImageService imageService;
+    private final GameRepository gameRepository;
 
     /**
      * 닉네임 중복 체크
@@ -115,4 +124,31 @@ public class MemberService {
         if (!isMatch)
             throw new UnmatchedPasswordException();
     }
+
+    /**
+     * 회원 일정 조회
+     * @param memberId - 회원 ID
+     * @param year - 년도
+     * @param month - 월
+     * @return 특정 월의 일정 리스트
+     */
+    public List<ScheduleResponse> getMemberSchedule(Long memberId, int year, int month) {
+        LocalDate startDate = LocalDate.of(year, month, 1);
+        LocalDate endDate = startDate.plusMonths(1).minusDays(1);
+        Member member = getMemberById(memberId);
+
+        List<ScheduleResponse> schedules = new ArrayList<>();
+
+        List<Game> games1 = gameRepository.findByTeam1AndDateBetween(member, startDate, endDate);
+        List<Game> games2 = gameRepository.findByTeam2AndDateBetween(member, startDate, endDate);
+        List<Game> allGames = Stream.concat(games1.stream(), games2.stream()).toList();
+
+        for (Game game : allGames) {
+            ScheduleResponse response = ScheduleResponse.of(game, member);
+            schedules.add(response);
+        }
+
+        return schedules;
+    }
+
 }
