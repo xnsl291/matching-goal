@@ -51,7 +51,7 @@ public class MemberController {
      * @return "수정완료"
      */
     @PatchMapping("/mypage")
-    public ResponseEntity<String> editMemberInfo(@RequestHeader(name = AUTH_HEADER) String token, @Valid UpdateMemberDto updateDto) {
+    public ResponseEntity<String> editMemberInfo(@RequestHeader(name = AUTH_HEADER) String token, @Valid @RequestBody UpdateMemberDto updateDto) {
         return ResponseEntity.ok().body(memberService.editMemberInfo(token,updateDto));
     }
 

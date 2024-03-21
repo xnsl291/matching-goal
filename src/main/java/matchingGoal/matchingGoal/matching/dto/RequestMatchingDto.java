@@ -18,7 +18,7 @@ public class RequestMatchingDto {
   private LocalDateTime createdDate;
   private Long memberId;
   private String nickname;
-  private Long memberImg;
+  private String memberImg;
 
   public static RequestMatchingDto of(MatchingRequest matchingRequest) {
     Member member = matchingRequest.getMember();
@@ -27,7 +27,7 @@ public class RequestMatchingDto {
         .createdDate(matchingRequest.getCreatedDate())
         .memberId(member.getId())
         .nickname(member.getNickname())
-        .memberImg(member.getImageId())
+        .memberImg(member.getImageUrl())
         .build();
   }
 }

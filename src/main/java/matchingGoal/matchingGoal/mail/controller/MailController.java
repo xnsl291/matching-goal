@@ -20,7 +20,7 @@ public class MailController {
      * 인증메일 발송
      * @return 발송성공여부
      */
-    @GetMapping(value = "/send-verification")
+    @PostMapping(value = "/send-verification")
     public ResponseEntity<Boolean> sendVerificationMail(@NotBlank @Email  @RequestParam String email) {
         return ResponseEntity.ok().body(mailService.sendVerificationMail(email));
     }

@@ -51,7 +51,7 @@ public class JwtTokenProvider {
     public void validateToken(String token) {
         try {
             // 로그아웃한 토큰일 경우
-            if (redisService.getData(BLACK_TOKEN_PREFIX + getEmail(token)) != null)
+            if (redisService.hasKeyAndValue( BLACK_TOKEN_PREFIX + getEmail(token) , token))
                 throw new ExpiredTokenException();
 
         } catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException e) {
@@ -114,6 +114,6 @@ public class JwtTokenProvider {
     }
 
     public void setBlacklist(String token) {
-        redisService.setData(BLACK_TOKEN_PREFIX + getEmail(token), token, refreshTokenExpirationTimeInSeconds);
+        redisService.setBlackList(BLACK_TOKEN_PREFIX + getEmail(token), token, refreshTokenExpirationTimeInSeconds);
     }
 }

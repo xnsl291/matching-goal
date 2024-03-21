@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
-import matchingGoal.matchingGoal.common.type.ErrorCode;
 import matchingGoal.matchingGoal.image.model.entity.Image;
 import matchingGoal.matchingGoal.image.repository.ImageRepository;
 import matchingGoal.matchingGoal.matching.domain.StatusType;
@@ -19,6 +18,7 @@ import matchingGoal.matchingGoal.matching.domain.entity.MatchingBoard;
 import matchingGoal.matchingGoal.matching.domain.entity.MatchingRequest;
 import matchingGoal.matchingGoal.matching.dto.BoardRequestDto;
 import matchingGoal.matchingGoal.matching.dto.BoardResponseDto;
+import matchingGoal.matchingGoal.matching.dto.ListBoardDto;
 import matchingGoal.matchingGoal.matching.dto.RequestMatchingDto;
 import matchingGoal.matchingGoal.matching.dto.UpdateBoardDto;
 import matchingGoal.matchingGoal.matching.exception.AlreadyRequestException;
@@ -30,10 +30,17 @@ import matchingGoal.matchingGoal.matching.exception.NotFoundRequestException;
 import matchingGoal.matchingGoal.matching.exception.SelfRequestException;
 import matchingGoal.matchingGoal.matching.repository.GameRepository;
 import matchingGoal.matchingGoal.matching.repository.MatchingBoardRepository;
+import matchingGoal.matchingGoal.matching.repository.MatchingBoardSpecification;
 import matchingGoal.matchingGoal.matching.repository.MatchingRequestRepository;
 import matchingGoal.matchingGoal.member.model.entity.Member;
 import matchingGoal.matchingGoal.member.repository.MemberRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -52,7 +59,7 @@ public class MatchingService {
    */
   public BoardResponseDto createBoard(BoardRequestDto requestDto) {
     Member member = memberRepository.findById(requestDto.getMemberId())
-        .orElseThrow(() -> new NotFoundMemberException(ErrorCode.MEMBER_NOT_FOUND));
+        .orElseThrow(NotFoundMemberException::new);
 
     List<Image> images = findImagesById(requestDto.getImgList());
 
@@ -86,6 +93,59 @@ public class MatchingService {
     return getBoardById(board.getId());
   }
 
+  public Page<ListBoardDto> getBoardList(
+      Integer page, String keyword, String type, String sort, String sortDirection, String date, String time) {
+
+    LocalDate parsedDate = (date != null) ? LocalDate.parse(date) : null;
+    LocalTime parsedTime = (time != null) ? LocalTime.parse(time) : null;
+
+    Pageable pageable = creatPageable(page, sort, sortDirection);
+    Page<MatchingBoard> boardPage = boardRepository.findAll(MatchingBoardSpecification.search(keyword, type, parsedDate, parsedTime), pageable);
+
+    return boardPage.map(this::convertToDto);
+  }
+
+  private Pageable creatPageable(Integer page, String sort, String sortDirection) {
+    int pageNum = (page != null && page >= 0) ? page : 0;
+
+    Sort.Direction direction = Direction.DESC;
+    if (sortDirection.equals("asc")) {
+      direction = Direction.ASC;
+    }
+
+    String sortType = "createdDate";
+    switch (sort) {
+      case "time":
+        break;
+      case "view":
+        sortType = "viewCount";
+        break;
+    }
+
+    return PageRequest.of(pageNum, 10, Sort.by(direction, sortType));
+  }
+
+  private ListBoardDto convertToDto(MatchingBoard matchingBoard) {
+    Member member = matchingBoard.getMember();
+    Game game = matchingBoard.getGame();
+
+    return ListBoardDto.builder()
+        .id(matchingBoard.getId())
+        .memberId(member.getId())
+        .memberImg(member.getImageId())
+        .nickname(member.getNickname())
+        .title(matchingBoard.getTitle())
+        .createdDate(matchingBoard.getCreatedDate())
+        .viewCount(matchingBoard.getViewCount())
+        .status(matchingBoard.getStatus())
+        .requestCount(matchingBoard.getMember().getRequestCount())
+        .region(matchingBoard.getRegion())
+        .stadium(game.getStadiumName())
+        .date(game.getDate())
+        .time(game.getTime())
+        .build();
+  }
+
   /**
    * 게시글 조회
    * @param id - 게시글 id
@@ -93,18 +153,15 @@ public class MatchingService {
    */
   public BoardResponseDto getBoardById(Long id) {
     MatchingBoard matchingBoard = boardRepository.findById(id)
-        .orElseThrow(() -> new NotFoundPostException(ErrorCode.POST_NOT_FOUND));
+        .orElseThrow(NotFoundPostException::new);
 
     boardRepository.increaseViewCountById(id);
 
     if (matchingBoard.getIsDeleted()) {
-      throw new DeletedPostException(ErrorCode.DELETED_POST);
+      throw new DeletedPostException();
     }
 
-    BoardResponseDto boardResponseDto = BoardResponseDto.of(matchingBoard);
-    boardResponseDto.setRequestCount(countRequestsByBoard(matchingBoard.getMember()));
-
-    return boardResponseDto;
+    return BoardResponseDto.of(matchingBoard);
   }
 
   /**
@@ -113,18 +170,18 @@ public class MatchingService {
    * @param requestDto - 게시글 수정 dto
    * @return 게시글 조회 dto
    */
+  @Transactional
   public BoardResponseDto updateBoard(Long id, UpdateBoardDto requestDto) {
     MatchingBoard matchingBoard = boardRepository.findById(id)
-        .orElseThrow(() -> new NotFoundPostException(ErrorCode.POST_NOT_FOUND));
+        .orElseThrow(NotFoundPostException::new);
 
     if (matchingBoard.getIsDeleted()) {
-      throw new DeletedPostException(ErrorCode.DELETED_POST);
+      throw new DeletedPostException();
     }
 
     List<Image> images = findImagesById(requestDto.getImgList());
     matchingBoard.updateImg(images);
     matchingBoard.update(requestDto);
-    boardRepository.save(matchingBoard);
 
     return getBoardById(matchingBoard.getId());
   }
@@ -134,27 +191,26 @@ public class MatchingService {
    * @param id - 게시글 id
    * @return 게시글 id
    */
+  @Transactional
   public Long deleteBoard(Long id) {
     MatchingBoard matchingBoard = boardRepository.findById(id)
-        .orElseThrow(() -> new NotFoundPostException(ErrorCode.POST_NOT_FOUND));
+        .orElseThrow(NotFoundPostException::new);
 
     if (matchingBoard.getIsDeleted()) {
-      throw new DeletedPostException(ErrorCode.DELETED_POST);
+      throw new DeletedPostException();
     }
 
     if (matchingBoard.getStatus() == StatusType.CLOSED) {
-      throw new CompletedMatchingException(ErrorCode.ALREADY_COMPLETED_MATCHING);
+      throw new CompletedMatchingException();
     }
 
     List<MatchingRequest> requests = requestRepository.findByBoardId(id).orElse(Collections.emptyList());
     for (MatchingRequest request : requests) {
       request.refuse();
-      requestRepository.save(request);
     }
 
     matchingBoard.delete();
     matchingBoard.getGame().delete();
-    boardRepository.save(matchingBoard);
 
     return matchingBoard.getId();
   }
@@ -167,24 +223,24 @@ public class MatchingService {
    */
   public String requestMatching(Long id, Long memberId) {
     MatchingBoard matchingBoard = boardRepository.findById(id)
-        .orElseThrow(() -> new NotFoundPostException(ErrorCode.POST_NOT_FOUND));
+        .orElseThrow(NotFoundPostException::new);
     Member member = memberRepository.findById(memberId)
-        .orElseThrow(() -> new NotFoundMemberException(ErrorCode.MEMBER_NOT_FOUND));
+        .orElseThrow(NotFoundMemberException::new);
 
     if (matchingBoard.getIsDeleted()) {
-      throw new DeletedPostException(ErrorCode.DELETED_POST);
+      throw new DeletedPostException();
     }
 
     if (matchingBoard.getStatus() == StatusType.CLOSED) {
-      throw new CompletedMatchingException(ErrorCode.ALREADY_COMPLETED_MATCHING);
+      throw new CompletedMatchingException();
     }
 
     if (matchingBoard.getMember() == member) {
-      throw new SelfRequestException(ErrorCode.SELF_REQUEST);
+      throw new SelfRequestException();
     }
 
     if (requestRepository.existsByBoardIdAndMemberId(id, memberId)) {
-      throw new AlreadyRequestException(ErrorCode.ALREADY_REQUEST_MATCHING);
+      throw new AlreadyRequestException();
     }
 
     MatchingRequest matchingRequest = MatchingRequest.builder()
@@ -193,6 +249,10 @@ public class MatchingService {
         .createdDate(LocalDateTime.now())
         .build();
     requestRepository.save(matchingRequest);
+
+    Member writer = matchingBoard.getMember();
+    writer.setRequestCount((countRequestsByMember(writer)));
+    memberRepository.save(writer);
 
     return "매칭 신청 완료";
   }
@@ -216,30 +276,28 @@ public class MatchingService {
    * @param id - 매칭 신청 id
    * @return "신청 수락 완료"
    */
+  @Transactional
   public String acceptRequest(Long id) {
     MatchingRequest request = requestRepository.findById(id)
-        .orElseThrow(() -> new NotFoundRequestException(ErrorCode.REQUEST_NOT_FOUND));
+        .orElseThrow(NotFoundRequestException::new);
 
     if (request.getBoard().getStatus() == StatusType.CLOSED) {
-      throw new CompletedMatchingException(ErrorCode.ALREADY_COMPLETED_MATCHING);
+      throw new CompletedMatchingException();
     }
 
     request.accept();
     request.getBoard().acceptMatching();
     request.getBoard().getGame().setOpponent(request.getMember());
-    requestRepository.save(request);
 
     List<MatchingRequest> otherRequests = requestRepository.findOtherRequestsByIdAndBoardId(id, request.getBoard().getId())
         .orElse(Collections.emptyList());
     for (MatchingRequest req : otherRequests) {
       req.refuse();
-      requestRepository.save(req);
     }
 
     List<MatchingRequest> sameTimeRequests = findSameTimeRequests(id).orElse(Collections.emptyList());
     for (MatchingRequest req : sameTimeRequests) {
       req.refuse();
-      requestRepository.save(req);
     }
 
     return "신청 수락 완료";
@@ -250,23 +308,23 @@ public class MatchingService {
    * @param id - 매칭 신청 id
    * @return "신청 거절 완료"
    */
+  @Transactional
   public String refuseRequest(Long id) {
     MatchingRequest request = requestRepository.findById(id)
-        .orElseThrow(() -> new NotFoundRequestException(ErrorCode.REQUEST_NOT_FOUND));
+        .orElseThrow(NotFoundRequestException::new);
 
     if (request.getBoard().getStatus() == StatusType.CLOSED) {
-      throw new CompletedMatchingException(ErrorCode.ALREADY_COMPLETED_MATCHING);
+      throw new CompletedMatchingException();
     }
 
     request.refuse();
-    requestRepository.save(request);
 
     return "신청 거절 완료";
   }
 
   private Optional<List<MatchingRequest>> findSameTimeRequests(Long id) {
     MatchingRequest request = requestRepository.findById(id)
-        .orElseThrow(() -> new NotFoundRequestException(ErrorCode.REQUEST_NOT_FOUND));
+        .orElseThrow(NotFoundRequestException::new);
 
     Game game = request.getBoard().getGame();
     LocalDate date = game.getDate();
@@ -289,7 +347,7 @@ public class MatchingService {
     return images;
   }
 
-  private Integer countRequestsByBoard(Member member) {
+  private Integer countRequestsByMember(Member member) {
     List<MatchingBoard> boards = boardRepository.findByMemberId(member.getId())
         .orElse(Collections.emptyList());
 

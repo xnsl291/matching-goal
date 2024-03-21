@@ -6,6 +6,6 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum StatusType {
-  OPEN, CLOSED
+  OPEN, CLOSED, CANCELLED
 
 }

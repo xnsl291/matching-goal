@@ -12,11 +12,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface GameRepository extends JpaRepository<Game, Long> {
 
-  Optional<Game> findByBoardId_Id(Long boardId);
-
   List<Game> findByTeam1AndDateBetween(Member member, LocalDate startDate, LocalDate endDate);
   List<Game> findByTeam2AndDateBetween(Member member, LocalDate startDate, LocalDate endDate);
-
   List<Game> findByTeam1OrTeam2AndDateLessThanEqualAndTimeLessThanOrderByDateDesc(Member team1, Member team1_copy , LocalDate date, LocalTime time);
-
 }

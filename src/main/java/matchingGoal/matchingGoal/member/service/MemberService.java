@@ -40,6 +40,7 @@ public class MemberService {
     private final ResultRepository resultRepository;
     private final CommentRepository commentRepository;
 
+
     /**
      * 닉네임 중복 체크
      * @return 중복 닉네임 존재시, false 반환
@@ -88,7 +89,8 @@ public class MemberService {
 
     /**
      * 개인 정보 수정
-     * @param updateDto - 정보 수정 dto (이름, 닉네임, 소개, 지역, 이미지)
+     * @param token - 토큰
+     * @param updateDto - 정보 수정 dto (이름, 닉네임, 소개, 지역)
      * @return "수정완료"
      */
     @Transactional
@@ -109,7 +111,6 @@ public class MemberService {
      */
     public SimplerInfoResponse getSimpleUserinfo(Long memberId) {
         Member member = getMemberById(memberId);
-
         return SimplerInfoResponse.builder()
                 .nickname(member.getNickname())
                 .introduction(member.getIntroduction())
