@@ -3,7 +3,6 @@ package matchingGoal.matchingGoal.member.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import matchingGoal.matchingGoal.common.auth.JwtTokenProvider;
-import matchingGoal.matchingGoal.common.type.ErrorCode;
 import matchingGoal.matchingGoal.matching.domain.entity.Comment;
 import matchingGoal.matchingGoal.matching.domain.entity.Game;
 import matchingGoal.matchingGoal.matching.domain.entity.Result;
@@ -167,7 +166,7 @@ public class MemberService {
                         member, member, LocalDate.now(), LocalTime.now());
 
         for (Game game : allGames){
-            Result result = resultRepository.findByGameId(game.getId()).orElseThrow(() -> new NotFoundGameException(ErrorCode.GAME_NOT_FOUND));
+            Result result = resultRepository.findByGameId(game.getId()).orElseThrow(NotFoundGameException::new);
             history.add(MatchHistoryResponse.of(member,result));
         }
 
