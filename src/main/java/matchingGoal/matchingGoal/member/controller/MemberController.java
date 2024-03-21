@@ -102,4 +102,12 @@ public class MemberController {
     public ResponseEntity<MatchStatisticResponse> getMatchStatistic(@PathVariable("memberId") Long memberId) {
         return ResponseEntity.ok().body(memberService.getMatchStatistic(memberId));
     }
+
+    /**
+     * 참여했던 경기 횟수 조회
+     */
+    @GetMapping("/{memberId}/count-matches")
+    public ResponseEntity<MatchAttendanceResponse> getMatchAttendance(@PathVariable("memberId") Long memberId) {
+        return ResponseEntity.ok().body(memberService.getMatchAttendance(memberId));
+    }
 }
