@@ -3,13 +3,14 @@ package matchingGoal.matchingGoal.member.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import matchingGoal.matchingGoal.common.auth.JwtTokenProvider;
+import matchingGoal.matchingGoal.common.type.ErrorCode;
 import matchingGoal.matchingGoal.image.service.ImageService;
 import matchingGoal.matchingGoal.matching.domain.entity.Game;
+import matchingGoal.matchingGoal.matching.domain.entity.Result;
+import matchingGoal.matchingGoal.matching.exception.NotFoundGameException;
 import matchingGoal.matchingGoal.matching.repository.GameRepository;
-import matchingGoal.matchingGoal.member.dto.ScheduleResponse;
-import matchingGoal.matchingGoal.member.dto.SimplerInfoResponse;
-import matchingGoal.matchingGoal.member.dto.UpdateMemberDto;
-import matchingGoal.matchingGoal.member.dto.UpdatePasswordDto;
+import matchingGoal.matchingGoal.matching.repository.ResultRepository;
+import matchingGoal.matchingGoal.member.dto.*;
 import matchingGoal.matchingGoal.member.exception.MemberNotFoundException;
 import matchingGoal.matchingGoal.member.exception.PasswordSameAsBeforeException;
 import matchingGoal.matchingGoal.member.exception.UnmatchedPasswordException;
@@ -21,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
@@ -32,8 +34,8 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final JwtTokenProvider jwtTokenProvider;
     private final PasswordEncoder passwordEncoder;
-    private final ImageService imageService;
     private final GameRepository gameRepository;
+    private final ResultRepository resultRepository;
 
     /**
      * 닉네임 중복 체크
@@ -104,13 +106,12 @@ public class MemberService {
      */
     public SimplerInfoResponse getSimpleUserinfo(Long memberId) {
         Member member = getMemberById(memberId);
-        String imageUrl = imageService.getImageUrl(member.getImageId());
 
         return SimplerInfoResponse.builder()
                 .nickname(member.getNickname())
                 .introduction(member.getIntroduction())
                 .region(member.getRegion())
-                .imageUrl(imageUrl)
+                .imageUrl(member.getImageUrl())
                 .build();
     }
 
@@ -151,4 +152,21 @@ public class MemberService {
         return schedules;
     }
 
+    /**
+     * 과거 매치 목록 조회
+     */
+    public List<MatchHistoryResponse> getMatchHistory(Long memberId) {
+        Member member = getMemberById(memberId);
+        List<MatchHistoryResponse> history = new ArrayList<>();
+        List<Game> allGames = gameRepository
+                .findByTeam1OrTeam2AndDateLessThanEqualAndTimeLessThanOrderByDateDesc(
+                        member, member, LocalDate.now(), LocalTime.now());
+
+        for (Game game : allGames){
+            Result result = resultRepository.findByGameId(game.getId()).orElseThrow(() -> new NotFoundGameException(ErrorCode.GAME_NOT_FOUND));
+            history.add(MatchHistoryResponse.of(member,result));
+        }
+
+        return history;
+    }
 }

@@ -4,10 +4,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import matchingGoal.matchingGoal.common.annotation.Nickname;
-import matchingGoal.matchingGoal.member.dto.ScheduleResponse;
-import matchingGoal.matchingGoal.member.dto.SimplerInfoResponse;
-import matchingGoal.matchingGoal.member.dto.UpdateMemberDto;
-import matchingGoal.matchingGoal.member.dto.UpdatePasswordDto;
+import matchingGoal.matchingGoal.member.dto.*;
 import matchingGoal.matchingGoal.member.model.entity.Member;
 import matchingGoal.matchingGoal.member.service.MemberService;
 import org.springframework.http.ResponseEntity;
@@ -80,6 +77,11 @@ public class MemberController {
                                                                     @RequestParam("year") int year,
                                                                     @RequestParam("month") int month) {
         return ResponseEntity.ok().body(memberService.getMemberSchedule(memberId,year,month));
+    }
+
+    @GetMapping("/{memberId}/history")
+    public ResponseEntity<List<MatchHistoryResponse>> getMatchHistory(@PathVariable("memberId") Long memberId) {
+        return ResponseEntity.ok().body(memberService.getMatchHistory(memberId));
     }
 
 }
