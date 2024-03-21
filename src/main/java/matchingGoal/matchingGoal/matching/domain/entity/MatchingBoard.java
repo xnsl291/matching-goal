@@ -1,5 +1,8 @@
 package matchingGoal.matchingGoal.matching.domain.entity;
 
+import jakarta.persistence.CollectionTable;
+import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -16,7 +19,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import matchingGoal.matchingGoal.image.model.entity.Image;
 import matchingGoal.matchingGoal.matching.domain.StatusType;
 import matchingGoal.matchingGoal.matching.dto.UpdateBoardDto;
 import matchingGoal.matchingGoal.member.model.entity.Member;
@@ -55,9 +57,10 @@ public class MatchingBoard {
 
   private LocalDateTime modifiedDate;
 
-  @OneToMany
-  @JoinColumn(name = "board_id")
-  private List<Image> imgList;
+  @ElementCollection
+  @CollectionTable(name = "board_images",joinColumns = @JoinColumn(name = "board_id"))
+  @Column(name = "image_url")
+  private List<String> imageUrls;
 
   @OneToOne(mappedBy = "board")
   private Game game;
@@ -68,11 +71,8 @@ public class MatchingBoard {
   public void update(UpdateBoardDto requestDto) {
     this.title = requestDto.getTitle();
     this.content = requestDto.getContent();
+    this.imageUrls = requestDto.getImageUrls();
     this.modifiedDate = LocalDateTime.now();
-  }
-
-  public void updateImg(List<Image> images) {
-    this.imgList = images;
   }
 
   public void delete() {

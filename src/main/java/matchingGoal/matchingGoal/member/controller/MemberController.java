@@ -4,13 +4,13 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import matchingGoal.matchingGoal.common.annotation.Nickname;
-import matchingGoal.matchingGoal.member.dto.SimplerInfoResponse;
-import matchingGoal.matchingGoal.member.dto.UpdateMemberDto;
-import matchingGoal.matchingGoal.member.dto.UpdatePasswordDto;
+import matchingGoal.matchingGoal.member.dto.*;
 import matchingGoal.matchingGoal.member.model.entity.Member;
 import matchingGoal.matchingGoal.member.service.MemberService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -65,4 +65,41 @@ public class MemberController {
         return ResponseEntity.ok().body(memberService.getSimpleUserinfo(memberId));
     }
 
+    /**
+     * 회원 일정 조회
+     * @param memberId - 회원 ID
+     * @param year - 년도
+     * @param month - 월
+     * @return 특정 월의 일정 리스트
+     */
+    @GetMapping("/{memberId}/calender")
+    public ResponseEntity<List<ScheduleResponse>> getMemberSchedule(@PathVariable("memberId") Long memberId,
+                                                                    @RequestParam("year") int year,
+                                                                    @RequestParam("month") int month) {
+        return ResponseEntity.ok().body(memberService.getMemberSchedule(memberId,year,month));
+    }
+
+    /**
+     * 참여했던 경기 목록 조회
+     */
+    @GetMapping("/{memberId}/history")
+    public ResponseEntity<List<MatchHistoryResponse>> getMatchHistory(@PathVariable("memberId") Long memberId) {
+        return ResponseEntity.ok().body(memberService.getMatchHistory(memberId));
+    }
+
+    /**
+     * 평점, 한줄평 목록 조회
+     */
+    @GetMapping("/{memberId}/comments")
+    public ResponseEntity<CommentHistoryResponse> getCommentHistory(@PathVariable("memberId") Long memberId) {
+        return ResponseEntity.ok().body(memberService.getCommentHistory(memberId));
+    }
+
+    /**
+     * 경기 전적 조회
+     */
+    @GetMapping("/{memberId}/simple-history")
+    public ResponseEntity<MatchStatisticResponse> getMatchStatistic(@PathVariable("memberId") Long memberId) {
+        return ResponseEntity.ok().body(memberService.getMatchStatistic(memberId));
+    }
 }

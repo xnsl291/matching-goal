@@ -4,12 +4,10 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import matchingGoal.matchingGoal.image.model.entity.Image;
 import matchingGoal.matchingGoal.matching.domain.StatusType;
 import matchingGoal.matchingGoal.matching.domain.entity.MatchingBoard;
 
@@ -25,7 +23,7 @@ public class BoardResponseDto {
   private String memberImg;
   private String title;
   private String content;
-  private List<Long> imgList;
+  private List<String> imageUrls;
   private LocalDateTime createdDate;
   private LocalDateTime modifiedDate;
   private Integer viewCount;
@@ -44,9 +42,7 @@ public class BoardResponseDto {
         .nickname(matchingBoard.getMember().getNickname())
         .title(matchingBoard.getTitle())
         .content(matchingBoard.getContent())
-        .imgList(matchingBoard.getImgList().stream()
-            .map(Image::getId)
-            .collect(Collectors.toList()))
+        .imageUrls(matchingBoard.getImageUrls())
         .createdDate(matchingBoard.getCreatedDate())
         .modifiedDate(matchingBoard.getModifiedDate())
         .viewCount(matchingBoard.getViewCount())

@@ -16,7 +16,7 @@ public class BoardRequestDto {
 
   private Long memberId;
 
-  private List<Long> imgList;
+  private List<String> imageUrls;
   
   @NotBlank(message = "지역을 입력해주세요")
   private String region;

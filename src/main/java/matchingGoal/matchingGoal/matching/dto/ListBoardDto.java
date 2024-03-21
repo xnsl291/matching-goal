@@ -18,7 +18,7 @@ public class ListBoardDto {
   private Long id;
   private Long memberId;
   private String nickname;
-  private Long memberImg;
+  private String memberImgUrl;
   private String title;
   private LocalDateTime createdDate;
   private Integer viewCount;
