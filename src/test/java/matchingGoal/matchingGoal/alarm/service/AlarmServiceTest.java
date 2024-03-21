@@ -5,6 +5,7 @@ import java.util.List;
 import matchingGoal.matchingGoal.alarm.domain.AlarmType;
 import matchingGoal.matchingGoal.alarm.dto.AlarmDto;
 import matchingGoal.matchingGoal.alarm.repository.AlarmRepository;
+import matchingGoal.matchingGoal.chat.entity.dto.ChatMessageDto;
 import matchingGoal.matchingGoal.member.dto.SignInDto;
 import matchingGoal.matchingGoal.member.service.AuthService;
 import org.junit.jupiter.api.DisplayName;
@@ -31,8 +32,8 @@ class AlarmServiceTest  {
     AlarmDto dto = AlarmDto.builder()
         .memberId(1)
         .type(AlarmType.CHAT)
-        .contentId(1)
-        .checkedOut(false)
+        .contentId("1")
+        .checkedOut(0)
         .build();
     //when
     alarmService.createAlarm("bearer " + token, dto);
@@ -49,8 +50,8 @@ class AlarmServiceTest  {
     AlarmDto dto = AlarmDto.builder()
         .memberId(1)
         .type(AlarmType.CHAT)
-        .contentId(1)
-        .checkedOut(false)
+        .contentId("1")
+        .checkedOut(0)
         .build();
     token = "bearer " + token;
     alarmService.createAlarm(token, dto);
@@ -59,6 +60,25 @@ class AlarmServiceTest  {
     //when
     alarmService.checkOut(token, id);
     //then
-    assert(alarmService.getAlarmEntity(id).isCheckedOut());
+    assert(alarmService.getAlarmEntity(id).getCheckedOut() == 1);
+  }
+
+  @Test
+  @DisplayName("messageAlarm")
+  void messageAlarm() {
+    //given
+    String token = authService.signIn(SignInDto.builder().email("test1@test.com").password("test123!@#").build()).getAccessToken();
+
+    ChatMessageDto messageDto = ChatMessageDto.builder()
+        .message("ㅇㅇ")
+        .chatRoomId("eac043e7-40e8-4798-bc2f-606bfb627b01")
+        .receiverId(2)
+        .build();
+    //when
+    alarmService.messageAlarm(messageDto);
+    //then
+    assert(alarmRepository.findAllByMemberId(2).size() == 1);
+
+
   }
 }

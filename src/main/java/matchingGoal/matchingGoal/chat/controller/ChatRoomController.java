@@ -2,9 +2,9 @@ package matchingGoal.matchingGoal.chat.controller;
 
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import matchingGoal.matchingGoal.chat.dto.ChatMessageDto;
-import matchingGoal.matchingGoal.chat.dto.ChatRoomListResponse;
-import matchingGoal.matchingGoal.chat.dto.CreateChatRoomRequest;
+import matchingGoal.matchingGoal.chat.entity.dto.ChatMessageDto;
+import matchingGoal.matchingGoal.chat.entity.dto.ChatRoomListResponse;
+import matchingGoal.matchingGoal.chat.entity.dto.CreateChatRoomRequest;
 import matchingGoal.matchingGoal.chat.service.ChatRoomService;
 import matchingGoal.matchingGoal.common.auth.JwtTokenProvider;
 import org.springframework.http.ResponseEntity;
