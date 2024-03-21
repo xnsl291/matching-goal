@@ -2,9 +2,9 @@ package matchingGoal.matchingGoal.chat.controller;
 
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import matchingGoal.matchingGoal.chat.dto.ChatMessageDto;
-import matchingGoal.matchingGoal.chat.dto.ChatRoomListResponse;
-import matchingGoal.matchingGoal.chat.dto.CreateChatRoomRequest;
+import matchingGoal.matchingGoal.chat.entity.dto.ChatMessageDto;
+import matchingGoal.matchingGoal.chat.entity.dto.ChatRoomListResponse;
+import matchingGoal.matchingGoal.chat.entity.dto.CreateChatRoomRequest;
 import matchingGoal.matchingGoal.chat.service.ChatRoomService;
 import matchingGoal.matchingGoal.common.auth.JwtTokenProvider;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -25,8 +26,9 @@ public class ChatRoomController {
   private final JwtTokenProvider jwtTokenProvider;
 
   @PostMapping("/personal")
-  public ResponseEntity<?> createChatRoom(@RequestHeader(value = "authorization") String token,
+  public ResponseEntity<?> createChatRoom(@RequestHeader(value = "authorization") String token, @RequestBody
       CreateChatRoomRequest request) {
+    token = token.substring(7);
     long hostId = jwtTokenProvider.getId(token);
     String result = chatRoomService.createChatRoom(hostId, request.getMemberId());
 
@@ -36,6 +38,7 @@ public class ChatRoomController {
 
   @GetMapping("/list")
   public ResponseEntity<?> myChats(@RequestHeader(value = "authorization") String token) {
+    token = token.substring(7);
     long userId = jwtTokenProvider.getId(token);
     List<ChatRoomListResponse> result = chatRoomService.myChat(userId);
 

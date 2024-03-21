@@ -11,7 +11,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import matchingGoal.matchingGoal.chat.dto.ChatMessageDto;
+import matchingGoal.matchingGoal.chat.entity.dto.ChatMessageDto;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -30,8 +30,10 @@ public class ChatMessage {
   private long memberId;
   private String nickname;
   private String message;
+  private long receiverId;
   @CreatedDate
   private LocalDateTime createdDate;
+  private int readYn;
 
   public static ChatMessage fromDto(ChatMessageDto dto) {
 
@@ -40,6 +42,8 @@ public class ChatMessage {
         .chatRoomId(dto.getChatRoomId())
         .memberId(dto.getMemberId())
         .nickname(dto.getNickname())
+        .receiverId(dto.getReceiverId())
+        .readYn(dto.getReadYn())
         .build();
   }
 

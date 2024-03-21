@@ -1,4 +1,4 @@
-package matchingGoal.matchingGoal.chat.dto;
+package matchingGoal.matchingGoal.chat.entity.dto;
 
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -16,14 +16,16 @@ import matchingGoal.matchingGoal.member.model.entity.Member;
 @Setter
 public class ChatRoomListResponse {
   private String id;
-  private List<Long> members ;
+  private List<Long> memberIdList;
+  private List<String> memberNicknameList;
 
   public static ChatRoomListResponse fromEntity(ChatRoom entity) {
     List<Long> memberIdList = entity.getChatRoomMembers().stream().map(Member::getId).toList();
-
+    List<String> memberNicknameList = entity.getChatRoomMembers().stream().map(Member::getNickname).toList();
     return ChatRoomListResponse.builder()
         .id(entity.getId())
-        .members(memberIdList)
+        .memberIdList(memberIdList)
+        .memberNicknameList(memberNicknameList)
         .build();
   }
 }

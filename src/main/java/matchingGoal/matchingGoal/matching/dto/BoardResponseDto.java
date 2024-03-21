@@ -4,12 +4,10 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import matchingGoal.matchingGoal.image.model.entity.Image;
 import matchingGoal.matchingGoal.matching.domain.StatusType;
 import matchingGoal.matchingGoal.matching.domain.entity.MatchingBoard;
 
@@ -22,10 +20,10 @@ public class BoardResponseDto {
   private Long id;
   private Long memberId;
   private String nickname;
-  private Long memberImg;
+  private String memberImg;
   private String title;
   private String content;
-  private List<Long> imgList;
+  private List<String> imageUrls;
   private LocalDateTime createdDate;
   private LocalDateTime modifiedDate;
   private Integer viewCount;
@@ -40,17 +38,16 @@ public class BoardResponseDto {
     return BoardResponseDto.builder()
         .id(matchingBoard.getId())
         .memberId(matchingBoard.getMember().getId())
-        .memberImg(matchingBoard.getMember().getImageId())
+        .memberImg(matchingBoard.getMember().getImageUrl())
         .nickname(matchingBoard.getMember().getNickname())
         .title(matchingBoard.getTitle())
         .content(matchingBoard.getContent())
-        .imgList(matchingBoard.getImgList().stream()
-            .map(Image::getId)
-            .collect(Collectors.toList()))
+        .imageUrls(matchingBoard.getImageUrls())
         .createdDate(matchingBoard.getCreatedDate())
         .modifiedDate(matchingBoard.getModifiedDate())
         .viewCount(matchingBoard.getViewCount())
         .status(matchingBoard.getStatus())
+        .requestCount(matchingBoard.getMember().getRequestCount())
         .region(matchingBoard.getRegion())
         .stadium(matchingBoard.getGame().getStadiumName())
         .date(matchingBoard.getGame().getDate())
@@ -58,7 +55,4 @@ public class BoardResponseDto {
         .build();
   }
 
-  public void setRequestCount(Integer requestCount) {
-    this.requestCount = requestCount;
-  }
 }

@@ -1,6 +1,6 @@
 package matchingGoal.matchingGoal.member.service;
 
-import matchingGoal.matchingGoal.member.dto.MemberRegisterDto;
+import matchingGoal.matchingGoal.member.dto.SignUpDto;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -17,7 +17,7 @@ class AuthServiceTest {
     String invalidPw2 = "pass123";  //len < 10
     String invalidPw3 = "123456!!!!";  // no alpha
 
-    MemberRegisterDto invalid_registerDto_1 = MemberRegisterDto.builder()
+    SignUpDto invalid_registerDto_1 = SignUpDto.builder()
             .email("test_00@gmail.com")
             .name("test111")
             .password(invalidPw1)
@@ -26,7 +26,7 @@ class AuthServiceTest {
             .region("seoul")
             .build();
 
-    MemberRegisterDto invalid_registerDto_2 = MemberRegisterDto.builder()
+    SignUpDto invalid_registerDto_2 = SignUpDto.builder()
             .email("test_11@gmail.com")
             .name("test111")
             .password(invalidPw2)
@@ -34,7 +34,7 @@ class AuthServiceTest {
             .introduction("hello, there")
             .region("seoul")
             .build();
-    MemberRegisterDto invalid_registerDto_3 = MemberRegisterDto.builder()
+    SignUpDto invalid_registerDto_3 = SignUpDto.builder()
             .email("test_22@gmail.com")
             .name("test111")
             .password(invalidPw3)
@@ -42,7 +42,7 @@ class AuthServiceTest {
             .introduction("hello, there")
             .region("seoul")
             .build();
-    MemberRegisterDto valid_registerDto = MemberRegisterDto.builder()
+    SignUpDto valid_registerDto = SignUpDto.builder()
             .email("test111@gmail.com")
             .name("test111")
             .password(validPw)

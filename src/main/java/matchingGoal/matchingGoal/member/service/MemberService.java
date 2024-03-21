@@ -41,6 +41,7 @@ public class MemberService {
     private final CommentRepository commentRepository;
     private final GameCancelRepository gameCancelRepository;
 
+
     /**
      * 닉네임 중복 체크
      * @return 중복 닉네임 존재시, false 반환
@@ -89,7 +90,8 @@ public class MemberService {
 
     /**
      * 개인 정보 수정
-     * @param updateDto - 정보 수정 dto (이름, 닉네임, 소개, 지역, 이미지)
+     * @param token - 토큰
+     * @param updateDto - 정보 수정 dto (이름, 닉네임, 소개, 지역)
      * @return "수정완료"
      */
     @Transactional
@@ -100,6 +102,7 @@ public class MemberService {
         member.setNickname(updateDto.getNickname());
         member.setIntroduction(updateDto.getIntroduction());
         member.setRegion(updateDto.getRegion());
+        member.setImageUrl(updateDto.getImageUrl());
         return "수정완료";
     }
 
@@ -110,7 +113,6 @@ public class MemberService {
      */
     public SimplerInfoResponse getSimpleUserinfo(Long memberId) {
         Member member = getMemberById(memberId);
-
         return SimplerInfoResponse.builder()
                 .nickname(member.getNickname())
                 .introduction(member.getIntroduction())
@@ -167,7 +169,7 @@ public class MemberService {
                         member, member, LocalDate.now(), LocalTime.now());
 
         for (Game game : allGames){
-            Result result = resultRepository.findByGameId(game.getId()).orElseThrow(() -> new NotFoundGameException(ErrorCode.GAME_NOT_FOUND));
+            Result result = resultRepository.findByGameId(game.getId()).orElseThrow(NotFoundGameException::new);
             history.add(MatchHistoryResponse.of(member,result));
         }
 
