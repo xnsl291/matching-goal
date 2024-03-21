@@ -4,10 +4,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import matchingGoal.matchingGoal.common.auth.JwtTokenProvider;
 import matchingGoal.matchingGoal.common.type.ErrorCode;
-import matchingGoal.matchingGoal.image.service.ImageService;
+import matchingGoal.matchingGoal.matching.domain.entity.Comment;
 import matchingGoal.matchingGoal.matching.domain.entity.Game;
 import matchingGoal.matchingGoal.matching.domain.entity.Result;
+import matchingGoal.matchingGoal.matching.dto.CommentHistoryDto;
 import matchingGoal.matchingGoal.matching.exception.NotFoundGameException;
+import matchingGoal.matchingGoal.matching.repository.CommentRepository;
 import matchingGoal.matchingGoal.matching.repository.GameRepository;
 import matchingGoal.matchingGoal.matching.repository.ResultRepository;
 import matchingGoal.matchingGoal.member.dto.*;
@@ -22,6 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,6 +39,7 @@ public class MemberService {
     private final PasswordEncoder passwordEncoder;
     private final GameRepository gameRepository;
     private final ResultRepository resultRepository;
+    private final CommentRepository commentRepository;
 
     /**
      * 닉네임 중복 체크
@@ -168,5 +172,27 @@ public class MemberService {
         }
 
         return history;
+    }
+
+    /**
+     * 평점, 한줄평 목록 조회
+     */
+    public CommentHistoryResponse getCommentHistory(Long memberId) {
+        double totalRate = 0.0 ;
+        Member member = getMemberById(memberId);
+        List<Comment> comments = commentRepository.findByOpponent(member);
+        List<CommentHistoryDto> commentDtoList = new ArrayList<>();
+
+        for(Comment comment : comments){
+            commentDtoList.add(CommentHistoryDto.of(comment));
+            totalRate += comment.getScore();
+        }
+
+        int size = commentDtoList.size();
+
+        return CommentHistoryResponse.builder()
+                .totalRate(size == 0 ? 0 : totalRate / size )
+                .comments(commentDtoList)
+                .build();
     }
 }

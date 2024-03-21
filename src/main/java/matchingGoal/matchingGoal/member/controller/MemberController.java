@@ -79,9 +79,19 @@ public class MemberController {
         return ResponseEntity.ok().body(memberService.getMemberSchedule(memberId,year,month));
     }
 
+    /**
+     * 참여했던 경기 목록 조회
+     */
     @GetMapping("/{memberId}/history")
     public ResponseEntity<List<MatchHistoryResponse>> getMatchHistory(@PathVariable("memberId") Long memberId) {
         return ResponseEntity.ok().body(memberService.getMatchHistory(memberId));
     }
 
+    /**
+     * 평점, 한줄평 목록 조회
+     */
+    @GetMapping("/{memberId}/comments")
+    public ResponseEntity<CommentHistoryResponse> getCommentHistory(@PathVariable("memberId") Long memberId) {
+        return ResponseEntity.ok().body(memberService.getCommentHistory(memberId));
+    }
 }
