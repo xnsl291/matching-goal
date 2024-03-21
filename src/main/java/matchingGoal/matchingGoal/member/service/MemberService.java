@@ -3,10 +3,16 @@ package matchingGoal.matchingGoal.member.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import matchingGoal.matchingGoal.common.auth.JwtTokenProvider;
-import matchingGoal.matchingGoal.image.service.ImageService;
-import matchingGoal.matchingGoal.member.dto.SimplerInfoResponse;
-import matchingGoal.matchingGoal.member.dto.UpdateMemberDto;
-import matchingGoal.matchingGoal.member.dto.UpdatePasswordDto;
+import matchingGoal.matchingGoal.common.type.ErrorCode;
+import matchingGoal.matchingGoal.matching.domain.entity.Comment;
+import matchingGoal.matchingGoal.matching.domain.entity.Game;
+import matchingGoal.matchingGoal.matching.domain.entity.Result;
+import matchingGoal.matchingGoal.matching.dto.CommentHistoryDto;
+import matchingGoal.matchingGoal.matching.exception.NotFoundGameException;
+import matchingGoal.matchingGoal.matching.repository.CommentRepository;
+import matchingGoal.matchingGoal.matching.repository.GameRepository;
+import matchingGoal.matchingGoal.matching.repository.ResultRepository;
+import matchingGoal.matchingGoal.member.dto.*;
 import matchingGoal.matchingGoal.member.exception.MemberNotFoundException;
 import matchingGoal.matchingGoal.member.exception.PasswordSameAsBeforeException;
 import matchingGoal.matchingGoal.member.exception.UnmatchedPasswordException;
@@ -17,6 +23,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Stream;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -24,6 +36,10 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final JwtTokenProvider jwtTokenProvider;
     private final PasswordEncoder passwordEncoder;
+    private final GameRepository gameRepository;
+    private final ResultRepository resultRepository;
+    private final CommentRepository commentRepository;
+
 
     /**
      * 닉네임 중복 체크
@@ -93,9 +109,8 @@ public class MemberService {
      * @param memberId - 조회하고 싶은 회원 ID
      * @return OtherMemberInfoResponse - 닉네임, 소개, 지역, 이미지url
      */
-    public SimplerInfoResponse getSimpleUserinfo(Long id) {
-        Member member = getMemberById(id);
-
+    public SimplerInfoResponse getSimpleUserinfo(Long memberId) {
+        Member member = getMemberById(memberId);
         return SimplerInfoResponse.builder()
                 .nickname(member.getNickname())
                 .introduction(member.getIntroduction())
@@ -114,4 +129,100 @@ public class MemberService {
         if (!isMatch)
             throw new UnmatchedPasswordException();
     }
+
+    /**
+     * 회원 일정 조회
+     * @param memberId - 회원 ID
+     * @param year - 년도
+     * @param month - 월
+     * @return 특정 월의 일정 리스트
+     */
+    public List<ScheduleResponse> getMemberSchedule(Long memberId, int year, int month) {
+        LocalDate startDate = LocalDate.of(year, month, 1);
+        LocalDate endDate = startDate.plusMonths(1).minusDays(1);
+        Member member = getMemberById(memberId);
+
+        List<ScheduleResponse> schedules = new ArrayList<>();
+
+        List<Game> games1 = gameRepository.findByTeam1AndDateBetween(member, startDate, endDate);
+        List<Game> games2 = gameRepository.findByTeam2AndDateBetween(member, startDate, endDate);
+        List<Game> allGames = Stream.concat(games1.stream(), games2.stream()).toList();
+
+        for (Game game : allGames) {
+            ScheduleResponse response = ScheduleResponse.of(game, member);
+            schedules.add(response);
+        }
+
+        return schedules;
+    }
+
+    /**
+     * 과거 매치 목록 조회
+     */
+    public List<MatchHistoryResponse> getMatchHistory(Long memberId) {
+        Member member = getMemberById(memberId);
+        List<MatchHistoryResponse> history = new ArrayList<>();
+        List<Game> allGames = gameRepository
+                .findByTeam1OrTeam2AndDateLessThanEqualAndTimeLessThanOrderByDateDesc(
+                        member, member, LocalDate.now(), LocalTime.now());
+
+        for (Game game : allGames){
+            Result result = resultRepository.findByGameId(game.getId()).orElseThrow(() -> new NotFoundGameException(ErrorCode.GAME_NOT_FOUND));
+            history.add(MatchHistoryResponse.of(member,result));
+        }
+
+        return history;
+    }
+
+    /**
+     * 평점, 한줄평 목록 조회
+     */
+    public CommentHistoryResponse getCommentHistory(Long memberId) {
+        double totalRate = 0.0 ;
+        Member member = getMemberById(memberId);
+        List<Comment> comments = commentRepository.findByOpponent(member);
+        List<CommentHistoryDto> commentDtoList = new ArrayList<>();
+
+        for(Comment comment : comments){
+            commentDtoList.add(CommentHistoryDto.of(comment));
+            totalRate += comment.getScore();
+        }
+
+        int size = commentDtoList.size();
+
+        return CommentHistoryResponse.builder()
+                .totalRate(size == 0 ? 0 : totalRate / size )
+                .comments(commentDtoList)
+                .build();
+    }
+
+    /**
+     * 경기 전적 조회
+     */
+    public MatchStatisticResponse getMatchStatistic(Long memberId){
+        List<MatchHistoryResponse> records = getMatchHistory(memberId);
+
+        int totalSize = records.size();
+        int win = 0, lose = 0, draw = 0;
+        double winRate = 0.0 ;
+
+        for (MatchHistoryResponse record : records){
+            if(record.isWin())
+                win += 1;
+
+            else{
+                if(record.getScore1() == record.getScore2())
+                    draw += 1;
+                else
+                    lose += 1;
+            }
+        }
+
+        if (totalSize != 0 )
+            winRate = (double) win / totalSize;
+
+        return new MatchStatisticResponse(winRate, totalSize, win , lose ,draw );
+    }
+
 }
+
