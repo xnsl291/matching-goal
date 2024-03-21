@@ -15,7 +15,7 @@ public class CommentResponse {
   private Long commentId;
   private Long opponentId;
   private Long writerId;
-  private Long writerImgId;
+  private String writerImgId;
   private Long gameId;
   private Integer score;
   private String content;
@@ -25,7 +25,7 @@ public class CommentResponse {
         .commentId(comment.getId())
         .opponentId(comment.getOpponent().getId())
         .writerId(comment.getWriter().getId())
-        .writerImgId(comment.getWriter().getImageId())
+        .writerImgId(comment.getWriter().getImageUrl())
         .gameId(comment.getGame().getId())
         .score(comment.getScore())
         .content(comment.getContent())

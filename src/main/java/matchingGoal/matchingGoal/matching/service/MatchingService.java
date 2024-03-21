@@ -61,8 +61,6 @@ public class MatchingService {
     Member member = memberRepository.findById(requestDto.getMemberId())
         .orElseThrow(NotFoundMemberException::new);
 
-    List<Image> images = findImagesById(requestDto.getImgList());
-
     MatchingBoard matchingBoard = MatchingBoard.builder()
         .member(member)
         .region(requestDto.getRegion())
@@ -72,7 +70,7 @@ public class MatchingService {
         .createdDate(LocalDateTime.now())
         .isDeleted(false)
         .viewCount(0)
-        .imgList(images)
+        .imageUrls(requestDto.getImageUrls())
         .build();
     MatchingBoard savedBoard = boardRepository.save(matchingBoard);
 
@@ -132,7 +130,7 @@ public class MatchingService {
     return ListBoardDto.builder()
         .id(matchingBoard.getId())
         .memberId(member.getId())
-        .memberImg(member.getImageId())
+        .memberImgUrl(member.getImageUrl())
         .nickname(member.getNickname())
         .title(matchingBoard.getTitle())
         .createdDate(matchingBoard.getCreatedDate())
@@ -179,8 +177,6 @@ public class MatchingService {
       throw new DeletedPostException();
     }
 
-    List<Image> images = findImagesById(requestDto.getImgList());
-    matchingBoard.updateImg(images);
     matchingBoard.update(requestDto);
 
     return getBoardById(matchingBoard.getId());
@@ -334,18 +330,18 @@ public class MatchingService {
     return requestRepository.findSameTimeRequests(memberId, date, time, id);
   }
 
-  private List<Image> findImagesById(List<Long> imgList) {
-    List<Image> images = new ArrayList<>();
-
-    if (imgList != null) {
-      for (Long id : imgList) {
-        Optional<Image> optionalImage = imageRepository.findById(id);
-        optionalImage.ifPresent(images::add);
-      }
-    }
-
-    return images;
-  }
+//  private List<Image> findImagesById(List<Long> imgList) {
+//    List<Image> images = new ArrayList<>();
+//
+//    if (imgList != null) {
+//      for (Long id : imgList) {
+//        Optional<Image> optionalImage = imageRepository.findById(id);
+//        optionalImage.ifPresent(images::add);
+//      }
+//    }
+//
+//    return images;
+//  }
 
   private Integer countRequestsByMember(Member member) {
     List<MatchingBoard> boards = boardRepository.findByMemberId(member.getId())
