@@ -25,7 +25,7 @@ public class CommentResponse {
         .commentId(comment.getId())
         .opponentId(comment.getOpponent().getId())
         .writerId(comment.getWriter().getId())
-        .writerImgId(comment.getWriter().getImageId())
+//        .writerImgId(comment.getWriter().getImageId())
         .gameId(comment.getGame().getId())
         .score(comment.getScore())
         .content(comment.getContent())

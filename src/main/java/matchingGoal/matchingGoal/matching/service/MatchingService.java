@@ -132,7 +132,7 @@ public class MatchingService {
     return ListBoardDto.builder()
         .id(matchingBoard.getId())
         .memberId(member.getId())
-        .memberImg(member.getImageId())
+//        .memberImg(member.getImageId())
         .nickname(member.getNickname())
         .title(matchingBoard.getTitle())
         .createdDate(matchingBoard.getCreatedDate())

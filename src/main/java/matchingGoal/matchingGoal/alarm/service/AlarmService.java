@@ -1,12 +1,14 @@
 package matchingGoal.matchingGoal.alarm.service;
 
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import matchingGoal.matchingGoal.alarm.domain.AlarmType;
 import matchingGoal.matchingGoal.alarm.dto.AlarmDto;
 import matchingGoal.matchingGoal.alarm.domain.entity.Alarm;
 import matchingGoal.matchingGoal.alarm.repository.AlarmRepository;
+import matchingGoal.matchingGoal.chat.entity.dto.ChatMessageDto;
 import matchingGoal.matchingGoal.common.auth.JwtTokenProvider;
 import matchingGoal.matchingGoal.common.config.RabbitConfig;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -17,7 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Slf4j
 public class AlarmService {
-  private final RabbitTemplate rabbitTemplate;
   private final AlarmRepository alarmRepository;
   private final JwtTokenProvider jwtTokenProvider;
 
@@ -27,11 +28,11 @@ public class AlarmService {
 
   //알람생성
   public long createAlarm(String token, AlarmDto dto) {
-    Alarm alarm = Alarm.fromDto(dto);
 
     return createAlarm(getMemberIdFromToken(token), dto.getType(), dto.getContentId());
   }
-  public long createAlarm(long memberId, AlarmType type, long contentId) {
+
+  public long createAlarm(long memberId, AlarmType type, String contentId) {
     Alarm alarm = Alarm.builder()
         .memberId(memberId)
         .type(type)
@@ -43,12 +44,28 @@ public class AlarmService {
     return alarm.getId();
   }
 
+  //채팅메세지 알람
+  @Transactional
+  public void messageAlarm(ChatMessageDto dto) {
+    Optional<Alarm> optionalAlarm = alarmRepository.findByMemberIdAndContentId(dto.getReceiverId(), dto.getChatRoomId());
+    if (optionalAlarm.isPresent()) {
+      Alarm alarm = optionalAlarm.get();
+      alarm.messageAlarmUpdate();
+      log.info("alarm update for member: " + alarm.getMemberId());
+    } else {
+      createAlarm(dto.getReceiverId(), AlarmType.CHAT, dto.getChatRoomId());
+    }
+  }
+
   //알람리스트 조회
   public List<AlarmDto> getAlarm(String token) {
     long memberId = getMemberIdFromToken(token);
 
     return alarmRepository.findAllByMemberId(memberId).stream().map(AlarmDto::fromEntity).toList();
   }
+
+
+
   //수신확인
   @Transactional
   public void checkOut(String token, long alarmId) {

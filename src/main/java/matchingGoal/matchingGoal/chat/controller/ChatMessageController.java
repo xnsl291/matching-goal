@@ -1,7 +1,7 @@
 package matchingGoal.matchingGoal.chat.controller;
 
 import lombok.RequiredArgsConstructor;
-import matchingGoal.matchingGoal.chat.dto.ChatMessageDto;
+import matchingGoal.matchingGoal.chat.entity.dto.ChatMessageDto;
 import matchingGoal.matchingGoal.chat.service.ChatMessageService;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
@@ -25,7 +25,7 @@ public class ChatMessageController {
 
   @RabbitListener(queues = CHAT_QUEUE_NAME)
   public void receive(ChatMessageDto chat) {
-    System.out.println("recieved : " + chat.getMessage());
+    chatMessageService.saveMessage(chat);
   }
 
 }

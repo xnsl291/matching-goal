@@ -15,6 +15,7 @@ import lombok.NoArgsConstructor;
 import matchingGoal.matchingGoal.alarm.domain.AlarmType;
 import matchingGoal.matchingGoal.alarm.domain.AlarmTypeAttributeConverter;
 import matchingGoal.matchingGoal.alarm.dto.AlarmDto;
+import org.hibernate.annotations.DynamicUpdate;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -23,6 +24,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
+@DynamicUpdate
 @EntityListeners(AuditingEntityListener.class)
 public class Alarm {
   @Id
@@ -31,24 +33,28 @@ public class Alarm {
   private long memberId;
   @Convert(converter = AlarmTypeAttributeConverter.class)
   private AlarmType type;
-  private long contentId;
+  private String contentId;
   @Default
-  private boolean checkedOut = false;
+  private int checkedOut = 0;
   @CreatedDate
   private LocalDateTime createdDate;
-
+  private LocalDateTime updatedDate;
   public static Alarm fromDto(AlarmDto dto) {
     return Alarm.builder()
         .memberId(dto.getMemberId())
         .type(dto.getType())
         .contentId(dto.getContentId())
-        .checkedOut(dto.isCheckedOut())
+        .checkedOut(dto.getCheckedOut())
         .build();
   }
 
   public void checkOut() {
-    this.checkedOut = true;
+    this.checkedOut = 1;
 
+  }
+  public void messageAlarmUpdate() {
+    this.checkedOut = 0;
+    this.updatedDate = LocalDateTime.now();
   }
 
 }

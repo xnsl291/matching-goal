@@ -1,4 +1,4 @@
-package matchingGoal.matchingGoal.chat.dto;
+package matchingGoal.matchingGoal.chat.entity.dto;
 
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
@@ -18,7 +18,9 @@ public class ChatMessageDto {
   private long memberId;
   private String nickname;
   private String message;
+  private long receiverId;
   private LocalDateTime createdDate;
+  private int readYn;
 
   public static ChatMessageDto fromEntity(ChatMessage entity) {
     return ChatMessageDto.builder()
@@ -27,6 +29,8 @@ public class ChatMessageDto {
         .nickname(entity.getNickname())
         .message(entity.getMessage())
         .createdDate(entity.getCreatedDate())
+        .receiverId(entity.getReceiverId())
+        .readYn(entity.getReadYn())
         .build();
   }
 }

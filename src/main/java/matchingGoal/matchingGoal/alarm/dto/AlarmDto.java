@@ -20,9 +20,9 @@ public class AlarmDto {
   private long id;
   private long memberId;
   private AlarmType type;
-  private long contentId;
+  private String contentId;
   private String message;
-  private boolean checkedOut;
+  private int checkedOut;
   private LocalDateTime createdDate;
 
   public static AlarmDto fromEntity(Alarm alarm){
@@ -33,7 +33,7 @@ public class AlarmDto {
         .message(messageFromType(alarm.getType()))
         .type(alarm.getType())
         .contentId(alarm.getContentId())
-        .checkedOut(alarm.isCheckedOut())
+        .checkedOut(alarm.getCheckedOut())
         .createdDate(alarm.getCreatedDate())
         .build();
   }
