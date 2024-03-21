@@ -100,6 +100,7 @@ public class MemberService {
         member.setNickname(updateDto.getNickname());
         member.setIntroduction(updateDto.getIntroduction());
         member.setRegion(updateDto.getRegion());
+        member.setImageUrl(updateDto.getImageUrl());
         return "수정완료";
     }
 
