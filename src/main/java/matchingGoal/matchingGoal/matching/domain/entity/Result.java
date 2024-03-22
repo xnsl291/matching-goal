@@ -30,11 +30,6 @@ public class Result {
   @JoinColumn(name = "game_id")
   private Game game;
 
-  @Setter
-  @ManyToOne
-  @JoinColumn(name = "winner_id")
-  private Member winner;
-
   private Integer score1;
 
   private Integer score2;

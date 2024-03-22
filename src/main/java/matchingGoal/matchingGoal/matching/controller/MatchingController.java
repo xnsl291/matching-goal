@@ -36,6 +36,7 @@ public class MatchingController {
   @GetMapping("/list")
   public Page<ListBoardDto> getBoardList(
       @RequestParam(defaultValue = "0") int page,
+      @RequestParam(name = "size") int pageSize,
       @RequestParam(required = false) String keyword,
       @RequestParam(required = false) String type,
       @RequestParam(defaultValue = "time") String sort,
@@ -43,7 +44,7 @@ public class MatchingController {
       @RequestParam(required = false) String date,
       @RequestParam(required = false) String time
   ) {
-    return matchingService.getBoardList(page, keyword, type, sort, sortDirection, date, time);
+    return matchingService.getBoardList(page, pageSize, keyword, type, sort, sortDirection, date, time);
   }
 
   @GetMapping("/{id}")

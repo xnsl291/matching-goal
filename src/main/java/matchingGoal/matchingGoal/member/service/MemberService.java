@@ -3,12 +3,13 @@ package matchingGoal.matchingGoal.member.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import matchingGoal.matchingGoal.common.auth.JwtTokenProvider;
-import matchingGoal.matchingGoal.matching.domain.entity.Comment;
-import matchingGoal.matchingGoal.matching.domain.entity.Game;
-import matchingGoal.matchingGoal.matching.domain.entity.Result;
+import matchingGoal.matchingGoal.common.type.ErrorCode;
+import matchingGoal.matchingGoal.matching.domain.CancelType;
+import matchingGoal.matchingGoal.matching.domain.entity.*;
 import matchingGoal.matchingGoal.matching.dto.CommentHistoryDto;
 import matchingGoal.matchingGoal.matching.exception.NotFoundGameException;
 import matchingGoal.matchingGoal.matching.repository.CommentRepository;
+import matchingGoal.matchingGoal.matching.repository.GameCancelRepository;
 import matchingGoal.matchingGoal.matching.repository.GameRepository;
 import matchingGoal.matchingGoal.matching.repository.ResultRepository;
 import matchingGoal.matchingGoal.member.dto.*;
@@ -38,6 +39,7 @@ public class MemberService {
     private final GameRepository gameRepository;
     private final ResultRepository resultRepository;
     private final CommentRepository commentRepository;
+    private final GameCancelRepository gameCancelRepository;
 
 
     /**
@@ -149,8 +151,12 @@ public class MemberService {
         List<Game> allGames = Stream.concat(games1.stream(), games2.stream()).toList();
 
         for (Game game : allGames) {
-            ScheduleResponse response = ScheduleResponse.of(game, member);
-            schedules.add(response);
+            try{
+                ScheduleResponse response = ScheduleResponse.of(game, member);
+                schedules.add(response);
+            }catch (Exception e){
+//                System.out.println("not matched game");
+            }
         }
 
         return schedules;
@@ -167,10 +173,11 @@ public class MemberService {
                         member, member, LocalDate.now(), LocalTime.now());
 
         for (Game game : allGames){
-            Result result = resultRepository.findByGameId(game.getId()).orElseThrow(NotFoundGameException::new);
-            history.add(MatchHistoryResponse.of(member,result));
+            try{
+                Result result = resultRepository.findByGameId(game.getId()).orElseThrow(NotFoundGameException::new);
+                history.add(MatchHistoryResponse.of(member, result));
+            }catch (Exception e){}
         }
-
         return history;
     }
 
@@ -224,5 +231,23 @@ public class MemberService {
         return new MatchStatisticResponse(winRate, totalSize, win , lose ,draw );
     }
 
+    /**
+     * 참여했던 경기 횟수 조회
+     */
+    public MatchAttendanceResponse getMatchAttendance(Long memberId){
+        int cancel = 0, noshow = 0 ;
+        Member member = getMemberById(memberId);
+
+        List<Game> allGames = gameRepository.findByTeam1OrTeam2AndDateLessThanEqualAndTimeLessThanOrderByDateDesc(member,member,LocalDate.now(),LocalTime.now());
+        List<GameCancel> cancelGames = gameCancelRepository.findByMember(member);
+
+        for (GameCancel gameCancel : cancelGames){
+            if(gameCancel.getType().equals(CancelType.CANCEL))
+                cancel += 1;
+            else
+                noshow += 1;
+        }
+     return new MatchAttendanceResponse(allGames.size(), cancel, noshow );
+    }
 }
 

@@ -12,13 +12,10 @@ import lombok.NoArgsConstructor;
 @Builder
 public class ResultDto {
 
-  @NotNull(message = "승리팀을 선택해주세요")
-  private Long winnerId;
-
-  @NotNull(message = "점수를 모두 입력해주세요")
+  @NotNull(message = "상태팀의 점수를 입력해주세요")
   private Integer score1;
 
-  @NotNull(message = "점수를 모두 입력해주세요")
+  @NotNull(message = "득점한 점수를 입력해주세요")
   private Integer score2;
 
   @NotNull(message = "경기 시간을 입력해주세요")
