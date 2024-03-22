@@ -21,14 +21,14 @@ public class AlarmController {
   private final AlarmService alarmService;
 
   @PostMapping("/")
-  public ResponseEntity<Long> Alarm(@RequestHeader(value = "authorization") String token, @RequestBody AlarmDto alarmDto) {
+  public ResponseEntity<Long> create(@RequestHeader(value = "authorization") String token, @RequestBody AlarmDto alarmDto) {
     long result = alarmService.createAlarm(token, alarmDto);
 
     return ResponseEntity.ok(result);
   }
 
   @GetMapping("/")
-  public ResponseEntity<List<AlarmDto>> Alarm (@RequestHeader(value = "authorization") String token) {
+  public ResponseEntity<List<AlarmDto>> myList (@RequestHeader(value = "authorization") String token) {
     List<AlarmDto> result = alarmService.getAlarm(token);
 
     return ResponseEntity.ok(result);

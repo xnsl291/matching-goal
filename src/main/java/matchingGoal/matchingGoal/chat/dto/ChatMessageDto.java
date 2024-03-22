@@ -1,4 +1,4 @@
-package matchingGoal.matchingGoal.chat.entity.dto;
+package matchingGoal.matchingGoal.chat.dto;
 
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;

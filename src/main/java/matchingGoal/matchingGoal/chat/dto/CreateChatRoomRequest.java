@@ -1,4 +1,4 @@
-package matchingGoal.matchingGoal.chat.entity.dto;
+package matchingGoal.matchingGoal.chat.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

@@ -4,9 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import matchingGoal.matchingGoal.chat.entity.dto.ChatMessageDto;
+import matchingGoal.matchingGoal.chat.dto.ChatMessageDto;
+import matchingGoal.matchingGoal.chat.entity.ChatMessage;
 import matchingGoal.matchingGoal.chat.entity.ChatRoom;
-import matchingGoal.matchingGoal.chat.entity.dto.ChatRoomListResponse;
+import matchingGoal.matchingGoal.chat.dto.ChatRoomListResponse;
 import matchingGoal.matchingGoal.chat.repository.ChatMessageRepository;
 import matchingGoal.matchingGoal.chat.repository.ChatRoomRepository;
 import matchingGoal.matchingGoal.member.model.entity.Member;
@@ -63,12 +64,16 @@ public class ChatRoomService {
     chatRoom.quit(userId);
 
   }
-
+  @Transactional
   public List<ChatMessageDto> getChatMessage(String chatRoomId) {
-
-    return chatMessageRepository.findByChatRoomId(chatRoomId).stream()
+    List<ChatMessage> chatMessageList = chatMessageRepository.findByChatRoomId(chatRoomId);
+    for (ChatMessage chat : chatMessageList) {
+      chat.changeReadYn(1);
+    }
+    return chatMessageList.stream()
         .map(ChatMessageDto::fromEntity).toList();
   }
+
 
   public ChatRoom getChatRoom(String chatRoomId) {
 
