@@ -8,10 +8,10 @@ import matchingGoal.matchingGoal.alarm.domain.AlarmType;
 import matchingGoal.matchingGoal.alarm.dto.AlarmDto;
 import matchingGoal.matchingGoal.alarm.domain.entity.Alarm;
 import matchingGoal.matchingGoal.alarm.repository.AlarmRepository;
-import matchingGoal.matchingGoal.chat.entity.dto.ChatMessageDto;
+import matchingGoal.matchingGoal.chat.dto.ChatMessageDto;
 import matchingGoal.matchingGoal.common.auth.JwtTokenProvider;
-import matchingGoal.matchingGoal.common.config.RabbitConfig;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import matchingGoal.matchingGoal.common.exception.CustomException;
+import matchingGoal.matchingGoal.common.type.ErrorCode;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,12 +19,9 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Slf4j
 public class AlarmService {
+
   private final AlarmRepository alarmRepository;
   private final JwtTokenProvider jwtTokenProvider;
-
-  private static final String ALARM_QUEUE_NAME = RabbitConfig.ALARM_QUEUE_NAME;
-  private static final String ALARM_EXCHANGE = RabbitConfig.ALARM_EXCHANGE;
-  private static final String ALARM_ROUTING_KEY = RabbitConfig.ALARM_ROUTING_KEY;
 
   //알람생성
   public long createAlarm(String token, AlarmDto dto) {
@@ -47,7 +44,8 @@ public class AlarmService {
   //채팅메세지 알람
   @Transactional
   public void messageAlarm(ChatMessageDto dto) {
-    Optional<Alarm> optionalAlarm = alarmRepository.findByMemberIdAndContentId(dto.getReceiverId(), dto.getChatRoomId());
+    Optional<Alarm> optionalAlarm = alarmRepository.findByMemberIdAndContentId(dto.getReceiverId(),
+        dto.getChatRoomId());
     if (optionalAlarm.isPresent()) {
       Alarm alarm = optionalAlarm.get();
       alarm.messageAlarmUpdate();
@@ -65,21 +63,21 @@ public class AlarmService {
   }
 
 
-
   //수신확인
   @Transactional
   public void checkOut(String token, long alarmId) {
     long memberId = getMemberIdFromToken(token);
     Alarm alarm = getAlarmEntity(alarmId);
     if (alarm.getMemberId() != memberId) {
-      throw new RuntimeException();
+      throw new CustomException(ErrorCode.MEMBER_NOT_MATCHED);
     }
     alarm.checkOut();
   }
 
   public Alarm getAlarmEntity(long alarmId) {
 
-    return alarmRepository.findById(alarmId).orElseThrow(RuntimeException::new);
+    return alarmRepository.findById(alarmId)
+        .orElseThrow(() -> new CustomException(ErrorCode.ALARM_NOT_FOUND));
   }
 
   private long getMemberIdFromToken(String token) {
