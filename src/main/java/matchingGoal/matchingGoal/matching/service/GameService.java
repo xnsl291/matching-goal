@@ -43,17 +43,10 @@ public class GameService {
   private final JwtTokenProvider jwtTokenProvider;
 
   public ResultResponse writeResult(String token, Long gameId, ResultDto resultDto) {
-    Member winner = memberRepository.findById(resultDto.getWinnerId())
-        .orElseThrow(NotFoundMemberException::new);
     Game game = gameRepository.findById(gameId)
         .orElseThrow(NotFoundGameException::new);
 
     checkMemberPermission(token, game.getTeam2());
-
-    if (!resultDto.getWinnerId().equals(game.getTeam1().getId())
-        && !resultDto.getWinnerId().equals(game.getTeam2().getId())) {
-      throw new NonParticipatingException();
-    }
 
     if (resultRepository.existsByGame(game)) {
       throw new ExistingResultException();
@@ -61,7 +54,6 @@ public class GameService {
 
     Result result = Result.builder()
         .game(game)
-        .winner(winner)
         .score1(resultDto.getScore1())
         .score2(resultDto.getScore2())
         .duration(resultDto.getDuration())
@@ -79,14 +71,10 @@ public class GameService {
 
     checkMemberPermission(token, result.getGame().getTeam2());
 
-    Member winner = memberRepository.findById(resultDto.getWinnerId())
-        .orElseThrow(NotFoundMemberException::new);
-
     if (result.getIsAccepted() != null && result.getIsAccepted() == true) {
       throw new AcceptedResultException();
     }
 
-    result.setWinner(winner);
     result.update(resultDto);
     return ResultResponse.of(result);
   }
