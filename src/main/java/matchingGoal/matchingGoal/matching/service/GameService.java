@@ -16,9 +16,9 @@ import matchingGoal.matchingGoal.matching.dto.ResultDto;
 import matchingGoal.matchingGoal.matching.dto.ResultResponse;
 import matchingGoal.matchingGoal.matching.exception.AcceptedCancelException;
 import matchingGoal.matchingGoal.matching.exception.AcceptedResultException;
-import matchingGoal.matchingGoal.matching.exception.CancelTimeException;
 import matchingGoal.matchingGoal.matching.exception.ExistingCommentException;
 import matchingGoal.matchingGoal.matching.exception.ExistingResultException;
+import matchingGoal.matchingGoal.matching.exception.NotAvailableTimeException;
 import matchingGoal.matchingGoal.matching.exception.NotFoundCancelException;
 import matchingGoal.matchingGoal.matching.exception.NotFoundGameException;
 import matchingGoal.matchingGoal.matching.exception.NotFoundMemberException;
@@ -168,14 +168,42 @@ public class GameService {
 
     LocalDateTime gameDateTime = LocalDateTime.of(game.getDate(), game.getTime());
     if (LocalDateTime.now().isAfter(gameDateTime.minusHours(24))) {
-      throw new CancelTimeException();
+      throw new NotAvailableTimeException();
     }
 
     GameCancel cancel = GameCancel.builder()
         .member(member)
         .game(game)
-        .type(null)
+        .type(CancelType.CANCEL)
         .isAgreed(null)
+        .createdDate(LocalDateTime.now())
+        .build();
+    cancelRepository.save(cancel);
+
+    return CancelResponse.of(cancel);
+  }
+
+  public CancelResponse noshowGame(String token, Long gameId) {
+    Game game = gameRepository.findById(gameId)
+        .orElseThrow(NotFoundGameException::new);
+
+    Member member = getMemberByToken(token);
+    if (game.getTeam1() != member && game.getTeam2() != member) {
+      throw new PermissionException();
+    }
+
+    LocalDateTime gameDateTime = LocalDateTime.of(game.getDate(), game.getTime());
+    if (LocalDateTime.now().isBefore(gameDateTime.plusMinutes(10))) {
+      throw new NotAvailableTimeException();
+    }
+
+    Member noshowMember = member.equals(game.getTeam1()) ? game.getTeam2() : game.getTeam1();
+
+    GameCancel cancel = GameCancel.builder()
+        .member(noshowMember)
+        .game(game)
+        .type(CancelType.NO_SHOW)
+        .isAgreed(false)
         .createdDate(LocalDateTime.now())
         .build();
     cancelRepository.save(cancel);
@@ -197,7 +225,6 @@ public class GameService {
     }
 
     cancel.setIsAgreed(isAgreed);
-    cancel.setType(CancelType.CANCEL);
     game.getBoard().setStatus(StatusType.CANCELLED);
 
     return CancelResponse.of(cancel);

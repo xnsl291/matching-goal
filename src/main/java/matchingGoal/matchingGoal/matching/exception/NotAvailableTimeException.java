@@ -5,12 +5,12 @@ import matchingGoal.matchingGoal.common.exception.CustomException;
 import matchingGoal.matchingGoal.common.type.ErrorCode;
 
 @Getter
-public class CancelTimeException extends CustomException {
+public class NotAvailableTimeException extends CustomException {
 
     private final ErrorCode errorCode;
 
-    public CancelTimeException() {
-        this.errorCode = ErrorCode.CANCELLATION_TIME_OUT;
+    public NotAvailableTimeException() {
+        this.errorCode = ErrorCode.NOT_AVAILABLE_TIME;
     }
 
 }

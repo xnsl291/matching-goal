@@ -83,4 +83,12 @@ public class GameController {
   ) {
     return ResponseEntity.ok(gameService.handleCancel(token, cancelId, false));
   }
+
+  @PostMapping("/{gameId}/noshow")
+  public ResponseEntity<?> noshowGame(
+      @RequestHeader(value = "Authorization") String token,
+      @PathVariable Long gameId
+  ) {
+    return ResponseEntity.ok(gameService.noshowGame(token, gameId));
+  }
 }
