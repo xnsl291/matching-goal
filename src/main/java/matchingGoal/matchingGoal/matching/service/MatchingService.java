@@ -3,15 +3,12 @@ package matchingGoal.matchingGoal.matching.service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
-import matchingGoal.matchingGoal.image.model.entity.Image;
-import matchingGoal.matchingGoal.image.repository.ImageRepository;
 import matchingGoal.matchingGoal.matching.domain.StatusType;
 import matchingGoal.matchingGoal.matching.domain.entity.Game;
 import matchingGoal.matchingGoal.matching.domain.entity.MatchingBoard;
@@ -50,7 +47,6 @@ public class MatchingService {
   private final GameRepository gameRepository;
   private final MemberRepository memberRepository;
   private final MatchingRequestRepository requestRepository;
-  private final ImageRepository imageRepository;
 
   /**
    * 게시글 작성
@@ -92,18 +88,18 @@ public class MatchingService {
   }
 
   public Page<ListBoardDto> getBoardList(
-      Integer page, String keyword, String type, String sort, String sortDirection, String date, String time) {
+      Integer page, int pageSize, String keyword, String type, String sort, String sortDirection, String date, String time) {
 
     LocalDate parsedDate = (date != null) ? LocalDate.parse(date) : null;
     LocalTime parsedTime = (time != null) ? LocalTime.parse(time) : null;
 
-    Pageable pageable = creatPageable(page, sort, sortDirection);
+    Pageable pageable = creatPageable(page, pageSize, sort, sortDirection);
     Page<MatchingBoard> boardPage = boardRepository.findAll(MatchingBoardSpecification.search(keyword, type, parsedDate, parsedTime), pageable);
 
     return boardPage.map(this::convertToDto);
   }
 
-  private Pageable creatPageable(Integer page, String sort, String sortDirection) {
+  private Pageable creatPageable(Integer page, Integer pageSize, String sort, String sortDirection) {
     int pageNum = (page != null && page >= 0) ? page : 0;
 
     Sort.Direction direction = Direction.DESC;
@@ -120,7 +116,7 @@ public class MatchingService {
         break;
     }
 
-    return PageRequest.of(pageNum, 10, Sort.by(direction, sortType));
+    return PageRequest.of(pageNum, pageSize, Sort.by(direction, sortType));
   }
 
   private ListBoardDto convertToDto(MatchingBoard matchingBoard) {
@@ -329,19 +325,6 @@ public class MatchingService {
 
     return requestRepository.findSameTimeRequests(memberId, date, time, id);
   }
-
-//  private List<Image> findImagesById(List<Long> imgList) {
-//    List<Image> images = new ArrayList<>();
-//
-//    if (imgList != null) {
-//      for (Long id : imgList) {
-//        Optional<Image> optionalImage = imageRepository.findById(id);
-//        optionalImage.ifPresent(images::add);
-//      }
-//    }
-//
-//    return images;
-//  }
 
   private Integer countRequestsByMember(Member member) {
     List<MatchingBoard> boards = boardRepository.findByMemberId(member.getId())
