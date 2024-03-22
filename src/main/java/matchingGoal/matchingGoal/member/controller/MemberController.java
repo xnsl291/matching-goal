@@ -72,7 +72,7 @@ public class MemberController {
      * @param month - 월
      * @return 특정 월의 일정 리스트
      */
-    @GetMapping("/{memberId}/calender")
+    @GetMapping("/{memberId}/calendar")
     public ResponseEntity<List<ScheduleResponse>> getMemberSchedule(@PathVariable("memberId") Long memberId,
                                                                     @RequestParam("year") int year,
                                                                     @RequestParam("month") int month) {
