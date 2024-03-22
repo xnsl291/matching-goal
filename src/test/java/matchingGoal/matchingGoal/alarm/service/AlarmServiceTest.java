@@ -5,7 +5,7 @@ import java.util.List;
 import matchingGoal.matchingGoal.alarm.domain.AlarmType;
 import matchingGoal.matchingGoal.alarm.dto.AlarmDto;
 import matchingGoal.matchingGoal.alarm.repository.AlarmRepository;
-import matchingGoal.matchingGoal.chat.entity.dto.ChatMessageDto;
+import matchingGoal.matchingGoal.chat.dto.ChatMessageDto;
 import matchingGoal.matchingGoal.member.dto.SignInDto;
 import matchingGoal.matchingGoal.member.service.AuthService;
 import org.junit.jupiter.api.DisplayName;

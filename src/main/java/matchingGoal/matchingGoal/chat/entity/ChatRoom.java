@@ -36,7 +36,6 @@ public class ChatRoom {
 
   @Id
   private String id;
-
   @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
   @Default
   @JoinTable(name = "chatRoomMembers",
@@ -51,21 +50,15 @@ public class ChatRoom {
     room.setId(UUID.randomUUID().toString());
 
     return room;
-
   }
   public void addMembers(List<Member> members) {
-
     this.chatRoomMembers.addAll(members);
-
   }
-  //TODO:: 인원 0 됐을 때 처리 방법안 1) 즉시 방 폐쇄하고 삭제
-  //                              2) 30일 딜레이 후에 삭제 (복구기능 가능성)
+
   public void quit(long memberId) {
     for (Member member : this.getChatRoomMembers()) {
-
       if (member.getId() == memberId) {
         this.chatRoomMembers.remove(member);
-
       }
     }
   }

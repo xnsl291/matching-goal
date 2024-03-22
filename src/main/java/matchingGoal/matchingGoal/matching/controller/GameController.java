@@ -68,5 +68,28 @@ public class GameController {
     return ResponseEntity.ok(gameService.cancelGame(token, gameId));
   }
 
+  @PostMapping("/cancel/{cancelId}/accept")
+  public ResponseEntity<CancelResponse> acceptCancel(
+      @RequestHeader(value = "Authorization") String token,
+      @PathVariable Long cancelId
+  ) {
+    return ResponseEntity.ok(gameService.handleCancel(token, cancelId, true));
+  }
+
+  @PostMapping("/cancel/{cancelId}/refuse")
+  public ResponseEntity<CancelResponse> refuseCancel(
+      @RequestHeader(value = "Authorization") String token,
+      @PathVariable Long cancelId
+  ) {
+    return ResponseEntity.ok(gameService.handleCancel(token, cancelId, false));
+  }
+
+  @PostMapping("/{gameId}/noshow")
+  public ResponseEntity<?> noshowGame(
+      @RequestHeader(value = "Authorization") String token,
+      @PathVariable Long gameId
+  ) {
+    return ResponseEntity.ok(gameService.noshowGame(token, gameId));
+  }
 
 }

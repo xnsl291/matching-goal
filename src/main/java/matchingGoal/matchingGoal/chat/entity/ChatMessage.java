@@ -11,7 +11,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import matchingGoal.matchingGoal.chat.entity.dto.ChatMessageDto;
+import matchingGoal.matchingGoal.chat.dto.ChatMessageDto;
+import org.hibernate.annotations.DynamicUpdate;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -21,8 +22,10 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@DynamicUpdate
 @EntityListeners(AuditingEntityListener.class)
 public class ChatMessage {
+
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private long id;
@@ -35,6 +38,10 @@ public class ChatMessage {
   private LocalDateTime createdDate;
   private int readYn;
 
+  public void changeReadYn(int yn) {
+    this.readYn = yn;
+  }
+
   public static ChatMessage fromDto(ChatMessageDto dto) {
 
     return ChatMessage.builder()
@@ -46,5 +53,4 @@ public class ChatMessage {
         .readYn(dto.getReadYn())
         .build();
   }
-
 }

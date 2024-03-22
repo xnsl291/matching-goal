@@ -19,6 +19,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import matchingGoal.matchingGoal.matching.domain.StatusType;
 import matchingGoal.matchingGoal.matching.dto.UpdateBoardDto;
 import matchingGoal.matchingGoal.member.model.entity.Member;
@@ -44,6 +45,7 @@ public class MatchingBoard {
 
   private String content;
 
+  @Setter
   @Enumerated(EnumType.STRING)
   private StatusType status;
 

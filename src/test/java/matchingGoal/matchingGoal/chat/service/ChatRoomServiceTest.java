@@ -5,7 +5,7 @@ package matchingGoal.matchingGoal.chat.service;
 import java.util.ArrayList;
 import java.util.List;
 import matchingGoal.matchingGoal.chat.entity.ChatRoom;
-import matchingGoal.matchingGoal.chat.entity.dto.ChatRoomListResponse;
+import matchingGoal.matchingGoal.chat.dto.ChatRoomListResponseDto;
 import matchingGoal.matchingGoal.chat.repository.ChatRoomRepository;
 import matchingGoal.matchingGoal.member.model.entity.Member;
 import matchingGoal.matchingGoal.member.repository.MemberRepository;
@@ -70,7 +70,7 @@ class ChatRoomServiceTest {
     String id = chatRoomService.createChatRoom(1, 2);
     System.out.println(id);
     //when
-    List<ChatRoomListResponse> result = chatRoomService.myChat(1L);
+    List<ChatRoomListResponseDto> result = chatRoomService.myChat(1L);
 
     boolean check = !result.isEmpty();
     //then
