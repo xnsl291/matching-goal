@@ -181,6 +181,25 @@ public class GameService {
     return CancelResponse.of(cancel);
   }
 
+  @Transactional
+  public CancelResponse acceptCancel(String token, Long cancelId) {
+    GameCancel cancel = cancelRepository.findById(cancelId)
+        .orElseThrow(NotFoundCancelException::new);
+    Game game = cancel.getGame();
+
+    Member acceptMember = cancel.getMember().equals(game.getTeam1()) ? game.getTeam2() : game.getTeam1();
+    checkMemberPermission(token, acceptMember);
+
+    if (cancel.getIsAgreed() != null && cancel.getIsAgreed() == true) {
+      throw new AcceptedCancelException();
+    }
+
+    cancel.setIsAgreed(true);
+    game.getBoard().setStatus(StatusType.CANCELLED);
+
+    return CancelResponse.of(cancel);
+  }
+
   private Member getMemberByToken(String token) {
     jwtTokenProvider.validateToken(token);
     return memberRepository.findById(jwtTokenProvider.getId(token))

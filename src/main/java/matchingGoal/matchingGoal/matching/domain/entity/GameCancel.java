@@ -11,6 +11,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import matchingGoal.matchingGoal.matching.domain.CancelType;
 import matchingGoal.matchingGoal.member.model.entity.Member;
 
@@ -35,6 +36,7 @@ public class GameCancel {
 
   private CancelType type;
 
+  @Setter
   private Boolean isAgreed;
 
   private LocalDateTime createdDate;
