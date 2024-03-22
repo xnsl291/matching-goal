@@ -14,7 +14,6 @@ public class ResultResponse {
 
   private Long resultId;
   private Long gameId;
-  private Long winnerId;
   private Integer score1;
   private Integer score2;
   private Integer duration;
@@ -23,7 +22,6 @@ public class ResultResponse {
     return ResultResponse.builder()
         .resultId(result.getId())
         .gameId(result.getGame().getId())
-        .winnerId(result.getWinner().getId())
         .score1(result.getScore1())
         .score2(result.getScore2())
         .duration(result.getDuration())

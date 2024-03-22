@@ -68,5 +68,4 @@ public class GameController {
     return ResponseEntity.ok(gameService.cancelGame(token, gameId));
   }
 
-
 }
