@@ -20,7 +20,7 @@ public class MailController {
      * 인증메일 발송
      * @return 발송성공여부
      */
-    @PostMapping(value = "/send-verification")
+    @PostMapping("/send-verification")
     public ResponseEntity<Boolean> sendVerificationMail(@NotBlank @Email  @RequestParam String email) {
         return ResponseEntity.ok().body(mailService.sendVerificationMail(email));
     }
@@ -30,8 +30,8 @@ public class MailController {
      * @param mailVerificationDto - email, code, name
      * @return "인증성공"
      */
-    @PostMapping(value = "/verify")
-    public ResponseEntity<String> verifyMail(@Valid MailVerificationDto mailVerificationDto) {
+    @PostMapping("/verify")
+    public ResponseEntity<String> verifyMail(@Valid @RequestBody MailVerificationDto mailVerificationDto) {
         mailService.verifyMail(mailVerificationDto);
         return ResponseEntity.ok().body("인증성공");
     }

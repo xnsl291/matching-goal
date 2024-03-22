@@ -76,7 +76,7 @@ public class MailService {
      */
     private Boolean sendMail(String email, String templateName, EmailContent emailContent) {
         final String mailCharset = "utf-8";
-        final String path = "src/main/resources/templates/";
+        final String path =  (System.getProperty("user.dir") + "/backend/src/main/resources/templates/").replace("/",File.separator)  ;
 
         try {
             File input = new File(path + templateName);
