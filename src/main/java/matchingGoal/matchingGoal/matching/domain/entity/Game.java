@@ -13,6 +13,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import matchingGoal.matchingGoal.member.model.entity.Member;
 
 @Entity
@@ -44,6 +45,7 @@ public class Game {
 
   private LocalTime time;
 
+  @Setter
   private Boolean isDeleted;
 
   public void delete() {
