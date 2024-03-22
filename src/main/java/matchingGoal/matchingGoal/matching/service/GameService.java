@@ -3,6 +3,7 @@ package matchingGoal.matchingGoal.matching.service;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import matchingGoal.matchingGoal.common.auth.JwtTokenProvider;
+import matchingGoal.matchingGoal.matching.domain.CancelType;
 import matchingGoal.matchingGoal.matching.domain.StatusType;
 import matchingGoal.matchingGoal.matching.domain.entity.Comment;
 import matchingGoal.matchingGoal.matching.domain.entity.Game;
@@ -13,11 +14,12 @@ import matchingGoal.matchingGoal.matching.dto.CommentDto;
 import matchingGoal.matchingGoal.matching.dto.CommentResponse;
 import matchingGoal.matchingGoal.matching.dto.ResultDto;
 import matchingGoal.matchingGoal.matching.dto.ResultResponse;
+import matchingGoal.matchingGoal.matching.exception.AcceptedCancelException;
 import matchingGoal.matchingGoal.matching.exception.AcceptedResultException;
 import matchingGoal.matchingGoal.matching.exception.CancelTimeException;
 import matchingGoal.matchingGoal.matching.exception.ExistingCommentException;
 import matchingGoal.matchingGoal.matching.exception.ExistingResultException;
-import matchingGoal.matchingGoal.matching.exception.NonParticipatingException;
+import matchingGoal.matchingGoal.matching.exception.NotFoundCancelException;
 import matchingGoal.matchingGoal.matching.exception.NotFoundGameException;
 import matchingGoal.matchingGoal.matching.exception.NotFoundMemberException;
 import matchingGoal.matchingGoal.matching.exception.NotFoundResultException;
@@ -82,7 +84,7 @@ public class GameService {
     Member winner = memberRepository.findById(resultDto.getWinnerId())
         .orElseThrow(NotFoundMemberException::new);
 
-    if (result.getIsAccepted() != null && result.getIsAccepted() == true) {
+    if (Boolean.TRUE.equals(result.getIsAccepted())) {
       throw new AcceptedResultException();
     }
 
@@ -98,7 +100,7 @@ public class GameService {
 
     checkMemberPermission(token, result.getGame().getTeam1());
 
-    if (result.getIsAccepted() != null && result.getIsAccepted() == true) {
+    if (Boolean.TRUE.equals(result.getIsAccepted())) {
       throw new AcceptedResultException();
     }
 
@@ -114,7 +116,7 @@ public class GameService {
 
     checkMemberPermission(token, result.getGame().getTeam1());
 
-    if (result.getIsAccepted() != null && result.getIsAccepted() == true) {
+    if (Boolean.TRUE.equals(result.getIsAccepted())) {
       throw new AcceptedResultException();
     }
 
@@ -182,7 +184,7 @@ public class GameService {
   }
 
   @Transactional
-  public CancelResponse acceptCancel(String token, Long cancelId) {
+  public CancelResponse handleCancel(String token, Long cancelId, boolean isAgreed) {
     GameCancel cancel = cancelRepository.findById(cancelId)
         .orElseThrow(NotFoundCancelException::new);
     Game game = cancel.getGame();
@@ -190,11 +192,12 @@ public class GameService {
     Member acceptMember = cancel.getMember().equals(game.getTeam1()) ? game.getTeam2() : game.getTeam1();
     checkMemberPermission(token, acceptMember);
 
-    if (cancel.getIsAgreed() != null && cancel.getIsAgreed() == true) {
+    if (Boolean.TRUE.equals(cancel.getIsAgreed())) {
       throw new AcceptedCancelException();
     }
 
-    cancel.setIsAgreed(true);
+    cancel.setIsAgreed(isAgreed);
+    cancel.setType(CancelType.CANCEL);
     game.getBoard().setStatus(StatusType.CANCELLED);
 
     return CancelResponse.of(cancel);

@@ -34,6 +34,7 @@ public class GameCancel {
   @JoinColumn(name = "game_id")
   private Game game;
 
+  @Setter
   private CancelType type;
 
   @Setter
