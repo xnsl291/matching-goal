@@ -149,8 +149,12 @@ public class MemberService {
         List<Game> allGames = Stream.concat(games1.stream(), games2.stream()).toList();
 
         for (Game game : allGames) {
-            ScheduleResponse response = ScheduleResponse.of(game, member);
-            schedules.add(response);
+            try{
+                ScheduleResponse response = ScheduleResponse.of(game, member);
+                schedules.add(response);
+            }catch (Exception e){
+//                System.out.println("not matched game");
+            }
         }
 
         return schedules;
@@ -167,10 +171,11 @@ public class MemberService {
                         member, member, LocalDate.now(), LocalTime.now());
 
         for (Game game : allGames){
-            Result result = resultRepository.findByGameId(game.getId()).orElseThrow(NotFoundGameException::new);
-            history.add(MatchHistoryResponse.of(member,result));
+            try{
+                Result result = resultRepository.findByGameId(game.getId()).orElseThrow(NotFoundGameException::new);
+                history.add(MatchHistoryResponse.of(member, result));
+            }catch (Exception e){}
         }
-
         return history;
     }
 
