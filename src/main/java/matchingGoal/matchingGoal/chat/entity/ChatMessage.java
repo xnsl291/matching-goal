@@ -25,6 +25,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @DynamicUpdate
 @EntityListeners(AuditingEntityListener.class)
 public class ChatMessage {
+
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private long id;
@@ -52,5 +53,4 @@ public class ChatMessage {
         .readYn(dto.getReadYn())
         .build();
   }
-
 }

@@ -36,7 +36,6 @@ public class ChatRoom {
 
   @Id
   private String id;
-
   @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
   @Default
   @JoinTable(name = "chatRoomMembers",
@@ -51,20 +50,15 @@ public class ChatRoom {
     room.setId(UUID.randomUUID().toString());
 
     return room;
-
   }
   public void addMembers(List<Member> members) {
-
     this.chatRoomMembers.addAll(members);
-
   }
 
   public void quit(long memberId) {
     for (Member member : this.getChatRoomMembers()) {
-
       if (member.getId() == memberId) {
         this.chatRoomMembers.remove(member);
-
       }
     }
   }

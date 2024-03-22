@@ -46,15 +46,15 @@ public enum ErrorCode {
     ALREADY_ACCEPTED_RESULT(HttpStatus.BAD_REQUEST, "이미 수락된 경기 결과입니다."),
     ALREADY_COMMENT_EXISTS(HttpStatus.BAD_REQUEST, "한줄평이 입력된 게임입니다."),
     CANCELLATION_TIME_OUT(HttpStatus.BAD_REQUEST, "취소 가능 시간이 지났습니다."),
-
     //Stomp
     NO_REQUIRED_INFO(HttpStatus.BAD_REQUEST, "stomp 연결에 필요한 정보가 없습니다."),
-
     //chat
     CHATROOM_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 채팅방 입니다."),
     //ALARM
     ALARM_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 알림 입니다."),
-    MEMBER_NOT_MATCHED(HttpStatus.BAD_REQUEST, "이용자가 일치하지 않습니다.");
+    MEMBER_NOT_MATCHED(HttpStatus.BAD_REQUEST, "이용자가 일치하지 않습니다."),
+    TYPE_NOT_MATCHED(HttpStatus.BAD_REQUEST, "타입이 일치하지 않습니다");
+
     private final HttpStatus status;
     private final String description;
 }

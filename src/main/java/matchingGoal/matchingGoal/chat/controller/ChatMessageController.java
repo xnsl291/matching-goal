@@ -25,7 +25,9 @@ public class ChatMessageController {
 
   @RabbitListener(queues = CHAT_QUEUE_NAME)
   public void receive(ChatMessageDto chat) {
+
     chatMessageService.saveMessage(chat);
+
   }
 
 }

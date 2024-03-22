@@ -14,6 +14,7 @@ import matchingGoal.matchingGoal.chat.entity.ChatMessage;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ChatMessageDto {
+
   private String chatRoomId;
   private long memberId;
   private String nickname;
@@ -23,6 +24,7 @@ public class ChatMessageDto {
   private int readYn;
 
   public static ChatMessageDto fromEntity(ChatMessage entity) {
+
     return ChatMessageDto.builder()
         .chatRoomId(entity.getChatRoomId())
         .memberId(entity.getMemberId())

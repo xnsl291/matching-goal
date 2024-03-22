@@ -27,6 +27,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @DynamicUpdate
 @EntityListeners(AuditingEntityListener.class)
 public class Alarm {
+
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private long id;
@@ -38,8 +39,9 @@ public class Alarm {
   private int checkedOut = 0;
   @CreatedDate
   private LocalDateTime createdDate;
-  private LocalDateTime updatedDate;
+
   public static Alarm fromDto(AlarmDto dto) {
+
     return Alarm.builder()
         .memberId(dto.getMemberId())
         .type(dto.getType())
@@ -49,12 +51,13 @@ public class Alarm {
   }
 
   public void checkOut() {
-    this.checkedOut = 1;
 
+    this.checkedOut = 1;
   }
   public void messageAlarmUpdate() {
+
     this.checkedOut = 0;
-    this.updatedDate = LocalDateTime.now();
+    this.createdDate = LocalDateTime.now();
   }
 
 }

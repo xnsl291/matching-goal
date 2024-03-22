@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import matchingGoal.matchingGoal.alarm.domain.entity.Alarm;
 import matchingGoal.matchingGoal.alarm.domain.AlarmType;
+import matchingGoal.matchingGoal.common.exception.CustomException;
+import matchingGoal.matchingGoal.common.type.ErrorCode;
 import org.hibernate.annotations.DynamicUpdate;
 
 @Getter
@@ -17,6 +19,7 @@ import org.hibernate.annotations.DynamicUpdate;
 @AllArgsConstructor
 @DynamicUpdate
 public class AlarmDto {
+
   private long id;
   private long memberId;
   private AlarmType type;
@@ -37,17 +40,19 @@ public class AlarmDto {
         .createdDate(alarm.getCreatedDate())
         .build();
   }
+
   public static String messageFromType(AlarmType type) {
+
     String result = null;
+
     switch (type) {
       case CHAT -> result = "새로운 채팅메세지가 있습니다";
       case NEW_MATCHING_REQUEST -> result = "새로운 매치신청이 있습니다";
       case MATCHING_REQUEST_DENIED-> result = "매치신청이 거절 되었습니다";
       case MATCHING_REQUEST_ACCEPTED -> result = "매치신청이 수락 되었습니다";
     }
-
     if (result == null) {
-      throw new RuntimeException();
+      throw new CustomException(ErrorCode.TYPE_NOT_MATCHED);
     }
 
     return result;

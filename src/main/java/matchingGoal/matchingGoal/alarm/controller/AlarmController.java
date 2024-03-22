@@ -22,6 +22,7 @@ public class AlarmController {
 
   @PostMapping("/")
   public ResponseEntity<Long> create(@RequestHeader(value = "authorization") String token, @RequestBody AlarmDto alarmDto) {
+
     long result = alarmService.createAlarm(token, alarmDto);
 
     return ResponseEntity.ok(result);
@@ -29,6 +30,7 @@ public class AlarmController {
 
   @GetMapping("/")
   public ResponseEntity<List<AlarmDto>> myList (@RequestHeader(value = "authorization") String token) {
+
     List<AlarmDto> result = alarmService.getAlarm(token);
 
     return ResponseEntity.ok(result);
@@ -36,6 +38,7 @@ public class AlarmController {
 
   @PatchMapping("/{alarmId}")
   public ResponseEntity<?> checkOut (@RequestHeader(value = "authorization") String token, @PathVariable(value = "alarmId") long alarmId) {
+
     alarmService.checkOut(token, alarmId);
 
     return ResponseEntity.ok(null);

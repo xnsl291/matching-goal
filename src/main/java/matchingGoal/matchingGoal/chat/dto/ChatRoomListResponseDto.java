@@ -13,13 +13,14 @@ import matchingGoal.matchingGoal.chat.entity.ChatRoom;
 @NoArgsConstructor
 @AllArgsConstructor
 @Setter
-public class ChatRoomListResponse {
+public class ChatRoomListResponseDto {
 
   private String id;
   private List<ChatRoomMemberDto> memberList;
 
-  public static ChatRoomListResponse fromEntity(ChatRoom entity) {
-    return ChatRoomListResponse.builder()
+  public static ChatRoomListResponseDto fromEntity(ChatRoom entity) {
+
+    return ChatRoomListResponseDto.builder()
         .id(entity.getId())
         .memberList(
             entity.getChatRoomMembers().stream().map(ChatRoomMemberDto::fromEntity).toList())
