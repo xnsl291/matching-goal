@@ -58,8 +58,7 @@ public class ChatRoom {
     this.chatRoomMembers.addAll(members);
 
   }
-  //TODO:: 인원 0 됐을 때 처리 방법안 1) 즉시 방 폐쇄하고 삭제
-  //                              2) 30일 딜레이 후에 삭제 (복구기능 가능성)
+
   public void quit(long memberId) {
     for (Member member : this.getChatRoomMembers()) {
 

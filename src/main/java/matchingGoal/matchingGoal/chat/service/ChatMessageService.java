@@ -8,7 +8,6 @@ import matchingGoal.matchingGoal.alarm.service.AlarmService;
 import matchingGoal.matchingGoal.chat.dto.ChatMessageDto;
 import matchingGoal.matchingGoal.chat.entity.ChatMessage;
 import matchingGoal.matchingGoal.chat.repository.ChatMessageRepository;
-import matchingGoal.matchingGoal.chat.repository.ChatRoomRepository;
 import matchingGoal.matchingGoal.common.service.RedisService;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
@@ -24,7 +23,6 @@ public class ChatMessageService {
   private final static String CHAT_EXCHANGE_NAME = "chat.exchange";
   private final RedisService redisService;
   private final AlarmService alarmService;
-  private final ChatRoomRepository chatRoomRepository;
 
   @Transactional
   public void createMessage(ChatMessageDto chatDto, String chatRoomId) {

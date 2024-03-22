@@ -10,6 +10,8 @@ import matchingGoal.matchingGoal.chat.entity.ChatRoom;
 import matchingGoal.matchingGoal.chat.dto.ChatRoomListResponse;
 import matchingGoal.matchingGoal.chat.repository.ChatMessageRepository;
 import matchingGoal.matchingGoal.chat.repository.ChatRoomRepository;
+import matchingGoal.matchingGoal.common.exception.CustomException;
+import matchingGoal.matchingGoal.common.type.ErrorCode;
 import matchingGoal.matchingGoal.member.model.entity.Member;
 import matchingGoal.matchingGoal.member.repository.MemberRepository;
 import org.springframework.stereotype.Service;
@@ -45,7 +47,8 @@ public class ChatRoomService {
   }
 
   public void addMembers(String chatRoomId, List<Member> members) {
-    ChatRoom room = chatRoomRepository.findById(chatRoomId).orElseThrow(RuntimeException::new);
+    ChatRoom room = chatRoomRepository.findById(chatRoomId)
+        .orElseThrow(() -> new CustomException(ErrorCode.CHATROOM_NOT_FOUND));
     room.addMembers(members);
 
     log.info(chatRoomId + " 에 " + members.toString() + " 추가");
@@ -57,6 +60,7 @@ public class ChatRoomService {
 
     return myChat.stream().map(ChatRoomListResponse::fromEntity).toList();
   }
+
   @Transactional
   public void quit(long userId, String chatRoomId) {
 
@@ -64,6 +68,7 @@ public class ChatRoomService {
     chatRoom.quit(userId);
 
   }
+
   @Transactional
   public List<ChatMessageDto> getChatMessage(String chatRoomId) {
     List<ChatMessage> chatMessageList = chatMessageRepository.findByChatRoomId(chatRoomId);
@@ -77,13 +82,15 @@ public class ChatRoomService {
 
   public ChatRoom getChatRoom(String chatRoomId) {
 
-    return chatRoomRepository.findById(chatRoomId).orElseThrow(RuntimeException::new);
+    return chatRoomRepository.findById(chatRoomId)
+        .orElseThrow(() -> new CustomException(ErrorCode.CHATROOM_NOT_FOUND));
 
   }
 
   public Member getMember(long userId) {
 
-    return memberRepository.findById(userId).orElseThrow(RuntimeException::new);
+    return memberRepository.findById(userId)
+        .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
   }
 
 

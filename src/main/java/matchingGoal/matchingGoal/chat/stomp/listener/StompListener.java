@@ -18,7 +18,7 @@ public class StompListener {
   private final RedisService redisService;
 
   @EventListener
-  public void webSocketConnectListener(SessionConnectedEvent event) {
+  public void webSocketConnectListener(SessionConnectedEvent event)  {
     StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
     String sessionId = headerAccessor.getSessionId();
     String chatRoomId = Objects.requireNonNull(headerAccessor.getFirstNativeHeader("chatRoomId"));
