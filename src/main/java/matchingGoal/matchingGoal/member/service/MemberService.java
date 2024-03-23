@@ -176,7 +176,7 @@ public class MemberService {
 
         for (Game game : allGames){
             try{
-                Result result = resultRepository.findByGameId(game.getId()).orElseThrow(() -> new CustomException(ErrorCode.GAME_NOT_FOUND))
+                Result result = resultRepository.findByGameId(game.getId()).orElseThrow(() -> new CustomException(ErrorCode.GAME_NOT_FOUND));
                 history.add(MatchHistoryResponse.of(member, result));
             }catch (Exception e){}
         }
