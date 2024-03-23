@@ -5,10 +5,11 @@ import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import matchingGoal.matchingGoal.common.exception.CustomException;
 import matchingGoal.matchingGoal.common.service.RedisService;
+import matchingGoal.matchingGoal.common.type.ErrorCode;
 import matchingGoal.matchingGoal.mail.dto.MailDto;
 import matchingGoal.matchingGoal.mail.dto.MailVerificationDto;
-import matchingGoal.matchingGoal.mail.exception.InvalidValidationCodeException;
 import matchingGoal.matchingGoal.mail.model.entity.EmailContent;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.jsoup.Jsoup;
@@ -114,7 +115,7 @@ public class MailService {
     public void verifyMail(MailVerificationDto mailVerificationDto) {
         // 코드 불일치
         if (! redisService.getData(VALID_PREFIX+mailVerificationDto.getEmail()).equals(mailVerificationDto.getCode()) )
-            throw new InvalidValidationCodeException();
+            throw new CustomException(ErrorCode.INVALID_CODE);
 
         // 코드 일치
         redisService.deleteData(VALID_PREFIX+mailVerificationDto.getEmail());

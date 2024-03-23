@@ -3,6 +3,7 @@ package matchingGoal.matchingGoal.member.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import matchingGoal.matchingGoal.common.auth.JwtTokenProvider;
+import matchingGoal.matchingGoal.common.exception.CustomException;
 import matchingGoal.matchingGoal.common.type.ErrorCode;
 import matchingGoal.matchingGoal.matching.domain.CancelType;
 import matchingGoal.matchingGoal.matching.domain.entity.*;
@@ -13,10 +14,6 @@ import matchingGoal.matchingGoal.matching.repository.GameCancelRepository;
 import matchingGoal.matchingGoal.matching.repository.GameRepository;
 import matchingGoal.matchingGoal.matching.repository.ResultRepository;
 import matchingGoal.matchingGoal.member.dto.*;
-import matchingGoal.matchingGoal.member.exception.MemberNotFoundException;
-import matchingGoal.matchingGoal.member.exception.PasswordSameAsBeforeException;
-import matchingGoal.matchingGoal.member.exception.UnmatchedPasswordException;
-import matchingGoal.matchingGoal.member.exception.WithdrawnMemberAccessException;
 import matchingGoal.matchingGoal.member.model.entity.Member;
 import matchingGoal.matchingGoal.member.repository.MemberRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -61,7 +58,7 @@ public class MemberService {
         isMatchedPassword(passwordDto.getOldPassword(), member.getPassword());
 
         if(passwordDto.getOldPassword().equals(passwordDto.getNewPassword()))
-            throw new PasswordSameAsBeforeException();
+            throw new CustomException(ErrorCode.PASSWORD_NOT_UPDATED);
 
         member.setPassword(passwordEncoder.encode(passwordDto.getNewPassword()));
         return "변경완료";
@@ -72,10 +69,10 @@ public class MemberService {
      */
     public Member getMemberById(Long memberId){
         Member member = memberRepository.findById(memberId)
-                .orElseThrow(MemberNotFoundException::new);
+                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
 
         if (member.isDeleted())
-            throw new WithdrawnMemberAccessException();
+            throw new CustomException(ErrorCode.WITHDRAWN_MEMBER);
 
         return member;
     }
@@ -129,7 +126,7 @@ public class MemberService {
     public void isMatchedPassword(String rawPassword, String encodedPassword){
         boolean isMatch = passwordEncoder.matches(rawPassword,encodedPassword);
         if (!isMatch)
-            throw new UnmatchedPasswordException();
+            throw new CustomException(ErrorCode.WRONG_PASSWORD);
     }
 
     /**
@@ -154,9 +151,7 @@ public class MemberService {
             try{
                 ScheduleResponse response = ScheduleResponse.of(game, member);
                 schedules.add(response);
-            }catch (Exception e){
-//                System.out.println("not matched game");
-            }
+            }catch (Exception e){}
         }
 
         return schedules;
