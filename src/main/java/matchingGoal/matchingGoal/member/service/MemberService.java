@@ -143,17 +143,14 @@ public class MemberService {
 
         List<ScheduleResponse> schedules = new ArrayList<>();
 
-        List<Game> games1 = gameRepository.findByTeam1AndDateBetween(member, startDate, endDate);
+        List<Game> games1 = gameRepository.findByTeam1AndDateBetweenAndTeam2IsNotNull(member, startDate, endDate); // 매칭된 경기만 불러오기
         List<Game> games2 = gameRepository.findByTeam2AndDateBetween(member, startDate, endDate);
         List<Game> allGames = Stream.concat(games1.stream(), games2.stream()).toList();
 
         for (Game game : allGames) {
-            try{
-                ScheduleResponse response = ScheduleResponse.of(game, member);
-                schedules.add(response);
-            }catch (Exception e){}
+            ScheduleResponse response = ScheduleResponse.of(game, member);
+            schedules.add(response);
         }
-
         return schedules;
     }
 
@@ -164,7 +161,7 @@ public class MemberService {
         Member member = getMemberById(memberId);
         List<MatchHistoryResponse> history = new ArrayList<>();
         List<Game> allGames = gameRepository
-                .findByTeam1OrTeam2AndDateLessThanEqualAndTimeLessThanOrderByDateDesc(
+                .findByTeam1OrTeam2AndTeam2IsNotNullAndDateLessThanEqualAndTimeLessThanOrderByDateDesc(
                         member, member, LocalDate.now(), LocalTime.now());
 
         for (Game game : allGames){
@@ -233,7 +230,7 @@ public class MemberService {
         int cancel = 0, noshow = 0 ;
         Member member = getMemberById(memberId);
 
-        List<Game> allGames = gameRepository.findByTeam1OrTeam2AndDateLessThanEqualAndTimeLessThanOrderByDateDesc(member,member,LocalDate.now(),LocalTime.now());
+        List<Game> allGames = gameRepository.findByTeam1OrTeam2AndTeam2IsNotNullAndDateLessThanEqualAndTimeLessThanOrderByDateDesc(member,member,LocalDate.now(),LocalTime.now());
         List<GameCancel> cancelGames = gameCancelRepository.findByMember(member);
 
         for (GameCancel gameCancel : cancelGames){
