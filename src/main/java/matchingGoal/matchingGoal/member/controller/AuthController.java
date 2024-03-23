@@ -2,6 +2,7 @@ package matchingGoal.matchingGoal.member.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import matchingGoal.matchingGoal.common.auth.JwtToken;
 import matchingGoal.matchingGoal.member.dto.SignUpDto;
 import matchingGoal.matchingGoal.member.dto.SignInDto;
 import matchingGoal.matchingGoal.member.dto.GetPasswordDto;
@@ -56,6 +57,14 @@ public class AuthController {
      */
     @PostMapping("/sign-out")
     public ResponseEntity<String> signOut(@RequestHeader(name = AUTH_HEADER) String token) {
-        return ResponseEntity.ok(authService.signOut(token));
+        return ResponseEntity.ok().body(authService.signOut(token));
+    }
+
+    /**
+     * 토큰 갱신 요청
+     */
+    @PostMapping("/refresh")
+    public ResponseEntity<JwtToken> refreshToken(@RequestHeader(name = AUTH_HEADER) String token){
+        return ResponseEntity.ok().body(authService.refreshToken(token));
     }
 }

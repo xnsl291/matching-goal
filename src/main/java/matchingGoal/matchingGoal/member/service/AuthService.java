@@ -37,7 +37,7 @@ public class AuthService {
 
         // 이메일 중복 확인
         if(memberRepository.findByEmail(registerDto.getEmail()).isPresent())
-            throw new CustomException(ErrorCode.ALREADY_REGISTERED_EMAIL);
+            throw new CustomException(ErrorCode.DUPLICATED_EMAIL);
 
         // 닉네임 중복 확인
         if (! memberService.isDuplicatedNickname(registerDto.getNickname()))
@@ -111,5 +111,12 @@ public class AuthService {
         jwtTokenProvider.setBlacklist(token);
 
         return "로그아웃 완료";
+    }
+
+    /**
+     * 토큰 갱신
+     */
+    public JwtToken refreshToken(String token) {
+        return jwtTokenProvider.refresh(token);
     }
 }

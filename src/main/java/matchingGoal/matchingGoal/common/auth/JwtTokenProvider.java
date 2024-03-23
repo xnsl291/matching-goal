@@ -3,9 +3,12 @@ package matchingGoal.matchingGoal.common.auth;
 import io.jsonwebtoken.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import matchingGoal.matchingGoal.common.exception.CustomException;
 import matchingGoal.matchingGoal.common.service.RedisService;
-import matchingGoal.matchingGoal.member.exception.ExpiredTokenException;
-import matchingGoal.matchingGoal.member.exception.InvalidTokenException;
+import matchingGoal.matchingGoal.common.type.ErrorCode;
+import matchingGoal.matchingGoal.member.model.entity.Member;
+import matchingGoal.matchingGoal.member.repository.MemberRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
@@ -17,11 +20,13 @@ import java.util.Date;
 public class JwtTokenProvider {
 
     private final RedisService redisService;
+    private final MemberRepository memberRepository;
     private static final String BLACK_TOKEN_PREFIX = "BLACK: ";
-    private static final Long accessTokenExpirationTimeInSeconds = 30 * 60 * 1000L;
+    private static final Long accessTokenExpirationTimeInSeconds =  30 * 60 * 1000L;
     private static final Long refreshTokenExpirationTimeInSeconds = 7 * 24 * 60 * 60 * 1000L;
 
-    private final String key = "236979CB6F1AD6B6A6184A31E6BE37DB3818CC36871E26235DD67DCFE4041492";
+    @Value("${jwt.token.secret}")
+    private String key;
 
     public JwtToken generateToken(Long id, String email, String nickname) {
         long now = (new Date()).getTime();
@@ -52,16 +57,10 @@ public class JwtTokenProvider {
         try {
             // 로그아웃한 토큰일 경우
             if (redisService.hasKeyAndValue( BLACK_TOKEN_PREFIX + getEmail(token) , token))
-                throw new ExpiredTokenException();
+                throw new CustomException(ErrorCode.EXPIRED_TOKEN);
 
-        } catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException e) {
-            log.info("Invalid JWT Token", e);
-        } catch (ExpiredJwtException e) {
-            log.info("Expired JWT Token", e);
-        } catch (UnsupportedJwtException e) {
-            log.info("Unsupported JWT Token", e);
-        } catch (IllegalArgumentException e) {
-            log.info("JWT claims string is empty.", e);
+        } catch (Exception e) {
+            throw new CustomException(ErrorCode.INVALID_TOKEN);
         }
     }
 
@@ -108,12 +107,26 @@ public class JwtTokenProvider {
     public void deleteToken(String email) {
         String rtKey = getRefreshTokenKey(email);
         if (redisService.getData(rtKey) == null)
-            throw new InvalidTokenException();
+            throw new CustomException(ErrorCode.INVALID_TOKEN);
 
         redisService.deleteData(rtKey);
     }
 
     public void setBlacklist(String token) {
         redisService.setBlackList(BLACK_TOKEN_PREFIX + getEmail(token), token, refreshTokenExpirationTimeInSeconds);
+    }
+
+    /**
+     * 토큰 갱신
+     */
+    public JwtToken refresh(String token){
+        // 토큰 검증
+        validateToken(token);
+        Member member = memberRepository.findByEmail(getEmail(token)).orElseThrow(()->new CustomException(ErrorCode.MEMBER_NOT_FOUND));
+
+        if (! redisService.hasKey(getRefreshTokenKey(member.getEmail()) ))  // redis에 키가 저장되어 있지 않으면
+            throw new CustomException(ErrorCode.EXPIRED_TOKEN);
+
+        return generateToken(member.getId(),member.getEmail(),member.getNickname());
     }
 }
