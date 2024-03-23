@@ -27,7 +27,6 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @Entity
 @Builder
 @Getter
-@Setter
 @DynamicUpdate
 @NoArgsConstructor
 @AllArgsConstructor
@@ -35,6 +34,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 public class ChatRoom {
 
   @Id
+  @Setter
   private String id;
   @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
   @Default
@@ -42,25 +42,34 @@ public class ChatRoom {
       joinColumns = @JoinColumn(name = "chatRoom"),
       inverseJoinColumns = @JoinColumn(name = "member"))
   private Set<Member> chatRoomMembers = new HashSet<>();
+  private long matchingBoardId;
+  private int closedYn;
   @CreatedDate
   private LocalDateTime createdDate;
 
   public static ChatRoom create() {
+
     ChatRoom room = new ChatRoom();
     room.setId(UUID.randomUUID().toString());
 
     return room;
   }
   public void addMembers(List<Member> members) {
+
     this.chatRoomMembers.addAll(members);
   }
 
   public void quit(long memberId) {
+
     for (Member member : this.getChatRoomMembers()) {
       if (member.getId() == memberId) {
         this.chatRoomMembers.remove(member);
       }
     }
+  }
+
+  public void close() {
+    this.closedYn = 1;
   }
 
 }

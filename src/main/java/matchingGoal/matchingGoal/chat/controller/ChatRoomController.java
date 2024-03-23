@@ -32,7 +32,7 @@ public class ChatRoomController {
 
     token = token.substring(7);
     long hostId = jwtTokenProvider.getId(token);
-    String result = chatRoomService.createChatRoom(hostId, request.getMemberId());
+    String result = chatRoomService.createChatRoom(hostId, request);
 
     return ResponseEntity.ok(result);
   }

@@ -2,18 +2,17 @@ package matchingGoal.matchingGoal.matching.service;
 
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
-import matchingGoal.matchingGoal.common.auth.JwtTokenProvider;
 import matchingGoal.matchingGoal.matching.domain.CancelType;
 import matchingGoal.matchingGoal.matching.domain.StatusType;
 import matchingGoal.matchingGoal.matching.domain.entity.Comment;
 import matchingGoal.matchingGoal.matching.domain.entity.Game;
 import matchingGoal.matchingGoal.matching.domain.entity.GameCancel;
 import matchingGoal.matchingGoal.matching.domain.entity.Result;
-import matchingGoal.matchingGoal.matching.dto.CancelResponse;
+import matchingGoal.matchingGoal.matching.dto.CancelResponseDto;
 import matchingGoal.matchingGoal.matching.dto.CommentDto;
-import matchingGoal.matchingGoal.matching.dto.CommentResponse;
+import matchingGoal.matchingGoal.matching.dto.CommentHistoryDto;
 import matchingGoal.matchingGoal.matching.dto.ResultDto;
-import matchingGoal.matchingGoal.matching.dto.ResultResponse;
+import matchingGoal.matchingGoal.matching.dto.ResultResponseDto;
 import matchingGoal.matchingGoal.matching.exception.AcceptedCancelException;
 import matchingGoal.matchingGoal.matching.exception.AcceptedResultException;
 import matchingGoal.matchingGoal.matching.exception.ExistingCommentException;
@@ -21,7 +20,6 @@ import matchingGoal.matchingGoal.matching.exception.ExistingResultException;
 import matchingGoal.matchingGoal.matching.exception.NotAvailableTimeException;
 import matchingGoal.matchingGoal.matching.exception.NotFoundCancelException;
 import matchingGoal.matchingGoal.matching.exception.NotFoundGameException;
-import matchingGoal.matchingGoal.matching.exception.NotFoundMemberException;
 import matchingGoal.matchingGoal.matching.exception.NotFoundResultException;
 import matchingGoal.matchingGoal.matching.exception.PermissionException;
 import matchingGoal.matchingGoal.matching.repository.CommentRepository;
@@ -29,7 +27,7 @@ import matchingGoal.matchingGoal.matching.repository.GameCancelRepository;
 import matchingGoal.matchingGoal.matching.repository.GameRepository;
 import matchingGoal.matchingGoal.matching.repository.ResultRepository;
 import matchingGoal.matchingGoal.member.model.entity.Member;
-import matchingGoal.matchingGoal.member.repository.MemberRepository;
+import matchingGoal.matchingGoal.member.service.MemberService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,17 +36,16 @@ import org.springframework.transaction.annotation.Transactional;
 public class GameService {
 
   private final GameRepository gameRepository;
-  private final MemberRepository memberRepository;
   private final ResultRepository resultRepository;
   private final CommentRepository commentRepository;
   private final GameCancelRepository cancelRepository;
-  private final JwtTokenProvider jwtTokenProvider;
+  private final MemberService memberService;
 
-  public ResultResponse writeResult(String token, Long gameId, ResultDto resultDto) {
+  public ResultResponseDto writeResult(String token, Long gameId, ResultDto resultDto) {
     Game game = gameRepository.findById(gameId)
         .orElseThrow(NotFoundGameException::new);
 
-    checkMemberPermission(token, game.getTeam2());
+    memberService.checkMemberPermission(token, game.getTeam2());
 
     if (resultRepository.existsByGame(game)) {
       throw new ExistingResultException();
@@ -63,61 +60,45 @@ public class GameService {
         .build();
     resultRepository.save(result);
 
-    return ResultResponse.of(result);
+    return ResultResponseDto.of(result);
   }
 
   @Transactional
-  public ResultResponse updateResult(String token, Long resultId, ResultDto resultDto) {
+  public ResultResponseDto updateResult(String token, Long resultId, ResultDto resultDto) {
     Result result = resultRepository.findById(resultId)
         .orElseThrow(NotFoundResultException::new);
 
-    checkMemberPermission(token, result.getGame().getTeam2());
+    memberService.checkMemberPermission(token, result.getGame().getTeam2());
 
     if (Boolean.TRUE.equals(result.getIsAccepted())) {
       throw new AcceptedResultException();
     }
 
     result.update(resultDto);
-    return ResultResponse.of(result);
+    return ResultResponseDto.of(result);
   }
 
   @Transactional
-  public ResultResponse acceptResult(String token, Long resultId) {
+  public ResultResponseDto handleResult(String token, Long resultId, boolean isAccepted) {
     Result result = resultRepository.findById(resultId)
         .orElseThrow(NotFoundResultException::new);
 
-    checkMemberPermission(token, result.getGame().getTeam1());
+    memberService.checkMemberPermission(token, result.getGame().getTeam1());
 
     if (Boolean.TRUE.equals(result.getIsAccepted())) {
       throw new AcceptedResultException();
     }
 
-    result.setIsAccepted(true);
+    result.setIsAccepted(isAccepted);
 
-    return ResultResponse.of(result);
+    return ResultResponseDto.of(result);
   }
 
-  @Transactional
-  public ResultResponse refuseResult(String token, Long resultId) {
-    Result result = resultRepository.findById(resultId)
-        .orElseThrow(NotFoundResultException::new);
-
-    checkMemberPermission(token, result.getGame().getTeam1());
-
-    if (Boolean.TRUE.equals(result.getIsAccepted())) {
-      throw new AcceptedResultException();
-    }
-
-    result.setIsAccepted(false);
-
-    return ResultResponse.of(result);
-  }
-
-  public CommentResponse writeComment(String token, Long gameId, CommentDto commentDto) {
+  public CommentHistoryDto writeComment(String token, Long gameId, CommentDto commentDto) {
     Game game = gameRepository.findById(gameId)
         .orElseThrow(NotFoundGameException::new);
 
-    Member member = getMemberByToken(token);
+    Member member = memberService.getMemberInfo(token);
     Member opponent;
     if (game.getTeam1() == member) {
       opponent = game.getTeam2();
@@ -142,14 +123,14 @@ public class GameService {
         .build();
     commentRepository.save(comment);
 
-    return CommentResponse.of(comment);
+    return CommentHistoryDto.of(comment);
   }
 
-  public CancelResponse cancelGame(String token, Long gameId) {
+  public CancelResponseDto cancelGame(String token, Long gameId) {
     Game game = gameRepository.findById(gameId)
         .orElseThrow(NotFoundGameException::new);
 
-    Member member = getMemberByToken(token);
+    Member member = memberService.getMemberInfo(token);
     if (game.getTeam1() != member && game.getTeam2() != member) {
       throw new PermissionException();
     }
@@ -168,14 +149,14 @@ public class GameService {
         .build();
     cancelRepository.save(cancel);
 
-    return CancelResponse.of(cancel);
+    return CancelResponseDto.of(cancel);
   }
 
-  public CancelResponse noshowGame(String token, Long gameId) {
+  public String noshowGame(String token, Long gameId) {
     Game game = gameRepository.findById(gameId)
         .orElseThrow(NotFoundGameException::new);
 
-    Member member = getMemberByToken(token);
+    Member member = memberService.getMemberInfo(token);
     if (game.getTeam1() != member && game.getTeam2() != member) {
       throw new PermissionException();
     }
@@ -196,17 +177,17 @@ public class GameService {
         .build();
     cancelRepository.save(cancel);
 
-    return CancelResponse.of(cancel);
+    return "노쇼 처리 완료";
   }
 
   @Transactional
-  public CancelResponse handleCancel(String token, Long cancelId, boolean isAgreed) {
+  public CancelResponseDto handleCancel(String token, Long cancelId, boolean isAgreed) {
     GameCancel cancel = cancelRepository.findById(cancelId)
         .orElseThrow(NotFoundCancelException::new);
     Game game = cancel.getGame();
 
     Member acceptMember = cancel.getMember().equals(game.getTeam1()) ? game.getTeam2() : game.getTeam1();
-    checkMemberPermission(token, acceptMember);
+    memberService.checkMemberPermission(token, acceptMember);
 
     if (Boolean.TRUE.equals(cancel.getIsAgreed())) {
       throw new AcceptedCancelException();
@@ -215,19 +196,7 @@ public class GameService {
     cancel.setIsAgreed(isAgreed);
     game.getBoard().setStatus(StatusType.CANCELLED);
 
-    return CancelResponse.of(cancel);
+    return CancelResponseDto.of(cancel);
   }
 
-  private Member getMemberByToken(String token) {
-    jwtTokenProvider.validateToken(token);
-    return memberRepository.findById(jwtTokenProvider.getId(token))
-        .orElseThrow(NotFoundMemberException::new);
-  }
-
-  private void checkMemberPermission(String token, Member allowed) {
-    Member member = getMemberByToken(token);
-    if (allowed != member) {
-      throw new PermissionException();
-    }
-  }
 }

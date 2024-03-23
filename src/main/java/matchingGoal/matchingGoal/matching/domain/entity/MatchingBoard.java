@@ -21,7 +21,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import matchingGoal.matchingGoal.matching.domain.StatusType;
-import matchingGoal.matchingGoal.matching.dto.UpdateBoardDto;
+import matchingGoal.matchingGoal.matching.dto.BoardUpdateDto;
 import matchingGoal.matchingGoal.member.model.entity.Member;
 
 @Entity
@@ -64,13 +64,14 @@ public class MatchingBoard {
   @Column(name = "image_url")
   private List<String> imageUrls;
 
+  @Setter
   @OneToOne(mappedBy = "board")
   private Game game;
 
   @OneToMany(mappedBy = "board")
   private List<MatchingRequest> matchingRequest;
 
-  public void update(UpdateBoardDto requestDto) {
+  public void update(BoardUpdateDto requestDto) {
     this.title = requestDto.getTitle();
     this.content = requestDto.getContent();
     this.imageUrls = requestDto.getImageUrls();
@@ -82,11 +83,4 @@ public class MatchingBoard {
     this.deletedDate = LocalDateTime.now();
   }
 
-  public void acceptMatching() {
-    this.status = StatusType.CLOSED;
-  }
-
-  public void setGame(Game game) {
-    this.game = game;
-  }
 }

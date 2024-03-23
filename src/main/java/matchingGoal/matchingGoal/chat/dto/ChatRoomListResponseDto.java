@@ -16,14 +16,18 @@ import matchingGoal.matchingGoal.chat.entity.ChatRoom;
 public class ChatRoomListResponseDto {
 
   private String id;
+  private long matchingBoardId;
+  private int closedYn;
   private List<ChatRoomMemberDto> memberList;
 
   public static ChatRoomListResponseDto fromEntity(ChatRoom entity) {
 
     return ChatRoomListResponseDto.builder()
         .id(entity.getId())
-        .memberList(
-            entity.getChatRoomMembers().stream().map(ChatRoomMemberDto::fromEntity).toList())
+        .closedYn(entity.getClosedYn())
+        .matchingBoardId(entity.getMatchingBoardId())
+        .memberList(entity.getChatRoomMembers().stream()
+                    .map(ChatRoomMemberDto::fromEntity).toList())
         .build();
   }
 }

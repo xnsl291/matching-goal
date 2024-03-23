@@ -1,5 +1,7 @@
 package matchingGoal.matchingGoal.matching.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonFormat.Shape;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -24,6 +26,7 @@ public class CommentHistoryDto {
     private Integer rating;
     private String comment;
     private LocalDate date;
+    @JsonFormat(shape = Shape.STRING, pattern = "HH:mm", timezone = "Asia/Seoul")
     private LocalTime time;
 
     public static CommentHistoryDto of(Comment comment) {
