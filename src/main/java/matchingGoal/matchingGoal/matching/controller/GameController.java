@@ -85,7 +85,7 @@ public class GameController {
   }
 
   @PostMapping("/{gameId}/noshow")
-  public ResponseEntity<?> noshowGame(
+  public ResponseEntity<String> noshowGame(
       @RequestHeader(value = "Authorization") String token,
       @PathVariable Long gameId
   ) {

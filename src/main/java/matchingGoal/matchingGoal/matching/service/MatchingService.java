@@ -21,7 +21,6 @@ import matchingGoal.matchingGoal.matching.dto.UpdateBoardDto;
 import matchingGoal.matchingGoal.matching.exception.AlreadyRequestException;
 import matchingGoal.matchingGoal.matching.exception.CompletedMatchingException;
 import matchingGoal.matchingGoal.matching.exception.DeletedPostException;
-import matchingGoal.matchingGoal.matching.exception.NotFoundMemberException;
 import matchingGoal.matchingGoal.matching.exception.NotFoundPostException;
 import matchingGoal.matchingGoal.matching.exception.NotFoundRequestException;
 import matchingGoal.matchingGoal.matching.exception.SelfRequestException;
@@ -30,7 +29,7 @@ import matchingGoal.matchingGoal.matching.repository.MatchingBoardRepository;
 import matchingGoal.matchingGoal.matching.repository.MatchingBoardSpecification;
 import matchingGoal.matchingGoal.matching.repository.MatchingRequestRepository;
 import matchingGoal.matchingGoal.member.model.entity.Member;
-import matchingGoal.matchingGoal.member.repository.MemberRepository;
+import matchingGoal.matchingGoal.member.service.MemberService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -45,17 +44,17 @@ public class MatchingService {
 
   private final MatchingBoardRepository boardRepository;
   private final GameRepository gameRepository;
-  private final MemberRepository memberRepository;
   private final MatchingRequestRepository requestRepository;
+  private final MemberService memberService;
 
   /**
    * 게시글 작성
+   *
    * @param requestDto - 게시글 작성 dto
    * @return 게시글 조회 dto
    */
-  public BoardResponseDto createBoard(BoardRequestDto requestDto) {
-    Member member = memberRepository.findById(requestDto.getMemberId())
-        .orElseThrow(NotFoundMemberException::new);
+  public BoardResponseDto createBoard(String token, BoardRequestDto requestDto) {
+    Member member = memberService.getMemberInfo(token);
 
     MatchingBoard matchingBoard = MatchingBoard.builder()
         .member(member)
@@ -88,7 +87,8 @@ public class MatchingService {
   }
 
   public Page<ListBoardDto> getBoardList(
-      Integer page, int pageSize, String keyword, String type, String sort, String sortDirection, String date, String time) {
+      Integer page, int pageSize, String keyword, String type, String sort, String sortDirection, String date, String time
+  ) {
 
     LocalDate parsedDate = (date != null) ? LocalDate.parse(date) : null;
     LocalTime parsedTime = (time != null) ? LocalTime.parse(time) : null;
@@ -96,7 +96,7 @@ public class MatchingService {
     Pageable pageable = creatPageable(page, pageSize, sort, sortDirection);
     Page<MatchingBoard> boardPage = boardRepository.findAll(MatchingBoardSpecification.search(keyword, type, parsedDate, parsedTime), pageable);
 
-    return boardPage.map(this::convertToDto);
+    return boardPage.map(this::convertToListDto);
   }
 
   private Pageable creatPageable(Integer page, Integer pageSize, String sort, String sortDirection) {
@@ -119,7 +119,7 @@ public class MatchingService {
     return PageRequest.of(pageNum, pageSize, Sort.by(direction, sortType));
   }
 
-  private ListBoardDto convertToDto(MatchingBoard matchingBoard) {
+  private ListBoardDto convertToListDto(MatchingBoard matchingBoard) {
     Member member = matchingBoard.getMember();
     Game game = matchingBoard.getGame();
 
@@ -142,14 +142,14 @@ public class MatchingService {
 
   /**
    * 게시글 조회
-   * @param id - 게시글 id
+   * @param boardId - 게시글 id
    * @return 게시글 조회 dto
    */
-  public BoardResponseDto getBoardById(Long id) {
-    MatchingBoard matchingBoard = boardRepository.findById(id)
+  public BoardResponseDto getBoardById(Long boardId) {
+    MatchingBoard matchingBoard = boardRepository.findById(boardId)
         .orElseThrow(NotFoundPostException::new);
 
-    boardRepository.increaseViewCountById(id);
+    boardRepository.increaseViewCountById(boardId);
 
     if (matchingBoard.getIsDeleted()) {
       throw new DeletedPostException();
@@ -160,102 +160,104 @@ public class MatchingService {
 
   /**
    * 게시글 수정
-   * @param id - 게시글 id
+   *
    * @param requestDto - 게시글 수정 dto
    * @return 게시글 조회 dto
    */
   @Transactional
-  public BoardResponseDto updateBoard(Long id, UpdateBoardDto requestDto) {
-    MatchingBoard matchingBoard = boardRepository.findById(id)
+  public BoardResponseDto updateBoard(String token, Long boardId, UpdateBoardDto requestDto) {
+    MatchingBoard board = boardRepository.findById(boardId)
         .orElseThrow(NotFoundPostException::new);
 
-    if (matchingBoard.getIsDeleted()) {
+    memberService.checkMemberPermission(token, board.getMember());
+
+    if (board.getIsDeleted()) {
       throw new DeletedPostException();
     }
 
-    matchingBoard.update(requestDto);
+    board.update(requestDto);
 
-    return getBoardById(matchingBoard.getId());
+    return getBoardById(board.getId());
   }
 
   /**
    * 게시글 삭제
-   * @param id - 게시글 id
+   *
    * @return 게시글 id
    */
   @Transactional
-  public Long deleteBoard(Long id) {
-    MatchingBoard matchingBoard = boardRepository.findById(id)
+  public Long deleteBoard(String token, Long boardId) {
+    MatchingBoard board = boardRepository.findById(boardId)
         .orElseThrow(NotFoundPostException::new);
 
-    if (matchingBoard.getIsDeleted()) {
+    memberService.checkMemberPermission(token, board.getMember());
+
+    if (board.getIsDeleted()) {
       throw new DeletedPostException();
     }
 
-    if (matchingBoard.getStatus() == StatusType.CLOSED) {
+    if (board.getStatus() == StatusType.CLOSED) {
       throw new CompletedMatchingException();
     }
 
-    List<MatchingRequest> requests = requestRepository.findByBoardId(id).orElse(Collections.emptyList());
+    List<MatchingRequest> requests = requestRepository.findByBoardId(boardId).orElse(Collections.emptyList());
     for (MatchingRequest request : requests) {
-      request.refuse();
+      request.setIsAccepted(false);
     }
 
-    matchingBoard.delete();
-    matchingBoard.getGame().delete();
+    board.delete();
+    board.getGame().setIsDeleted(true);
 
-    return matchingBoard.getId();
+    return board.getId();
   }
 
   /**
    * 경기 매칭 신청
-   * @param id - 게시글 id
-   * @param memberId - 신청자 id
+   *
    * @return "매칭 신청 완료"
    */
-  public String requestMatching(Long id, Long memberId) {
-    MatchingBoard matchingBoard = boardRepository.findById(id)
+  @Transactional
+  public String requestMatching(String token, Long boardId) {
+    MatchingBoard board = boardRepository.findById(boardId)
         .orElseThrow(NotFoundPostException::new);
-    Member member = memberRepository.findById(memberId)
-        .orElseThrow(NotFoundMemberException::new);
+    Member member = memberService.getMemberInfo(token);
 
-    if (matchingBoard.getIsDeleted()) {
+    if (board.getIsDeleted()) {
       throw new DeletedPostException();
     }
 
-    if (matchingBoard.getStatus() == StatusType.CLOSED) {
+    if (board.getStatus() == StatusType.CLOSED) {
       throw new CompletedMatchingException();
     }
 
-    if (matchingBoard.getMember() == member) {
+    if (board.getMember() == member) {
       throw new SelfRequestException();
     }
 
-    if (requestRepository.existsByBoardIdAndMemberId(id, memberId)) {
+    if (requestRepository.existsByBoardIdAndMemberId(boardId, member.getId())) {
       throw new AlreadyRequestException();
     }
 
     MatchingRequest matchingRequest = MatchingRequest.builder()
-        .board(matchingBoard)
+        .board(board)
         .member(member)
         .createdDate(LocalDateTime.now())
         .build();
     requestRepository.save(matchingRequest);
 
-    Member writer = matchingBoard.getMember();
+    Member writer = board.getMember();
     writer.setRequestCount((countRequestsByMember(writer)));
-    memberRepository.save(writer);
 
     return "매칭 신청 완료";
   }
 
   /**
    * 매칭 신청한 팀 리스트 조회
-   * @param id - 게시글 id
+   *
    * @return 매칭 신청 목록
    */
-  public List<RequestMatchingDto> getRequestList(Long id) {
-    List<MatchingRequest> requestList = requestRepository.findByBoardId(id)
+  public List<RequestMatchingDto> getRequestList(Long boardId) {
+    List<MatchingRequest> requestList = requestRepository.findByBoardId(boardId)
         .orElse(Collections.emptyList());
 
     return requestList.stream().map(RequestMatchingDto::of)
@@ -265,31 +267,33 @@ public class MatchingService {
 
   /**
    * 매칭 신청 수락
-   * @param id - 매칭 신청 id
+   *
    * @return "신청 수락 완료"
    */
   @Transactional
-  public String acceptRequest(Long id) {
-    MatchingRequest request = requestRepository.findById(id)
+  public String acceptRequest(String token, Long requestId) {
+    MatchingRequest request = requestRepository.findById(requestId)
         .orElseThrow(NotFoundRequestException::new);
+
+    memberService.checkMemberPermission(token, request.getBoard().getMember());
 
     if (request.getBoard().getStatus() == StatusType.CLOSED) {
       throw new CompletedMatchingException();
     }
 
-    request.accept();
-    request.getBoard().acceptMatching();
-    request.getBoard().getGame().setOpponent(request.getMember());
+    request.setIsAccepted(true);
+    request.getBoard().setStatus(StatusType.CLOSED);
+    request.getBoard().getGame().setTeam2(request.getMember());
 
-    List<MatchingRequest> otherRequests = requestRepository.findOtherRequestsByIdAndBoardId(id, request.getBoard().getId())
+    List<MatchingRequest> otherRequests = requestRepository.findOtherRequestsByIdAndBoardId(requestId, request.getBoard().getId())
         .orElse(Collections.emptyList());
     for (MatchingRequest req : otherRequests) {
-      req.refuse();
+      req.setIsAccepted(false);
     }
 
-    List<MatchingRequest> sameTimeRequests = findSameTimeRequests(id).orElse(Collections.emptyList());
+    List<MatchingRequest> sameTimeRequests = findSameTimeRequests(requestId).orElse(Collections.emptyList());
     for (MatchingRequest req : sameTimeRequests) {
-      req.refuse();
+      req.setIsAccepted(false);
     }
 
     return "신청 수락 완료";
@@ -297,25 +301,27 @@ public class MatchingService {
 
   /**
    * 매칭 신청 거절
-   * @param id - 매칭 신청 id
+   *
    * @return "신청 거절 완료"
    */
   @Transactional
-  public String refuseRequest(Long id) {
-    MatchingRequest request = requestRepository.findById(id)
+  public String refuseRequest(String token, Long requestId) {
+    MatchingRequest request = requestRepository.findById(requestId)
         .orElseThrow(NotFoundRequestException::new);
+
+    memberService.checkMemberPermission(token, request.getBoard().getMember());
 
     if (request.getBoard().getStatus() == StatusType.CLOSED) {
       throw new CompletedMatchingException();
     }
 
-    request.refuse();
+    request.setIsAccepted(false);
 
     return "신청 거절 완료";
   }
 
-  private Optional<List<MatchingRequest>> findSameTimeRequests(Long id) {
-    MatchingRequest request = requestRepository.findById(id)
+  private Optional<List<MatchingRequest>> findSameTimeRequests(Long requestId) {
+    MatchingRequest request = requestRepository.findById(requestId)
         .orElseThrow(NotFoundRequestException::new);
 
     Game game = request.getBoard().getGame();
@@ -323,7 +329,7 @@ public class MatchingService {
     LocalTime time = game.getTime();
     Long memberId = request.getMember().getId();
 
-    return requestRepository.findSameTimeRequests(memberId, date, time, id);
+    return requestRepository.findSameTimeRequests(memberId, date, time, requestId);
   }
 
   private Integer countRequestsByMember(Member member) {

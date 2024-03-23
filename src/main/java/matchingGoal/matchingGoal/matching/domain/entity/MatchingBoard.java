@@ -64,6 +64,7 @@ public class MatchingBoard {
   @Column(name = "image_url")
   private List<String> imageUrls;
 
+  @Setter
   @OneToOne(mappedBy = "board")
   private Game game;
 
@@ -82,11 +83,4 @@ public class MatchingBoard {
     this.deletedDate = LocalDateTime.now();
   }
 
-  public void acceptMatching() {
-    this.status = StatusType.CLOSED;
-  }
-
-  public void setGame(Game game) {
-    this.game = game;
-  }
 }

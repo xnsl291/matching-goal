@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -29,8 +30,11 @@ public class MatchingController {
   private final MatchingService matchingService;
 
   @PostMapping("/write")
-  public ResponseEntity<BoardResponseDto> createBoard(@Valid @RequestBody BoardRequestDto requestDto) {
-    return ResponseEntity.ok(matchingService.createBoard(requestDto));
+  public ResponseEntity<BoardResponseDto> createBoard(
+      @RequestHeader(value = "Authorization") String token,
+      @Valid @RequestBody BoardRequestDto requestDto
+  ) {
+    return ResponseEntity.ok(matchingService.createBoard(token, requestDto));
   }
 
   @GetMapping("/list")
@@ -47,39 +51,54 @@ public class MatchingController {
     return matchingService.getBoardList(page, pageSize, keyword, type, sort, sortDirection, date, time);
   }
 
-  @GetMapping("/{id}")
-  public ResponseEntity<BoardResponseDto> getBoardById(@PathVariable Long id) {
-    return ResponseEntity.ok(matchingService.getBoardById(id));
+  @GetMapping("/{boardId}")
+  public ResponseEntity<BoardResponseDto> getBoardById(@PathVariable Long boardId) {
+    return ResponseEntity.ok(matchingService.getBoardById(boardId));
   }
 
-  @PatchMapping("/{id}")
-  public ResponseEntity<BoardResponseDto> updateBoard(@PathVariable Long id, @Valid @RequestBody UpdateBoardDto requestDto) {
-    return ResponseEntity.ok(matchingService.updateBoard(id, requestDto));
+  @PatchMapping("/{boardId}")
+  public ResponseEntity<BoardResponseDto> updateBoard(
+      @RequestHeader(value = "Authorization") String token,
+      @PathVariable Long boardId, @Valid @RequestBody UpdateBoardDto requestDto
+  ) {
+    return ResponseEntity.ok(matchingService.updateBoard(token, boardId, requestDto));
   }
 
-  @DeleteMapping("/{id}")
-  public ResponseEntity<Long> deleteBoard(@PathVariable Long id) {
-    return ResponseEntity.ok(matchingService.deleteBoard(id));
+  @DeleteMapping("/{boardId}")
+  public ResponseEntity<Long> deleteBoard(
+      @RequestHeader(value = "Authorization") String token,
+      @PathVariable Long boardId
+  ) {
+    return ResponseEntity.ok(matchingService.deleteBoard(token, boardId));
   }
 
-  @PostMapping("/{id}/request/{memberId}")
-  public ResponseEntity<String> requestMatching(@PathVariable Long id, @PathVariable Long memberId) {
-    return ResponseEntity.ok(matchingService.requestMatching(id, memberId));
+  @PostMapping("/{boardId}/request")
+  public ResponseEntity<String> requestMatching(
+      @RequestHeader(value = "Authorization") String token,
+      @PathVariable Long boardId
+  ) {
+    return ResponseEntity.ok(matchingService.requestMatching(token, boardId));
   }
 
-  @GetMapping("/{id}/request-list")
-  public ResponseEntity<List<RequestMatchingDto>> getRequestList(@PathVariable Long id) {
-    return ResponseEntity.ok(matchingService.getRequestList(id));
+  @GetMapping("/{boardId}/request-list")
+  public ResponseEntity<List<RequestMatchingDto>> getRequestList(@PathVariable Long boardId) {
+    return ResponseEntity.ok(matchingService.getRequestList(boardId));
   }
 
-  @PostMapping("/{id}/accept")
-  public ResponseEntity<String> acceptRequest(@PathVariable Long id) {
-    return ResponseEntity.ok(matchingService.acceptRequest(id));
+  @PostMapping("/{requestId}/accept")
+  public ResponseEntity<String> acceptRequest(
+      @RequestHeader(value = "Authorization") String token,
+      @PathVariable Long requestId
+  ) {
+    return ResponseEntity.ok(matchingService.acceptRequest(token, requestId));
   }
 
-  @PostMapping("/{id}/refuse")
-  public ResponseEntity<String> refuseRequest(@PathVariable Long id) {
-    return ResponseEntity.ok(matchingService.refuseRequest(id));
+  @PostMapping("/{requestId}/refuse")
+  public ResponseEntity<String> refuseRequest(
+      @RequestHeader(value = "Authorization") String token,
+      @PathVariable Long requestId
+  ) {
+    return ResponseEntity.ok(matchingService.refuseRequest(token, requestId));
   }
 
 }

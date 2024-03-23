@@ -14,8 +14,6 @@ import lombok.NoArgsConstructor;
 @Builder
 public class BoardRequestDto {
 
-  private Long memberId;
-
   private List<String> imageUrls;
   
   @NotBlank(message = "지역을 입력해주세요")
