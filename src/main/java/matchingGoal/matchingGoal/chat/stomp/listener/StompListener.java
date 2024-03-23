@@ -19,6 +19,7 @@ public class StompListener {
 
   @EventListener
   public void handleWebSocketConnectListener(SessionConnectEvent event) {
+
     StompHeaderAccessor headers = StompHeaderAccessor.wrap(event.getMessage());
     String sessionId = headers.getSessionId();
     String chatRoomId = Objects.requireNonNull(headers.getNativeHeader("chatRoomId")).get(0);
@@ -35,11 +36,9 @@ public class StompListener {
 
     StompHeaderAccessor headers = StompHeaderAccessor.wrap(event.getMessage());
     String sessionId = headers.getSessionId();
-    String chatRoomId = Objects.requireNonNull(headers.getNativeHeader("chatRoomId")).get(0);
 
-    redisService.removeChatRoomMember(chatRoomId, sessionId);
-    log.info("[connected]  chatroomId: " + chatRoomId + "sessionId: " + sessionId);
-
+    redisService.removeChatRoomMember(sessionId);
+    log.info("[disconnected] sessionId:" + sessionId);
   }
 
 

@@ -10,6 +10,7 @@ import matchingGoal.matchingGoal.chat.entity.ChatMessage;
 import matchingGoal.matchingGoal.chat.repository.ChatMessageRepository;
 import matchingGoal.matchingGoal.common.service.RedisService;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.boot.autoconfigure.data.redis.RedisProperties.Jedis;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,7 +37,7 @@ public class ChatMessageService {
 
   public void saveMessage(ChatMessageDto chatDto) {
     ChatMessage chatMessage = ChatMessage.fromDto(chatDto);
-
+    Jedis jeds = new Jedis();
     List<Object> count = redisService.getChatRoomMember(chatDto.getChatRoomId());
     if (count.size() == 2) {
       chatDto.setReadYn(1);

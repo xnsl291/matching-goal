@@ -4,6 +4,7 @@ package matchingGoal.matchingGoal.chat.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import matchingGoal.matchingGoal.chat.dto.CreateChatRoomRequestDto;
 import matchingGoal.matchingGoal.chat.entity.ChatRoom;
 import matchingGoal.matchingGoal.chat.dto.ChatRoomListResponseDto;
 import matchingGoal.matchingGoal.chat.repository.ChatRoomRepository;
@@ -30,9 +31,12 @@ class ChatRoomServiceTest {
   @Transactional
   public void createChatRoom() {
     //given
-
+    CreateChatRoomRequestDto dto = CreateChatRoomRequestDto.builder()
+                                    .matchingBoardId(1)
+                                    .guestId(1)
+                                    .build();
     //when
-    String id = chatRoomService.createChatRoom(1, 2);
+    String id = chatRoomService.createChatRoom(1, dto);
 
     //then
     ChatRoom newChat = chatRoomRepository.findById(id).orElseThrow(RuntimeException::new);
@@ -46,7 +50,11 @@ class ChatRoomServiceTest {
   @Transactional
   public void addMembers() {
     //given
-    String id = chatRoomService.createChatRoom(1, 2);
+    CreateChatRoomRequestDto dto = CreateChatRoomRequestDto.builder()
+        .matchingBoardId(1)
+        .guestId(1)
+        .build();
+    String id = chatRoomService.createChatRoom(1, dto);
 
     //when
     List<Member> members2 = new ArrayList<>();
@@ -67,8 +75,12 @@ class ChatRoomServiceTest {
   public void myChat() {
 
     //given
-    String id = chatRoomService.createChatRoom(1, 2);
-    System.out.println(id);
+    CreateChatRoomRequestDto dto = CreateChatRoomRequestDto.builder()
+        .matchingBoardId(1)
+        .guestId(1)
+        .build();
+    String id = chatRoomService.createChatRoom(1, dto);
+
     //when
     List<ChatRoomListResponseDto> result = chatRoomService.myChat(1L);
 
@@ -83,17 +95,19 @@ class ChatRoomServiceTest {
   @Transactional
   public void quit() {
     //given
-
-    String id = chatRoomService.createChatRoom(1, 2);
-    System.out.println(id);
+    CreateChatRoomRequestDto dto = CreateChatRoomRequestDto.builder()
+        .matchingBoardId(1)
+        .guestId(1)
+        .build();
+    String id = chatRoomService.createChatRoom(1, dto);
 
     //when
+
     chatRoomService.quit(2, id);
     ChatRoom chatRoom = chatRoomRepository.findById(id).orElseThrow(RuntimeException::new);
 
     boolean result = chatRoom.getChatRoomMembers().size() == 1;
 
-    System.out.println(chatRoom.getChatRoomMembers());
     //then
 
     assert result;
