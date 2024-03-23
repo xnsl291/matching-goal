@@ -2,11 +2,13 @@ package matchingGoal.matchingGoal.chat.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import matchingGoal.matchingGoal.chat.dto.ChatMessageDto;
 import matchingGoal.matchingGoal.chat.dto.ChatHistoryDto;
 import matchingGoal.matchingGoal.chat.dto.ChatRoomMemberDto;
+import matchingGoal.matchingGoal.chat.dto.CreateChatRoomRequestDto;
 import matchingGoal.matchingGoal.chat.entity.ChatMessage;
 import matchingGoal.matchingGoal.chat.entity.ChatRoom;
 import matchingGoal.matchingGoal.chat.dto.ChatRoomListResponseDto;
@@ -26,32 +28,45 @@ public class ChatRoomService {
 
   private final ChatRoomRepository chatRoomRepository;
   private final MemberRepository memberRepository;
-
   private final ChatMessageRepository chatMessageRepository;
 
 
-  public String createChatRoom(long hostId, long guestId) {
+  public String createChatRoom(long hostId, CreateChatRoomRequestDto request) {
     Member host = getMember(hostId);
-    Member guest = getMember(guestId);
+    Member guest = getMember(request.getGuestId());
+    long matchingBoardId = request.getMatchingBoardId();
     List<Member> members = new ArrayList<>();
+
     members.add(host);
     members.add(guest);
-    ChatRoom room = ChatRoom.create();
-    chatRoomRepository.save(room);
-    room.addMembers(members);
-    log.info(room.getId());
+    Optional<ChatRoom> optionalChatRoom = chatRoomRepository
+        .findByMatchingBoardIdAndChatRoomMembers(matchingBoardId, members);
 
-    return room.getId();
+    if (optionalChatRoom.isPresent()) {
+
+      return optionalChatRoom.get().getId();
+    } else {
+      ChatRoom room = ChatRoom.create();
+
+      chatRoomRepository.save(room);
+      room.addMembers(members);
+      log.info(room.getId());
+
+      return room.getId();
+    }
   }
 
   public void addMembers(String chatRoomId, List<Member> members) {
+
     ChatRoom room = chatRoomRepository.findById(chatRoomId)
         .orElseThrow(() -> new CustomException(ErrorCode.CHATROOM_NOT_FOUND));
+
     room.addMembers(members);
     log.info(chatRoomId + " 에 " + members.toString() + " 추가");
   }
 
   public List<ChatRoomListResponseDto> myChat(long userId) {
+
     List<ChatRoom> myChat = chatRoomRepository.findListsByChatRoomMembersId(userId);
 
     return myChat.stream().map(ChatRoomListResponseDto::fromEntity).toList();
@@ -59,13 +74,17 @@ public class ChatRoomService {
 
   @Transactional
   public void quit(long userId, String chatRoomId) {
+
     ChatRoom chatRoom = getChatRoom(chatRoomId);
+
     chatRoom.quit(userId);
   }
 
   @Transactional
   public List<ChatMessageDto> getChatMessage(String chatRoomId) {
+
     List<ChatMessage> chatMessageList = chatMessageRepository.findByChatRoomId(chatRoomId);
+
     for (ChatMessage chat : chatMessageList) {
       chat.changeReadYn(1);
     }
@@ -75,6 +94,7 @@ public class ChatRoomService {
   }
 
   public ChatHistoryDto getChatHistory(String chatRoomId) {
+
     ChatRoom chatRoom = getChatRoom(chatRoomId);
     List<ChatRoomMemberDto> chatRoomMemberInfo = chatRoom.getChatRoomMembers().stream()
         .map(ChatRoomMemberDto::fromEntity).toList();
@@ -86,16 +106,30 @@ public class ChatRoomService {
         .build();
   }
 
+  public List<ChatRoom> chatRoomList(long matchingBoardId) {
+
+    return chatRoomRepository.findAllByMatchingBoardId(matchingBoardId);
+  }
+
   public ChatRoom getChatRoom(String chatRoomId) {
 
     return chatRoomRepository.findById(chatRoomId)
-        .orElseThrow(() -> new CustomException(ErrorCode.CHATROOM_NOT_FOUND));
+          .orElseThrow(() -> new CustomException(ErrorCode.CHATROOM_NOT_FOUND));
   }
 
   public Member getMember(long userId) {
 
     return memberRepository.findById(userId)
         .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
+  }
+
+  @Transactional
+  public void closeChatRoom(long chatRoomId) {
+    List<ChatRoom> chatRoomList = chatRoomList(chatRoomId);
+
+    for (ChatRoom chatRoom : chatRoomList) {
+      chatRoom.close();
+    }
   }
 
 
