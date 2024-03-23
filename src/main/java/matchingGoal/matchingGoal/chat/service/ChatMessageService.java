@@ -1,7 +1,7 @@
 package matchingGoal.matchingGoal.chat.service;
 
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import matchingGoal.matchingGoal.alarm.service.AlarmService;
@@ -36,11 +36,10 @@ public class ChatMessageService {
 
   public void saveMessage(ChatMessageDto chatDto) {
     ChatMessage chatMessage = ChatMessage.fromDto(chatDto);
-
-    List<Object> count = redisService.getChatRoomMember(chatDto.getChatRoomId());
-    if (count.size() == 2) {
+    Set<Object> count = redisService.getChatRoomMember(chatDto.getChatRoomId());
+    if (count.size() >= 2) {
       chatDto.setReadYn(1);
-    } else if(count.size() <= 1) {
+    } else {
       chatDto.setReadYn(0);
       alarmService.messageAlarm(chatDto);
     }

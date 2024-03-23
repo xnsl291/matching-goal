@@ -8,7 +8,7 @@ import matchingGoal.matchingGoal.common.type.ErrorCode;
 import matchingGoal.matchingGoal.matching.domain.CancelType;
 import matchingGoal.matchingGoal.matching.domain.entity.*;
 import matchingGoal.matchingGoal.matching.dto.CommentHistoryDto;
-import matchingGoal.matchingGoal.matching.exception.NotFoundGameException;
+import matchingGoal.matchingGoal.matching.exception.PermissionException;
 import matchingGoal.matchingGoal.matching.repository.CommentRepository;
 import matchingGoal.matchingGoal.matching.repository.GameCancelRepository;
 import matchingGoal.matchingGoal.matching.repository.GameRepository;
@@ -83,6 +83,16 @@ public class MemberService {
     public Member getMemberInfo(String token){
         jwtTokenProvider.validateToken(token);
         return getMemberById(jwtTokenProvider.getId(token));
+    }
+
+    /**
+     * 토큰이 해당 멤버인지 조회
+     */
+    public void checkMemberPermission(String token, Member allowed) {
+        Member member = getMemberInfo(token);
+        if (allowed != member) {
+            throw new PermissionException();
+        }
     }
 
     /**
@@ -166,7 +176,7 @@ public class MemberService {
 
         for (Game game : allGames){
             try{
-                Result result = resultRepository.findByGameId(game.getId()).orElseThrow(NotFoundGameException::new);
+                Result result = resultRepository.findByGameId(game.getId()).orElseThrow(() -> new CustomException(ErrorCode.GAME_NOT_FOUND))
                 history.add(MatchHistoryResponse.of(member, result));
             }catch (Exception e){}
         }
