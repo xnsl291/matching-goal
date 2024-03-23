@@ -1,6 +1,7 @@
 package matchingGoal.matchingGoal.common.service;
 
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -54,9 +55,9 @@ public class RedisService {
         log.info("[redis saved] chatRoomId: " + chatRoomId + " sessionId: " + sessionId + " memberId: " + memberId);
     }
 
-    public List<Object> getChatRoomMember(String chatRoomId) {
+    public Set<Object> getChatRoomMember(String chatRoomId) {
 
-        return redisTemplate.opsForHash().values(chatRoomId);
+        return new HashSet<>(redisTemplate.opsForHash().values(chatRoomId));
     }
 
     @Transactional

@@ -1,7 +1,7 @@
 package matchingGoal.matchingGoal.chat.service;
 
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import matchingGoal.matchingGoal.alarm.service.AlarmService;
@@ -10,7 +10,6 @@ import matchingGoal.matchingGoal.chat.entity.ChatMessage;
 import matchingGoal.matchingGoal.chat.repository.ChatMessageRepository;
 import matchingGoal.matchingGoal.common.service.RedisService;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.boot.autoconfigure.data.redis.RedisProperties.Jedis;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,11 +36,10 @@ public class ChatMessageService {
 
   public void saveMessage(ChatMessageDto chatDto) {
     ChatMessage chatMessage = ChatMessage.fromDto(chatDto);
-    Jedis jeds = new Jedis();
-    List<Object> count = redisService.getChatRoomMember(chatDto.getChatRoomId());
-    if (count.size() == 2) {
+    Set<Object> count = redisService.getChatRoomMember(chatDto.getChatRoomId());
+    if (count.size() >= 2) {
       chatDto.setReadYn(1);
-    } else if(count.size() <= 1) {
+    } else {
       chatDto.setReadYn(0);
       alarmService.messageAlarm(chatDto);
     }
