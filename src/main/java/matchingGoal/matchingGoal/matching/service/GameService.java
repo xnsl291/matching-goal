@@ -79,7 +79,7 @@ public class GameService {
   }
 
   @Transactional
-  public ResultResponse acceptResult(String token, Long resultId) {
+  public ResultResponse handleResult(String token, Long resultId, boolean isAccepted) {
     Result result = resultRepository.findById(resultId)
         .orElseThrow(NotFoundResultException::new);
 
@@ -89,23 +89,7 @@ public class GameService {
       throw new AcceptedResultException();
     }
 
-    result.setIsAccepted(true);
-
-    return ResultResponse.of(result);
-  }
-
-  @Transactional
-  public ResultResponse refuseResult(String token, Long resultId) {
-    Result result = resultRepository.findById(resultId)
-        .orElseThrow(NotFoundResultException::new);
-
-    memberService.checkMemberPermission(token, result.getGame().getTeam1());
-
-    if (Boolean.TRUE.equals(result.getIsAccepted())) {
-      throw new AcceptedResultException();
-    }
-
-    result.setIsAccepted(false);
+    result.setIsAccepted(isAccepted);
 
     return ResultResponse.of(result);
   }

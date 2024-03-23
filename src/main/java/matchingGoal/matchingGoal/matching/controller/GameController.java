@@ -43,14 +43,14 @@ public class GameController {
   public ResponseEntity<ResultResponse> acceptResult(
       @RequestHeader(value = "Authorization") String token,
       @PathVariable Long resultId) {
-    return ResponseEntity.ok(gameService.acceptResult(token, resultId));
+    return ResponseEntity.ok(gameService.handleResult(token, resultId, true));
   }
 
   @PostMapping("/result/{resultId}/refuse")
   public ResponseEntity<ResultResponse> refuseResult(
       @RequestHeader(value = "Authorization") String token,
       @PathVariable Long resultId) {
-    return ResponseEntity.ok(gameService.refuseResult(token, resultId));
+    return ResponseEntity.ok(gameService.handleResult(token, resultId, false));
   }
 
   @PostMapping("/{gameId}/comment")
