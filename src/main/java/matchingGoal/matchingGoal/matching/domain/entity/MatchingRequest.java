@@ -11,6 +11,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import matchingGoal.matchingGoal.member.model.entity.Member;
 
 @Entity
@@ -32,16 +33,9 @@ public class MatchingRequest {
   @JoinColumn(name = "member_id")
   private Member member;
 
+  @Setter
   private Boolean isAccepted;
 
   private LocalDateTime createdDate;
-
-  public void accept() {
-    this.isAccepted = true;
-  }
-
-  public void refuse() {
-    this.isAccepted = false;
-  }
 
 }

@@ -10,7 +10,7 @@ import matchingGoal.matchingGoal.matching.domain.entity.Result;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ResultResponse {
+public class ResultResponseDto {
 
   private Long resultId;
   private Long gameId;
@@ -18,8 +18,8 @@ public class ResultResponse {
   private Integer score2;
   private Integer duration;
 
-  public static ResultResponse of(Result result) {
-    return ResultResponse.builder()
+  public static ResultResponseDto of(Result result) {
+    return ResultResponseDto.builder()
         .resultId(result.getId())
         .gameId(result.getGame().getId())
         .score1(result.getScore1())

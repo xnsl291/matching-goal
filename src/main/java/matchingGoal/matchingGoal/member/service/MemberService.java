@@ -3,11 +3,11 @@ package matchingGoal.matchingGoal.member.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import matchingGoal.matchingGoal.common.auth.JwtTokenProvider;
-import matchingGoal.matchingGoal.common.type.ErrorCode;
 import matchingGoal.matchingGoal.matching.domain.CancelType;
 import matchingGoal.matchingGoal.matching.domain.entity.*;
 import matchingGoal.matchingGoal.matching.dto.CommentHistoryDto;
 import matchingGoal.matchingGoal.matching.exception.NotFoundGameException;
+import matchingGoal.matchingGoal.matching.exception.PermissionException;
 import matchingGoal.matchingGoal.matching.repository.CommentRepository;
 import matchingGoal.matchingGoal.matching.repository.GameCancelRepository;
 import matchingGoal.matchingGoal.matching.repository.GameRepository;
@@ -86,6 +86,16 @@ public class MemberService {
     public Member getMemberInfo(String token){
         jwtTokenProvider.validateToken(token);
         return getMemberById(jwtTokenProvider.getId(token));
+    }
+
+    /**
+     * 토큰이 해당 멤버인지 조회
+     */
+    public void checkMemberPermission(String token, Member allowed) {
+        Member member = getMemberInfo(token);
+        if (allowed != member) {
+            throw new PermissionException();
+        }
     }
 
     /**

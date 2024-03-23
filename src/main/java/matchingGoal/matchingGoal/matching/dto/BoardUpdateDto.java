@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class UpdateBoardDto {
+public class BoardUpdateDto {
 
   @NotBlank(message = "제목을 입력해주세요")
   private String title;
