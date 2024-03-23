@@ -2,11 +2,11 @@ package matchingGoal.matchingGoal.matching.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import matchingGoal.matchingGoal.matching.dto.CancelResponse;
+import matchingGoal.matchingGoal.matching.dto.CancelResponseDto;
 import matchingGoal.matchingGoal.matching.dto.CommentDto;
-import matchingGoal.matchingGoal.matching.dto.CommentResponse;
+import matchingGoal.matchingGoal.matching.dto.CommentHistoryDto;
 import matchingGoal.matchingGoal.matching.dto.ResultDto;
-import matchingGoal.matchingGoal.matching.dto.ResultResponse;
+import matchingGoal.matchingGoal.matching.dto.ResultResponseDto;
 import matchingGoal.matchingGoal.matching.service.GameService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -25,14 +25,14 @@ public class GameController {
   private final GameService gameService;
 
   @PostMapping("/{gameId}/result")
-  public ResponseEntity<ResultResponse> writeResult(
+  public ResponseEntity<ResultResponseDto> writeResult(
       @RequestHeader(value = "Authorization") String token,
       @PathVariable Long gameId, @Valid @RequestBody ResultDto resultDto) {
     return ResponseEntity.ok(gameService.writeResult(token, gameId, resultDto));
   }
 
   @PatchMapping("/result/{resultId}")
-  public ResponseEntity<ResultResponse> updateResult(
+  public ResponseEntity<ResultResponseDto> updateResult(
       @RequestHeader(value = "Authorization") String token,
       @PathVariable Long resultId,
       @Valid @RequestBody ResultDto resultDto) {
@@ -40,21 +40,21 @@ public class GameController {
   }
 
   @PostMapping("/result/{resultId}/accept")
-  public ResponseEntity<ResultResponse> acceptResult(
+  public ResponseEntity<ResultResponseDto> acceptResult(
       @RequestHeader(value = "Authorization") String token,
       @PathVariable Long resultId) {
     return ResponseEntity.ok(gameService.handleResult(token, resultId, true));
   }
 
   @PostMapping("/result/{resultId}/refuse")
-  public ResponseEntity<ResultResponse> refuseResult(
+  public ResponseEntity<ResultResponseDto> refuseResult(
       @RequestHeader(value = "Authorization") String token,
       @PathVariable Long resultId) {
     return ResponseEntity.ok(gameService.handleResult(token, resultId, false));
   }
 
   @PostMapping("/{gameId}/comment")
-  public ResponseEntity<CommentResponse> writeComment(
+  public ResponseEntity<CommentHistoryDto> writeComment(
       @RequestHeader(value = "Authorization") String token,
       @PathVariable Long gameId,
       @Valid @RequestBody CommentDto commentDto) {
@@ -62,14 +62,14 @@ public class GameController {
   }
 
   @PostMapping("/{gameId}/cancel")
-  public ResponseEntity<CancelResponse> cancelGame(
+  public ResponseEntity<CancelResponseDto> cancelGame(
       @RequestHeader(value = "Authorization") String token,
       @PathVariable Long gameId) {
     return ResponseEntity.ok(gameService.cancelGame(token, gameId));
   }
 
   @PostMapping("/cancel/{cancelId}/accept")
-  public ResponseEntity<CancelResponse> acceptCancel(
+  public ResponseEntity<CancelResponseDto> acceptCancel(
       @RequestHeader(value = "Authorization") String token,
       @PathVariable Long cancelId
   ) {
@@ -77,7 +77,7 @@ public class GameController {
   }
 
   @PostMapping("/cancel/{cancelId}/refuse")
-  public ResponseEntity<CancelResponse> refuseCancel(
+  public ResponseEntity<CancelResponseDto> refuseCancel(
       @RequestHeader(value = "Authorization") String token,
       @PathVariable Long cancelId
   ) {

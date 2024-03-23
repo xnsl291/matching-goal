@@ -13,11 +13,11 @@ import matchingGoal.matchingGoal.matching.domain.StatusType;
 import matchingGoal.matchingGoal.matching.domain.entity.Game;
 import matchingGoal.matchingGoal.matching.domain.entity.MatchingBoard;
 import matchingGoal.matchingGoal.matching.domain.entity.MatchingRequest;
-import matchingGoal.matchingGoal.matching.dto.BoardRequestDto;
+import matchingGoal.matchingGoal.matching.dto.BoardDto;
 import matchingGoal.matchingGoal.matching.dto.BoardResponseDto;
 import matchingGoal.matchingGoal.matching.dto.ListBoardDto;
-import matchingGoal.matchingGoal.matching.dto.RequestMatchingDto;
-import matchingGoal.matchingGoal.matching.dto.UpdateBoardDto;
+import matchingGoal.matchingGoal.matching.dto.MatchingRequestResponseDto;
+import matchingGoal.matchingGoal.matching.dto.BoardUpdateDto;
 import matchingGoal.matchingGoal.matching.exception.AlreadyRequestException;
 import matchingGoal.matchingGoal.matching.exception.CompletedMatchingException;
 import matchingGoal.matchingGoal.matching.exception.DeletedPostException;
@@ -53,7 +53,7 @@ public class MatchingService {
    * @param requestDto - 게시글 작성 dto
    * @return 게시글 조회 dto
    */
-  public BoardResponseDto createBoard(String token, BoardRequestDto requestDto) {
+  public BoardResponseDto createBoard(String token, BoardDto requestDto) {
     Member member = memberService.getMemberInfo(token);
 
     MatchingBoard matchingBoard = MatchingBoard.builder()
@@ -165,7 +165,7 @@ public class MatchingService {
    * @return 게시글 조회 dto
    */
   @Transactional
-  public BoardResponseDto updateBoard(String token, Long boardId, UpdateBoardDto requestDto) {
+  public BoardResponseDto updateBoard(String token, Long boardId, BoardUpdateDto requestDto) {
     MatchingBoard board = boardRepository.findById(boardId)
         .orElseThrow(NotFoundPostException::new);
 
@@ -256,12 +256,12 @@ public class MatchingService {
    *
    * @return 매칭 신청 목록
    */
-  public List<RequestMatchingDto> getRequestList(Long boardId) {
+  public List<MatchingRequestResponseDto> getRequestList(Long boardId) {
     List<MatchingRequest> requestList = requestRepository.findByBoardId(boardId)
         .orElse(Collections.emptyList());
 
-    return requestList.stream().map(RequestMatchingDto::of)
-        .sorted(Comparator.comparing(RequestMatchingDto::getCreatedDate))
+    return requestList.stream().map(MatchingRequestResponseDto::of)
+        .sorted(Comparator.comparing(MatchingRequestResponseDto::getCreatedDate))
         .collect(Collectors.toList());
   }
 

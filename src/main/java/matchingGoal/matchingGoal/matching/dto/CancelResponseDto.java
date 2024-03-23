@@ -10,14 +10,14 @@ import matchingGoal.matchingGoal.matching.domain.entity.GameCancel;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class CancelResponse {
+public class CancelResponseDto {
 
   private Long cancelId;
   private Long memberId;
   private Long gameId;
 
-  public static CancelResponse of(GameCancel cancel) {
-    return CancelResponse.builder()
+  public static CancelResponseDto of(GameCancel cancel) {
+    return CancelResponseDto.builder()
         .cancelId(cancel.getId())
         .memberId(cancel.getMember().getId())
         .gameId(cancel.getGame().getId())

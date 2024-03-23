@@ -3,11 +3,11 @@ package matchingGoal.matchingGoal.matching.controller;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import matchingGoal.matchingGoal.matching.dto.BoardRequestDto;
+import matchingGoal.matchingGoal.matching.dto.BoardDto;
 import matchingGoal.matchingGoal.matching.dto.BoardResponseDto;
 import matchingGoal.matchingGoal.matching.dto.ListBoardDto;
-import matchingGoal.matchingGoal.matching.dto.RequestMatchingDto;
-import matchingGoal.matchingGoal.matching.dto.UpdateBoardDto;
+import matchingGoal.matchingGoal.matching.dto.MatchingRequestResponseDto;
+import matchingGoal.matchingGoal.matching.dto.BoardUpdateDto;
 import matchingGoal.matchingGoal.matching.service.MatchingService;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -32,7 +32,7 @@ public class MatchingController {
   @PostMapping("/write")
   public ResponseEntity<BoardResponseDto> createBoard(
       @RequestHeader(value = "Authorization") String token,
-      @Valid @RequestBody BoardRequestDto requestDto
+      @Valid @RequestBody BoardDto requestDto
   ) {
     return ResponseEntity.ok(matchingService.createBoard(token, requestDto));
   }
@@ -59,7 +59,7 @@ public class MatchingController {
   @PatchMapping("/{boardId}")
   public ResponseEntity<BoardResponseDto> updateBoard(
       @RequestHeader(value = "Authorization") String token,
-      @PathVariable Long boardId, @Valid @RequestBody UpdateBoardDto requestDto
+      @PathVariable Long boardId, @Valid @RequestBody BoardUpdateDto requestDto
   ) {
     return ResponseEntity.ok(matchingService.updateBoard(token, boardId, requestDto));
   }
@@ -81,7 +81,7 @@ public class MatchingController {
   }
 
   @GetMapping("/{boardId}/request-list")
-  public ResponseEntity<List<RequestMatchingDto>> getRequestList(@PathVariable Long boardId) {
+  public ResponseEntity<List<MatchingRequestResponseDto>> getRequestList(@PathVariable Long boardId) {
     return ResponseEntity.ok(matchingService.getRequestList(boardId));
   }
 

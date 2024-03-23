@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class BoardRequestDto {
+public class BoardDto {
 
   private List<String> imageUrls;
   
