@@ -18,6 +18,7 @@ import lombok.Builder.Default;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import matchingGoal.matchingGoal.chat.dto.CreateChatRoomRequestDto;
 import matchingGoal.matchingGoal.member.model.entity.Member;
 import org.hibernate.annotations.DynamicUpdate;
 import org.springframework.data.annotation.CreatedDate;
@@ -41,21 +42,26 @@ public class ChatRoom {
       joinColumns = @JoinColumn(name = "chatRoom"),
       inverseJoinColumns = @JoinColumn(name = "member"))
   private Set<Member> chatRoomMembers = new HashSet<>();
+
   private long matchingBoardId;
   private int closedYn;
   @CreatedDate
   private LocalDateTime createdDate;
 
-  public static ChatRoom create() {
+  public static ChatRoom create(CreateChatRoomRequestDto request, Set<Member> members) {
 
-    ChatRoom room = new ChatRoom();
-    room.setId(UUID.randomUUID().toString());
 
-    return room;
+    return ChatRoom.builder()
+        .id(UUID.randomUUID().toString())
+        .chatRoomMembers(members)
+        .matchingBoardId(request.getMatchingBoardId())
+        .closedYn(0)
+        .build();
   }
   public void addMembers(Set<Member> members) {
 
     this.chatRoomMembers.addAll(members);
+
   }
 
   public void quit(long memberId) {
