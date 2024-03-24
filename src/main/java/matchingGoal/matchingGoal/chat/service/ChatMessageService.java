@@ -26,17 +26,18 @@ public class ChatMessageService {
 
   @Transactional
   public void createMessage(ChatMessageDto chatDto, String chatRoomId) {
+
     chatDto.setChatRoomId(chatRoomId);
-
     chatDto.setCreatedDate(LocalDateTime.now());
-
     rabbitTemplate.convertAndSend(CHAT_EXCHANGE_NAME, "room." + chatRoomId, chatDto);
 
   }
 
   public void saveMessage(ChatMessageDto chatDto) {
+
     ChatMessage chatMessage = ChatMessage.fromDto(chatDto);
     Set<Object> count = redisService.getChatRoomMember(chatDto.getChatRoomId());
+
     if (count.size() >= 2) {
       chatDto.setReadYn(1);
     } else {

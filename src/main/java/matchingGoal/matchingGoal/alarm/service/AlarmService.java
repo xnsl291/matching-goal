@@ -30,6 +30,7 @@ public class AlarmService {
   }
 
   public long createAlarm(long memberId, AlarmType type, String contentId) {
+
     Alarm alarm = Alarm.builder()
         .memberId(memberId)
         .type(type)
@@ -44,8 +45,10 @@ public class AlarmService {
   //채팅메세지 알람
   @Transactional
   public void messageAlarm(ChatMessageDto dto) {
+
     Optional<Alarm> optionalAlarm = alarmRepository.findByMemberIdAndContentId(dto.getReceiverId(),
         dto.getChatRoomId());
+
     if (optionalAlarm.isPresent()) {
       Alarm alarm = optionalAlarm.get();
       alarm.messageAlarmUpdate();
@@ -57,6 +60,7 @@ public class AlarmService {
 
   //알람리스트 조회
   public List<AlarmDto> getAlarm(String token) {
+
     long memberId = getMemberIdFromToken(token);
 
     return alarmRepository.findAllByMemberId(memberId).stream().map(AlarmDto::fromEntity).toList();
@@ -66,8 +70,10 @@ public class AlarmService {
   //수신확인
   @Transactional
   public void checkOut(String token, long alarmId) {
+
     long memberId = getMemberIdFromToken(token);
     Alarm alarm = getAlarmEntity(alarmId);
+
     if (alarm.getMemberId() != memberId) {
       throw new CustomException(ErrorCode.MEMBER_NOT_MATCHED);
     }
@@ -81,6 +87,7 @@ public class AlarmService {
   }
 
   private long getMemberIdFromToken(String token) {
+
     token = token.substring(7);
 
     return jwtTokenProvider.getId(token);

@@ -9,6 +9,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import matchingGoal.matchingGoal.alarm.domain.AlarmType;
+import matchingGoal.matchingGoal.alarm.service.AlarmService;
+import matchingGoal.matchingGoal.chat.service.ChatRoomService;
 import matchingGoal.matchingGoal.matching.domain.StatusType;
 import matchingGoal.matchingGoal.matching.domain.entity.Game;
 import matchingGoal.matchingGoal.matching.domain.entity.MatchingBoard;
@@ -46,6 +49,8 @@ public class MatchingService {
   private final GameRepository gameRepository;
   private final MatchingRequestRepository requestRepository;
   private final MemberService memberService;
+  private final AlarmService alarmService;
+  private final ChatRoomService chatRoomService;
 
   /**
    * 게시글 작성
@@ -208,6 +213,9 @@ public class MatchingService {
     board.delete();
     board.getGame().setIsDeleted(true);
 
+    chatRoomService.closeAllChatRoom(boardId);
+
+
     return board.getId();
   }
 
@@ -247,6 +255,8 @@ public class MatchingService {
 
     Member writer = board.getMember();
     writer.setRequestCount((countRequestsByMember(writer)));
+    alarmService.createAlarm(writer.getId(), AlarmType.NEW_MATCHING_REQUEST, String.valueOf(boardId));
+
 
     return "매칭 신청 완료";
   }
@@ -274,7 +284,8 @@ public class MatchingService {
   public String acceptRequest(String token, Long requestId) {
     MatchingRequest request = requestRepository.findById(requestId)
         .orElseThrow(NotFoundRequestException::new);
-
+    MatchingBoard matchingBoard = request.getBoard();
+    long matchingBoardId = matchingBoard.getId();
     memberService.checkMemberPermission(token, request.getBoard().getMember());
 
     if (request.getBoard().getStatus() == StatusType.CLOSED) {
@@ -282,10 +293,10 @@ public class MatchingService {
     }
 
     request.setIsAccepted(true);
-    request.getBoard().setStatus(StatusType.CLOSED);
-    request.getBoard().getGame().setTeam2(request.getMember());
+    matchingBoard.setStatus(StatusType.CLOSED);
+    matchingBoard.getGame().setTeam2(request.getMember());
 
-    List<MatchingRequest> otherRequests = requestRepository.findOtherRequestsByIdAndBoardId(requestId, request.getBoard().getId())
+    List<MatchingRequest> otherRequests = requestRepository.findOtherRequestsByIdAndBoardId(requestId, matchingBoardId)
         .orElse(Collections.emptyList());
     for (MatchingRequest req : otherRequests) {
       req.setIsAccepted(false);
@@ -295,6 +306,9 @@ public class MatchingService {
     for (MatchingRequest req : sameTimeRequests) {
       req.setIsAccepted(false);
     }
+    alarmService.createAlarm(request.getMember().getId(), AlarmType.NEW_MATCHING_REQUEST, String.valueOf(matchingBoardId));
+    chatRoomService.closeAllChatRoom(matchingBoardId);
+
 
     return "신청 수락 완료";
   }

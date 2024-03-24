@@ -32,6 +32,7 @@ public class ChatRoomService {
 
 
   public String createChatRoom(long hostId, CreateChatRoomRequestDto request) {
+
     Member host = getMember(hostId);
     Member guest = getMember(request.getGuestId());
     long matchingBoardId = request.getMatchingBoardId();
@@ -114,7 +115,7 @@ public class ChatRoomService {
   public ChatRoom getChatRoom(String chatRoomId) {
 
     return chatRoomRepository.findById(chatRoomId)
-          .orElseThrow(() -> new CustomException(ErrorCode.CHATROOM_NOT_FOUND));
+        .orElseThrow(() -> new CustomException(ErrorCode.CHATROOM_NOT_FOUND));
   }
 
   public Member getMember(long userId) {
@@ -123,14 +124,22 @@ public class ChatRoomService {
         .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
   }
 
-  @Transactional
-  public void closeChatRoom(long chatRoomId) {
-    List<ChatRoom> chatRoomList = chatRoomList(chatRoomId);
+  public void closeAllChatRoom(long matchingBoardId) {
+
+    List<ChatRoom> chatRoomList = chatRoomList(matchingBoardId);
 
     for (ChatRoom chatRoom : chatRoomList) {
-      chatRoom.close();
+      closeChatRoom(chatRoom.getId());
     }
   }
 
+  @Transactional
+  public void closeChatRoom(String ChatRoomId) {
+
+    ChatRoom chatRoom = chatRoomRepository.findById(ChatRoomId)
+        .orElseThrow(() -> new CustomException(ErrorCode.CHATROOM_NOT_FOUND));
+
+    chatRoom.close();
+  }
 
 }
