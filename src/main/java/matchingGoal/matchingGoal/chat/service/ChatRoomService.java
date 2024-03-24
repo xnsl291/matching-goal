@@ -31,7 +31,7 @@ public class ChatRoomService {
   private final MemberRepository memberRepository;
   private final ChatMessageRepository chatMessageRepository;
 
-
+  @Transactional
   public String createChatRoom(long hostId, CreateChatRoomRequestDto request) {
 
     Member host = getMember(hostId);
@@ -48,10 +48,10 @@ public class ChatRoomService {
 
       return optionalChatRoom.get().getId();
     } else {
-      ChatRoom room = ChatRoom.create();
+      ChatRoom room = ChatRoom.create(request, members);
 
       chatRoomRepository.save(room);
-      room.addMembers(members);
+
       log.info(room.getId());
 
       return room.getId();
@@ -100,6 +100,7 @@ public class ChatRoomService {
     ChatRoom chatRoom = getChatRoom(chatRoomId);
     List<ChatRoomMemberDto> chatRoomMemberInfo = chatRoom.getChatRoomMembers().stream()
         .map(ChatRoomMemberDto::fromEntity).toList();
+
     List<ChatMessageDto> chatMessageList = getChatMessage(chatRoomId);
 
     return ChatHistoryDto.builder()
