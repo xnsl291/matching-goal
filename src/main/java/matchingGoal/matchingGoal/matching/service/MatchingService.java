@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import matchingGoal.matchingGoal.alarm.domain.AlarmType;
 import matchingGoal.matchingGoal.alarm.service.AlarmService;
+import matchingGoal.matchingGoal.chat.service.ChatRoomService;
 import matchingGoal.matchingGoal.matching.domain.StatusType;
 import matchingGoal.matchingGoal.matching.domain.entity.Game;
 import matchingGoal.matchingGoal.matching.domain.entity.MatchingBoard;
@@ -50,6 +51,7 @@ public class MatchingService {
   private final MemberRepository memberRepository;
   private final MatchingRequestRepository requestRepository;
   private final AlarmService alarmService;
+  private final ChatRoomService chatRoomService;
 
   /**
    * 게시글 작성
@@ -289,14 +291,15 @@ public class MatchingService {
   public String acceptRequest(Long id) {
     MatchingRequest request = requestRepository.findById(id)
         .orElseThrow(NotFoundRequestException::new);
+    MatchingBoard matchingBoard = request.getBoard();
 
-    if (request.getBoard().getStatus() == StatusType.CLOSED) {
+    if (matchingBoard.getStatus() == StatusType.CLOSED) {
       throw new CompletedMatchingException();
     }
 
     request.accept();
-    request.getBoard().acceptMatching();
-    request.getBoard().getGame().setOpponent(request.getMember());
+    matchingBoard.acceptMatching();
+    matchingBoard.getGame().setOpponent(request.getMember());
 
     List<MatchingRequest> otherRequests = requestRepository.findOtherRequestsByIdAndBoardId(id,
             request.getBoard().getId())
@@ -312,7 +315,8 @@ public class MatchingService {
     }
 
     alarmService.createAlarm(request.getMember().getId(), AlarmType.MATCHING_REQUEST_ACCEPTED,
-        String.valueOf(request.getBoard().getId()));
+        String.valueOf(matchingBoard.getId()));
+    chatRoomService.closeAllChatRoom(matchingBoard.getId());
 
     return "신청 수락 완료";
   }
