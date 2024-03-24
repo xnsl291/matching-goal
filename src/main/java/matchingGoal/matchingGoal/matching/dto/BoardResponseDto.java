@@ -1,5 +1,7 @@
 package matchingGoal.matchingGoal.matching.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonFormat.Shape;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -24,7 +26,9 @@ public class BoardResponseDto {
   private String title;
   private String content;
   private List<String> imageUrls;
+  @JsonFormat(shape = Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm", timezone = "Asia/Seoul")
   private LocalDateTime createdDate;
+  @JsonFormat(shape = Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm", timezone = "Asia/Seoul")
   private LocalDateTime modifiedDate;
   private Integer viewCount;
   private StatusType status;
@@ -32,6 +36,7 @@ public class BoardResponseDto {
   private String region;
   private String stadium;
   private LocalDate date;
+  @JsonFormat(shape = Shape.STRING, pattern = "HH:mm", timezone = "Asia/Seoul")
   private LocalTime time;
 
   public static BoardResponseDto of(MatchingBoard matchingBoard) {

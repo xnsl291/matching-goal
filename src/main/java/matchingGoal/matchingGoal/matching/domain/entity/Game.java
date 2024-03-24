@@ -35,6 +35,7 @@ public class Game {
   @JoinColumn(name = "team1_id")
   private Member team1;
 
+  @Setter
   @ManyToOne
   @JoinColumn(name = "team2_id")
   private Member team2;
@@ -47,13 +48,5 @@ public class Game {
 
   @Setter
   private Boolean isDeleted;
-
-  public void delete() {
-    this.isDeleted = true;
-  }
-
-  public void setOpponent(Member member) {
-    this.team2 = member;
-  }
 
 }

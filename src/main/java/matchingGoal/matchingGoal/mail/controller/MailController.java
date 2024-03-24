@@ -1,10 +1,9 @@
 package matchingGoal.matchingGoal.mail.controller;
 
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import matchingGoal.matchingGoal.mail.dto.MailVerificationDto;
+import matchingGoal.matchingGoal.mail.dto.SendMailVerificationDto;
 import matchingGoal.matchingGoal.mail.service.MailService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,8 +20,8 @@ public class MailController {
      * @return 발송성공여부
      */
     @PostMapping("/send-verification")
-    public ResponseEntity<Boolean> sendVerificationMail(@NotBlank @Email  @RequestParam String email) {
-        return ResponseEntity.ok().body(mailService.sendVerificationMail(email));
+    public ResponseEntity<Boolean> sendVerificationMail(@Valid @RequestBody SendMailVerificationDto sendMailVerificationDto) {
+        return ResponseEntity.ok().body(mailService.sendVerificationMail(sendMailVerificationDto));
     }
 
     /**

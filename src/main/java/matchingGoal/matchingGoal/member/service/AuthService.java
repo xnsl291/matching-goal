@@ -1,15 +1,15 @@
 package matchingGoal.matchingGoal.member.service;
 
+import matchingGoal.matchingGoal.common.exception.CustomException;
+import matchingGoal.matchingGoal.common.type.ErrorCode;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import matchingGoal.matchingGoal.common.auth.JwtToken;
 import matchingGoal.matchingGoal.common.auth.JwtTokenProvider;
-import matchingGoal.matchingGoal.common.service.RedisService;
 import matchingGoal.matchingGoal.member.dto.SignInDto;
 import matchingGoal.matchingGoal.member.dto.GetPasswordDto;
 import matchingGoal.matchingGoal.member.dto.SignInResponse;
-import matchingGoal.matchingGoal.member.exception.*;
 import matchingGoal.matchingGoal.member.dto.SignUpDto;
 import matchingGoal.matchingGoal.member.model.entity.Member;
 import matchingGoal.matchingGoal.member.repository.MemberRepository;
@@ -37,11 +37,11 @@ public class AuthService {
 
         // 이메일 중복 확인
         if(memberRepository.findByEmail(registerDto.getEmail()).isPresent())
-            throw new AlreadyRegisteredEmailException();
+            throw new CustomException(ErrorCode.DUPLICATED_EMAIL);
 
         // 닉네임 중복 확인
         if (! memberService.isDuplicatedNickname(registerDto.getNickname()))
-            throw new DuplicatedNicknameException();
+            throw new CustomException(ErrorCode.DUPLICATED_NICKNAME);
 
         Member member = Member.builder()
                 .name(registerDto.getName())
@@ -80,13 +80,13 @@ public class AuthService {
      * @return SignInResponse - accessToken, refreshToken, id, nickname, email, imageUrl
      */
     public SignInResponse signIn(SignInDto signInDto) {
-        Member member = memberRepository.findByEmail(signInDto.getEmail()).orElseThrow(MemberNotFoundException::new);
+        Member member = memberRepository.findByEmail(signInDto.getEmail()).orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
 
         // 비밀번호 체크
         memberService.isMatchedPassword(signInDto.getPassword(),member.getPassword());
 
         if(member.isDeleted())
-            throw new WithdrawnMemberAccessException();
+            throw new CustomException(ErrorCode.WITHDRAWN_MEMBER);
 
         // 토큰 발행
         JwtToken tokens = jwtTokenProvider.generateToken(member.getId(), member.getEmail(), member.getNickname());
@@ -111,5 +111,12 @@ public class AuthService {
         jwtTokenProvider.setBlacklist(token);
 
         return "로그아웃 완료";
+    }
+
+    /**
+     * 토큰 갱신
+     */
+    public JwtToken refreshToken(String token) {
+        return jwtTokenProvider.refresh(token);
     }
 }

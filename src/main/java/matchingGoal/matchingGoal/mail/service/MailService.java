@@ -5,10 +5,12 @@ import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import matchingGoal.matchingGoal.common.exception.CustomException;
 import matchingGoal.matchingGoal.common.service.RedisService;
+import matchingGoal.matchingGoal.common.type.ErrorCode;
 import matchingGoal.matchingGoal.mail.dto.MailDto;
 import matchingGoal.matchingGoal.mail.dto.MailVerificationDto;
-import matchingGoal.matchingGoal.mail.exception.InvalidValidationCodeException;
+import matchingGoal.matchingGoal.mail.dto.SendMailVerificationDto;
 import matchingGoal.matchingGoal.mail.model.entity.EmailContent;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.jsoup.Jsoup;
@@ -46,10 +48,9 @@ public class MailService {
 
     /**
      * 이메일 인증 메일 발송
-     * @param email - 이메일
      * @return 발송성공여부 (성공시 true)
      */
-    public Boolean sendVerificationMail(String email) {
+    public Boolean sendVerificationMail(SendMailVerificationDto sendMailVerificationDto) {
         final long redisDurationInMinutes = 3;
         final String TEMPLATE_NAME = "InitialEmailVerification.html";
         final String code = RandomStringUtils.random(7, true, true);
@@ -60,10 +61,10 @@ public class MailService {
         emailContent.add("code", code);
         emailContent.add("expire", expire);
 
-        if (!sendMail(email, TEMPLATE_NAME, emailContent))
+        if (!sendMail(sendMailVerificationDto.getEmail(), TEMPLATE_NAME, emailContent))
             return false;
 
-        redisService.setData(VALID_PREFIX + email, code, redisDurationInMinutes);
+        redisService.setData(VALID_PREFIX + sendMailVerificationDto.getEmail(), code, redisDurationInMinutes);
         return true;
     }
 
@@ -114,7 +115,7 @@ public class MailService {
     public void verifyMail(MailVerificationDto mailVerificationDto) {
         // 코드 불일치
         if (! redisService.getData(VALID_PREFIX+mailVerificationDto.getEmail()).equals(mailVerificationDto.getCode()) )
-            throw new InvalidValidationCodeException();
+            throw new CustomException(ErrorCode.INVALID_CODE);
 
         // 코드 일치
         redisService.deleteData(VALID_PREFIX+mailVerificationDto.getEmail());

@@ -1,8 +1,9 @@
 package matchingGoal.matchingGoal.mail.service;
 
+import matchingGoal.matchingGoal.common.exception.CustomException;
 import matchingGoal.matchingGoal.common.service.RedisService;
 import matchingGoal.matchingGoal.mail.dto.MailVerificationDto;
-import matchingGoal.matchingGoal.mail.exception.InvalidValidationCodeException;
+import matchingGoal.matchingGoal.mail.dto.SendMailVerificationDto;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,9 +23,11 @@ class MailServiceTest {
     @Value("${spring.mail.username}")
     private String username;
 
+    SendMailVerificationDto dto = SendMailVerificationDto.builder()
+            .email(username).build();
     @Test
     void sendMail(){
-        mailService.sendVerificationMail(username);
+        mailService.sendVerificationMail(dto);
     }
 
     @Test
@@ -39,7 +42,7 @@ class MailServiceTest {
                 .email(email)
                 .build();
 
-        assertThrows(InvalidValidationCodeException.class, () -> mailService.verifyMail(mailVerificationDto));
+        assertThrows(CustomException.class, () -> mailService.verifyMail(mailVerificationDto));
     }
 
     @Test

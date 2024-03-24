@@ -1,12 +1,10 @@
 package matchingGoal.matchingGoal.image.service;
 
 import lombok.AllArgsConstructor;
-import matchingGoal.matchingGoal.common.auth.JwtTokenProvider;
-import matchingGoal.matchingGoal.image.exception.InvalidFileFormatException;
-import matchingGoal.matchingGoal.image.exception.NotFoundImageException;
+import matchingGoal.matchingGoal.common.exception.CustomException;
+import matchingGoal.matchingGoal.common.type.ErrorCode;
 import matchingGoal.matchingGoal.image.model.entity.Image;
 import matchingGoal.matchingGoal.image.repository.ImageRepository;
-import matchingGoal.matchingGoal.member.repository.MemberRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -50,7 +48,7 @@ public class ImageService {
         String pathName = path + saveName;
 
         if (!Objects.requireNonNull(file.getContentType()).startsWith("image"))
-            throw new InvalidFileFormatException();
+            throw new CustomException(ErrorCode.INVALID_FILE_FORMAT);
 
         Path directory = Paths.get(path);
 

@@ -3,20 +3,17 @@ package matchingGoal.matchingGoal.member.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import matchingGoal.matchingGoal.common.auth.JwtTokenProvider;
+import matchingGoal.matchingGoal.common.exception.CustomException;
 import matchingGoal.matchingGoal.common.type.ErrorCode;
 import matchingGoal.matchingGoal.matching.domain.CancelType;
 import matchingGoal.matchingGoal.matching.domain.entity.*;
 import matchingGoal.matchingGoal.matching.dto.CommentHistoryDto;
-import matchingGoal.matchingGoal.matching.exception.NotFoundGameException;
+import matchingGoal.matchingGoal.matching.exception.PermissionException;
 import matchingGoal.matchingGoal.matching.repository.CommentRepository;
 import matchingGoal.matchingGoal.matching.repository.GameCancelRepository;
 import matchingGoal.matchingGoal.matching.repository.GameRepository;
 import matchingGoal.matchingGoal.matching.repository.ResultRepository;
 import matchingGoal.matchingGoal.member.dto.*;
-import matchingGoal.matchingGoal.member.exception.MemberNotFoundException;
-import matchingGoal.matchingGoal.member.exception.PasswordSameAsBeforeException;
-import matchingGoal.matchingGoal.member.exception.UnmatchedPasswordException;
-import matchingGoal.matchingGoal.member.exception.WithdrawnMemberAccessException;
 import matchingGoal.matchingGoal.member.model.entity.Member;
 import matchingGoal.matchingGoal.member.repository.MemberRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -61,7 +58,7 @@ public class MemberService {
         isMatchedPassword(passwordDto.getOldPassword(), member.getPassword());
 
         if(passwordDto.getOldPassword().equals(passwordDto.getNewPassword()))
-            throw new PasswordSameAsBeforeException();
+            throw new CustomException(ErrorCode.PASSWORD_NOT_UPDATED);
 
         member.setPassword(passwordEncoder.encode(passwordDto.getNewPassword()));
         return "변경완료";
@@ -72,10 +69,10 @@ public class MemberService {
      */
     public Member getMemberById(Long memberId){
         Member member = memberRepository.findById(memberId)
-                .orElseThrow(MemberNotFoundException::new);
+                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
 
         if (member.isDeleted())
-            throw new WithdrawnMemberAccessException();
+            throw new CustomException(ErrorCode.WITHDRAWN_MEMBER);
 
         return member;
     }
@@ -86,6 +83,16 @@ public class MemberService {
     public Member getMemberInfo(String token){
         jwtTokenProvider.validateToken(token);
         return getMemberById(jwtTokenProvider.getId(token));
+    }
+
+    /**
+     * 토큰이 해당 멤버인지 조회
+     */
+    public void checkMemberPermission(String token, Member allowed) {
+        Member member = getMemberInfo(token);
+        if (allowed != member) {
+            throw new PermissionException();
+        }
     }
 
     /**
@@ -129,7 +136,7 @@ public class MemberService {
     public void isMatchedPassword(String rawPassword, String encodedPassword){
         boolean isMatch = passwordEncoder.matches(rawPassword,encodedPassword);
         if (!isMatch)
-            throw new UnmatchedPasswordException();
+            throw new CustomException(ErrorCode.WRONG_PASSWORD);
     }
 
     /**
@@ -146,19 +153,14 @@ public class MemberService {
 
         List<ScheduleResponse> schedules = new ArrayList<>();
 
-        List<Game> games1 = gameRepository.findByTeam1AndDateBetween(member, startDate, endDate);
+        List<Game> games1 = gameRepository.findByTeam1AndDateBetweenAndTeam2IsNotNull(member, startDate, endDate); // 매칭된 경기만 불러오기
         List<Game> games2 = gameRepository.findByTeam2AndDateBetween(member, startDate, endDate);
         List<Game> allGames = Stream.concat(games1.stream(), games2.stream()).toList();
 
         for (Game game : allGames) {
-            try{
-                ScheduleResponse response = ScheduleResponse.of(game, member);
-                schedules.add(response);
-            }catch (Exception e){
-//                System.out.println("not matched game");
-            }
+            ScheduleResponse response = ScheduleResponse.of(game, member);
+            schedules.add(response);
         }
-
         return schedules;
     }
 
@@ -169,12 +171,12 @@ public class MemberService {
         Member member = getMemberById(memberId);
         List<MatchHistoryResponse> history = new ArrayList<>();
         List<Game> allGames = gameRepository
-                .findByTeam1OrTeam2AndDateLessThanEqualAndTimeLessThanOrderByDateDesc(
+                .findByTeam1OrTeam2AndTeam2IsNotNullAndDateLessThanEqualAndTimeLessThanOrderByDateDesc(
                         member, member, LocalDate.now(), LocalTime.now());
 
         for (Game game : allGames){
             try{
-                Result result = resultRepository.findByGameId(game.getId()).orElseThrow(NotFoundGameException::new);
+                Result result = resultRepository.findByGameId(game.getId()).orElseThrow(() -> new CustomException(ErrorCode.GAME_NOT_FOUND));
                 history.add(MatchHistoryResponse.of(member, result));
             }catch (Exception e){}
         }
@@ -238,7 +240,7 @@ public class MemberService {
         int cancel = 0, noshow = 0 ;
         Member member = getMemberById(memberId);
 
-        List<Game> allGames = gameRepository.findByTeam1OrTeam2AndDateLessThanEqualAndTimeLessThanOrderByDateDesc(member,member,LocalDate.now(),LocalTime.now());
+        List<Game> allGames = gameRepository.findByTeam1OrTeam2AndTeam2IsNotNullAndDateLessThanEqualAndTimeLessThanOrderByDateDesc(member,member,LocalDate.now(),LocalTime.now());
         List<GameCancel> cancelGames = gameCancelRepository.findByMember(member);
 
         for (GameCancel gameCancel : cancelGames){
