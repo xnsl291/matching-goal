@@ -2,8 +2,9 @@ package matchingGoal.matchingGoal.chat.service;
 
 
 
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import matchingGoal.matchingGoal.chat.dto.CreateChatRoomRequestDto;
 import matchingGoal.matchingGoal.chat.entity.ChatRoom;
 import matchingGoal.matchingGoal.chat.dto.ChatRoomListResponseDto;
@@ -57,7 +58,7 @@ class ChatRoomServiceTest {
     String id = chatRoomService.createChatRoom(1, dto);
 
     //when
-    List<Member> members2 = new ArrayList<>();
+    Set<Member> members2 = new HashSet<>();
     Member third = memberRepository.findById(3L).orElseThrow(RuntimeException::new);
     members2.add(third);
     chatRoomService.addMembers(id, members2);

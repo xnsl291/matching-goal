@@ -10,7 +10,6 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import java.time.LocalDateTime;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
@@ -54,7 +53,7 @@ public class ChatRoom {
 
     return room;
   }
-  public void addMembers(List<Member> members) {
+  public void addMembers(Set<Member> members) {
 
     this.chatRoomMembers.addAll(members);
   }
