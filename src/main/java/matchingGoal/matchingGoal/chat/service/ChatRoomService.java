@@ -1,8 +1,9 @@
 package matchingGoal.matchingGoal.chat.service;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import matchingGoal.matchingGoal.chat.dto.ChatMessageDto;
@@ -36,7 +37,7 @@ public class ChatRoomService {
     Member host = getMember(hostId);
     Member guest = getMember(request.getGuestId());
     long matchingBoardId = request.getMatchingBoardId();
-    List<Member> members = new ArrayList<>();
+    Set<Member> members = new HashSet<>();
 
     members.add(host);
     members.add(guest);
@@ -57,7 +58,7 @@ public class ChatRoomService {
     }
   }
 
-  public void addMembers(String chatRoomId, List<Member> members) {
+  public void addMembers(String chatRoomId, Set<Member> members) {
 
     ChatRoom room = chatRoomRepository.findById(chatRoomId)
         .orElseThrow(() -> new CustomException(ErrorCode.CHATROOM_NOT_FOUND));
