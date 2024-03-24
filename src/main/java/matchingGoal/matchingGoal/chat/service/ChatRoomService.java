@@ -32,6 +32,7 @@ public class ChatRoomService {
 
 
   public String createChatRoom(long hostId, CreateChatRoomRequestDto request) {
+
     Member host = getMember(hostId);
     Member guest = getMember(request.getGuestId());
     long matchingBoardId = request.getMatchingBoardId();
@@ -125,6 +126,7 @@ public class ChatRoomService {
 
   @Transactional
   public void closeChatRoom(long chatRoomId) {
+
     List<ChatRoom> chatRoomList = chatRoomList(chatRoomId);
 
     for (ChatRoom chatRoom : chatRoomList) {
