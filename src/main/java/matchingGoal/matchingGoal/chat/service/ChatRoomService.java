@@ -15,6 +15,7 @@ import matchingGoal.matchingGoal.chat.entity.ChatRoom;
 import matchingGoal.matchingGoal.chat.dto.ChatRoomListResponseDto;
 import matchingGoal.matchingGoal.chat.repository.ChatMessageRepository;
 import matchingGoal.matchingGoal.chat.repository.ChatRoomRepository;
+import matchingGoal.matchingGoal.common.auth.JwtTokenProvider;
 import matchingGoal.matchingGoal.common.exception.CustomException;
 import matchingGoal.matchingGoal.common.type.ErrorCode;
 import matchingGoal.matchingGoal.member.model.entity.Member;
@@ -30,15 +31,18 @@ public class ChatRoomService {
   private final ChatRoomRepository chatRoomRepository;
   private final MemberRepository memberRepository;
   private final ChatMessageRepository chatMessageRepository;
+  private final JwtTokenProvider jwtTokenProvider;
 
   @Transactional
-  public String createChatRoom(long hostId, CreateChatRoomRequestDto request) {
+  public String createChatRoom(String token, CreateChatRoomRequestDto request) {
 
+    jwtTokenProvider.validateToken(token);
+
+    long hostId = jwtTokenProvider.getId(token);
     Member host = getMember(hostId);
     Member guest = getMember(request.getGuestId());
     long matchingBoardId = request.getMatchingBoardId();
     Set<Member> members = new HashSet<>();
-
     members.add(host);
     members.add(guest);
     Optional<ChatRoom> optionalChatRoom = chatRoomRepository
@@ -67,19 +71,23 @@ public class ChatRoomService {
     log.info(chatRoomId + " 에 " + members.toString() + " 추가");
   }
 
-  public List<ChatRoomListResponseDto> myChat(long userId) {
+  public List<ChatRoomListResponseDto> myChat(String token) {
 
-    List<ChatRoom> myChat = chatRoomRepository.findListsByChatRoomMembersId(userId);
+    jwtTokenProvider.validateToken(token);
+    long memberId = jwtTokenProvider.getId(token);
+    List<ChatRoom> myChat = chatRoomRepository.findListsByChatRoomMembersId(memberId);
 
     return myChat.stream().map(ChatRoomListResponseDto::fromEntity).toList();
   }
 
   @Transactional
-  public void quit(long userId, String chatRoomId) {
+  public void quit(String token, String chatRoomId) {
 
+    jwtTokenProvider.validateToken(token);
+    long memberId = jwtTokenProvider.getId(token);
     ChatRoom chatRoom = getChatRoom(chatRoomId);
 
-    chatRoom.quit(userId);
+    chatRoom.quit(memberId);
   }
 
   @Transactional
@@ -95,11 +103,24 @@ public class ChatRoomService {
         .map(ChatMessageDto::fromEntity).toList();
   }
 
-  public ChatHistoryDto getChatHistory(String chatRoomId) {
+  public ChatHistoryDto getChatHistory(String token, String chatRoomId) {
 
+    jwtTokenProvider.validateToken(token);
+    long memberId = jwtTokenProvider.getId(token);
+    boolean isChatRoomMember = false;
     ChatRoom chatRoom = getChatRoom(chatRoomId);
     List<ChatRoomMemberDto> chatRoomMemberInfo = chatRoom.getChatRoomMembers().stream()
         .map(ChatRoomMemberDto::fromEntity).toList();
+
+    for (ChatRoomMemberDto member : chatRoomMemberInfo) {
+      if (member.getMemberId() == memberId) {
+        isChatRoomMember = true;
+        break;
+      }
+    }
+    if (!isChatRoomMember) {
+      throw new CustomException(ErrorCode.NOT_CHATROOM_MEMBER);
+    }
 
     List<ChatMessageDto> chatMessageList = getChatMessage(chatRoomId);
 

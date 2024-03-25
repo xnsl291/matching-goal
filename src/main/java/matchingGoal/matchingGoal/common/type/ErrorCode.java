@@ -55,6 +55,7 @@ public enum ErrorCode {
     NO_REQUIRED_INFO(HttpStatus.BAD_REQUEST, "stomp 연결에 필요한 정보가 없습니다."),
     //chat
     CHATROOM_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 채팅방 입니다."),
+    NOT_CHATROOM_MEMBER(HttpStatus.BAD_REQUEST, "채팅 참여자가 아닙니다"),
     //ALARM
     ALARM_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 알림 입니다."),
     MEMBER_NOT_MATCHED(HttpStatus.BAD_REQUEST, "이용자가 일치하지 않습니다."),
