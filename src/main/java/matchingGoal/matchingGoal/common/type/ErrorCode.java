@@ -49,7 +49,6 @@ public enum ErrorCode {
     CANCEL_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 취소 신청입니다."), 
     ALREADY_ACCEPTED_CANCEL(HttpStatus.BAD_REQUEST, "이미 수락된 취소 신청입니다."),
 
-
     //Stomp
     NO_REQUIRED_INFO(HttpStatus.BAD_REQUEST, "stomp 연결에 필요한 정보가 없습니다."),
     //chat
