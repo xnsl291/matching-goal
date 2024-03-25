@@ -38,7 +38,11 @@ public class GameService {
     Game game = gameRepository.findById(gameId)
         .orElseThrow(() -> new CustomException(ErrorCode.GAME_NOT_FOUND));
 
-    memberService.checkMemberPermission(token, game.getTeam2());
+//    memberService.checkMemberPermission(token, game.getTeam2());
+    Member member = memberService.getMemberInfo(token);
+    if (game.getTeam1() != member && game.getTeam2() != member) {
+      throw new CustomException(ErrorCode.NO_PERMISSION);
+    }
 
     if (resultRepository.existsByGame(game)) {
       throw new CustomException(ErrorCode.ALREADY_RESULT_EXISTS);
@@ -49,43 +53,43 @@ public class GameService {
         .score1(resultDto.getScore1())
         .score2(resultDto.getScore2())
         .duration(resultDto.getDuration())
-        .isAccepted(null)
+//        .isAccepted(null)
         .build();
     resultRepository.save(result);
 
     return ResultResponseDto.of(result);
   }
 
-  @Transactional
-  public ResultResponseDto updateResult(String token, Long resultId, ResultDto resultDto) {
-    Result result = resultRepository.findById(resultId)
-        .orElseThrow(() -> new CustomException(ErrorCode.REQUEST_NOT_FOUND));
-
-    memberService.checkMemberPermission(token, result.getGame().getTeam2());
-
-    if (Boolean.TRUE.equals(result.getIsAccepted())) {
-      throw new CustomException(ErrorCode.ALREADY_ACCEPTED_RESULT);
-    }
-
-    result.update(resultDto);
-    return ResultResponseDto.of(result);
-  }
-
-  @Transactional
-  public ResultResponseDto handleResult(String token, Long resultId, boolean isAccepted) {
-    Result result = resultRepository.findById(resultId)
-        .orElseThrow(() -> new CustomException(ErrorCode.RESULT_NOT_FOUND));
-
-    memberService.checkMemberPermission(token, result.getGame().getTeam1());
-
-    if (Boolean.TRUE.equals(result.getIsAccepted())) {
-      throw new CustomException(ErrorCode.ALREADY_ACCEPTED_RESULT);
-    }
-
-    result.setIsAccepted(isAccepted);
-
-    return ResultResponseDto.of(result);
-  }
+//  @Transactional
+//  public ResultResponseDto updateResult(String token, Long resultId, ResultDto resultDto) {
+//    Result result = resultRepository.findById(resultId)
+//        .orElseThrow(() -> new CustomException(ErrorCode.REQUEST_NOT_FOUND));
+//
+//    memberService.checkMemberPermission(token, result.getGame().getTeam2());
+//
+//    if (Boolean.TRUE.equals(result.getIsAccepted())) {
+//      throw new CustomException(ErrorCode.ALREADY_ACCEPTED_RESULT);
+//    }
+//
+//    result.update(resultDto);
+//    return ResultResponseDto.of(result);
+//  }
+//
+//  @Transactional
+//  public ResultResponseDto handleResult(String token, Long resultId, boolean isAccepted) {
+//    Result result = resultRepository.findById(resultId)
+//        .orElseThrow(() -> new CustomException(ErrorCode.RESULT_NOT_FOUND));
+//
+//    memberService.checkMemberPermission(token, result.getGame().getTeam1());
+//
+//    if (Boolean.TRUE.equals(result.getIsAccepted())) {
+//      throw new CustomException(ErrorCode.ALREADY_ACCEPTED_RESULT);
+//    }
+//
+//    result.setIsAccepted(isAccepted);
+//
+//    return ResultResponseDto.of(result);
+//  }
 
   public CommentHistoryDto writeComment(String token, Long gameId, CommentDto commentDto) {
     Game game = gameRepository.findById(gameId)

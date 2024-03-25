@@ -36,8 +36,8 @@ public class Result {
 
   private Integer duration;
 
-  @Setter
-  private Boolean isAccepted;
+//  @Setter
+//  private Boolean isAccepted;
 
   public void update(ResultDto resultDto) {
     this.score1 = resultDto.getScore1();
