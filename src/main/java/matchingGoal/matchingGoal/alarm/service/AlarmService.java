@@ -71,17 +71,17 @@ public class AlarmService {
 
   //수신확인
   @Transactional
-  public void checkOut(String token, long alarmId) {
+  public void checkOut(String token, List<Long> alarmIdList) {
 
     jwtTokenProvider.validateToken(token);
-
     long memberId = jwtTokenProvider.getId(token);
-    Alarm alarm = getAlarmEntity(alarmId);
-
-    if (alarm.getMemberId() != memberId) {
-      throw new CustomException(ErrorCode.MEMBER_NOT_MATCHED);
+    for (long alarmId : alarmIdList) {
+      Alarm alarm = getAlarmEntity(alarmId);
+      if (alarm.getMemberId() != memberId) {
+        throw new CustomException(ErrorCode.MEMBER_NOT_MATCHED);
+      }
+      alarm.checkOut();
     }
-    alarm.checkOut();
   }
 
   public Alarm getAlarmEntity(long alarmId) {
