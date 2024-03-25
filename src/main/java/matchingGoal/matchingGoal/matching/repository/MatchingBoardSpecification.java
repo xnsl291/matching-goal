@@ -3,6 +3,7 @@ package matchingGoal.matchingGoal.matching.repository;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.Predicate;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -45,6 +46,14 @@ public class MatchingBoardSpecification {
 
       predicates.add(criteriaBuilder.isFalse(root.get("isDeleted")));
       predicates.add(criteriaBuilder.equal(root.get("status"), StatusType.OPEN));
+
+      predicates.add(criteriaBuilder.or(
+          criteriaBuilder.greaterThan(root.get("game").get("date"), LocalDate.now()),
+          criteriaBuilder.and(
+              criteriaBuilder.equal(root.get("game").get("date"), LocalDate.now()),
+              criteriaBuilder.greaterThan(root.get("game").get("time"), LocalTime.now())
+          )
+      ));
 
       return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
     });

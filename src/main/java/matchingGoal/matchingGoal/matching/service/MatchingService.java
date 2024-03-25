@@ -3,6 +3,7 @@ package matchingGoal.matchingGoal.matching.service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -274,7 +275,19 @@ public class MatchingService {
     List<MatchingRequest> requestList = requestRepository.findByBoardId(boardId)
         .orElse(Collections.emptyList());
 
-    return requestList.stream().map(MatchingRequestResponseDto::of)
+    return requestList.stream()
+        .map(MatchingRequestResponseDto::of)
+        .sorted(Comparator.comparing(MatchingRequestResponseDto::getCreatedDate))
+        .collect(Collectors.toList());
+  }
+
+  public List<MatchingRequestResponseDto> getRequestListByMember(Long memberId) {
+    List<MatchingBoard> boardList = boardRepository.findByMemberIdAndStatus(memberId, StatusType.OPEN)
+        .orElse(Collections.emptyList());
+
+    return boardList.stream()
+        .map(board -> getRequestList(board.getId()))
+        .flatMap(List::stream)
         .sorted(Comparator.comparing(MatchingRequestResponseDto::getCreatedDate))
         .collect(Collectors.toList());
   }

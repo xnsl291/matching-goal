@@ -2,6 +2,7 @@ package matchingGoal.matchingGoal.matching.repository;
 
 import java.util.List;
 import java.util.Optional;
+import matchingGoal.matchingGoal.matching.domain.StatusType;
 import matchingGoal.matchingGoal.matching.domain.entity.MatchingBoard;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -26,4 +27,5 @@ public interface MatchingBoardRepository extends JpaRepository<MatchingBoard, Lo
 
   Page<MatchingBoard> findAll(Specification<MatchingBoard> spec, Pageable pageable);
 
+  Optional<List<MatchingBoard>> findByMemberIdAndStatus(Long memberId, StatusType statusType);
 }

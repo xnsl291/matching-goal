@@ -80,9 +80,14 @@ public class MatchingController {
     return ResponseEntity.ok(matchingService.requestMatching(token, boardId));
   }
 
-  @GetMapping("/{boardId}/request-list")
-  public ResponseEntity<List<MatchingRequestResponseDto>> getRequestList(@PathVariable Long boardId) {
-    return ResponseEntity.ok(matchingService.getRequestList(boardId));
+//  @GetMapping("/{boardId}/request-list")
+//  public ResponseEntity<List<MatchingRequestResponseDto>> getRequestList(@PathVariable Long boardId) {
+//    return ResponseEntity.ok(matchingService.getRequestList(boardId));
+//  }
+
+  @GetMapping("/{memberId}/request-list")
+  public ResponseEntity<List<MatchingRequestResponseDto>> getRequestList(@PathVariable Long memberId) {
+    return ResponseEntity.ok(matchingService.getRequestListByMember(memberId));
   }
 
   @PostMapping("/{requestId}/accept")
