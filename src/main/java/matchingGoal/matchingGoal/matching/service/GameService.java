@@ -2,6 +2,8 @@ package matchingGoal.matchingGoal.matching.service;
 
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
+import matchingGoal.matchingGoal.common.exception.CustomException;
+import matchingGoal.matchingGoal.common.type.ErrorCode;
 import matchingGoal.matchingGoal.matching.domain.CancelType;
 import matchingGoal.matchingGoal.matching.domain.StatusType;
 import matchingGoal.matchingGoal.matching.domain.entity.Comment;
@@ -13,15 +15,6 @@ import matchingGoal.matchingGoal.matching.dto.CommentDto;
 import matchingGoal.matchingGoal.matching.dto.CommentHistoryDto;
 import matchingGoal.matchingGoal.matching.dto.ResultDto;
 import matchingGoal.matchingGoal.matching.dto.ResultResponseDto;
-import matchingGoal.matchingGoal.matching.exception.AcceptedCancelException;
-import matchingGoal.matchingGoal.matching.exception.AcceptedResultException;
-import matchingGoal.matchingGoal.matching.exception.ExistingCommentException;
-import matchingGoal.matchingGoal.matching.exception.ExistingResultException;
-import matchingGoal.matchingGoal.matching.exception.NotAvailableTimeException;
-import matchingGoal.matchingGoal.matching.exception.NotFoundCancelException;
-import matchingGoal.matchingGoal.matching.exception.NotFoundGameException;
-import matchingGoal.matchingGoal.matching.exception.NotFoundResultException;
-import matchingGoal.matchingGoal.matching.exception.PermissionException;
 import matchingGoal.matchingGoal.matching.repository.CommentRepository;
 import matchingGoal.matchingGoal.matching.repository.GameCancelRepository;
 import matchingGoal.matchingGoal.matching.repository.GameRepository;
@@ -43,12 +36,12 @@ public class GameService {
 
   public ResultResponseDto writeResult(String token, Long gameId, ResultDto resultDto) {
     Game game = gameRepository.findById(gameId)
-        .orElseThrow(NotFoundGameException::new);
+        .orElseThrow(() -> new CustomException(ErrorCode.GAME_NOT_FOUND));
 
     memberService.checkMemberPermission(token, game.getTeam2());
 
     if (resultRepository.existsByGame(game)) {
-      throw new ExistingResultException();
+      throw new CustomException(ErrorCode.ALREADY_RESULT_EXISTS);
     }
 
     Result result = Result.builder()
@@ -66,12 +59,12 @@ public class GameService {
   @Transactional
   public ResultResponseDto updateResult(String token, Long resultId, ResultDto resultDto) {
     Result result = resultRepository.findById(resultId)
-        .orElseThrow(NotFoundResultException::new);
+        .orElseThrow(() -> new CustomException(ErrorCode.REQUEST_NOT_FOUND));
 
     memberService.checkMemberPermission(token, result.getGame().getTeam2());
 
     if (Boolean.TRUE.equals(result.getIsAccepted())) {
-      throw new AcceptedResultException();
+      throw new CustomException(ErrorCode.ALREADY_ACCEPTED_RESULT);
     }
 
     result.update(resultDto);
@@ -81,12 +74,12 @@ public class GameService {
   @Transactional
   public ResultResponseDto handleResult(String token, Long resultId, boolean isAccepted) {
     Result result = resultRepository.findById(resultId)
-        .orElseThrow(NotFoundResultException::new);
+        .orElseThrow(() -> new CustomException(ErrorCode.RESULT_NOT_FOUND));
 
     memberService.checkMemberPermission(token, result.getGame().getTeam1());
 
     if (Boolean.TRUE.equals(result.getIsAccepted())) {
-      throw new AcceptedResultException();
+      throw new CustomException(ErrorCode.ALREADY_ACCEPTED_RESULT);
     }
 
     result.setIsAccepted(isAccepted);
@@ -96,7 +89,7 @@ public class GameService {
 
   public CommentHistoryDto writeComment(String token, Long gameId, CommentDto commentDto) {
     Game game = gameRepository.findById(gameId)
-        .orElseThrow(NotFoundGameException::new);
+        .orElseThrow(() -> new CustomException(ErrorCode.GAME_NOT_FOUND));
 
     Member member = memberService.getMemberInfo(token);
     Member opponent;
@@ -105,11 +98,11 @@ public class GameService {
     } else if (game.getTeam2() == member) {
       opponent = game.getTeam1();
     } else {
-      throw new PermissionException();
+      throw new CustomException(ErrorCode.NO_PERMISSION);
     }
 
     if (commentRepository.existsByGame(game)) {
-      throw new ExistingCommentException();
+      throw new CustomException(ErrorCode.ALREADY_COMMENT_EXISTS);
     }
 
     Comment comment = Comment.builder()
@@ -128,16 +121,16 @@ public class GameService {
 
   public CancelResponseDto cancelGame(String token, Long gameId) {
     Game game = gameRepository.findById(gameId)
-        .orElseThrow(NotFoundGameException::new);
+        .orElseThrow(() -> new CustomException(ErrorCode.GAME_NOT_FOUND));
 
     Member member = memberService.getMemberInfo(token);
     if (game.getTeam1() != member && game.getTeam2() != member) {
-      throw new PermissionException();
+      throw new CustomException(ErrorCode.NO_PERMISSION);
     }
 
     LocalDateTime gameDateTime = LocalDateTime.of(game.getDate(), game.getTime());
     if (LocalDateTime.now().isAfter(gameDateTime.minusHours(24))) {
-      throw new NotAvailableTimeException();
+      throw new CustomException(ErrorCode.NOT_AVAILABLE_TIME);
     }
 
     GameCancel cancel = GameCancel.builder()
@@ -154,16 +147,16 @@ public class GameService {
 
   public String noshowGame(String token, Long gameId) {
     Game game = gameRepository.findById(gameId)
-        .orElseThrow(NotFoundGameException::new);
+        .orElseThrow(() -> new CustomException(ErrorCode.GAME_NOT_FOUND));
 
     Member member = memberService.getMemberInfo(token);
     if (game.getTeam1() != member && game.getTeam2() != member) {
-      throw new PermissionException();
+      throw new CustomException(ErrorCode.NO_PERMISSION);
     }
 
     LocalDateTime gameDateTime = LocalDateTime.of(game.getDate(), game.getTime());
     if (LocalDateTime.now().isBefore(gameDateTime.plusMinutes(10))) {
-      throw new NotAvailableTimeException();
+      throw new CustomException(ErrorCode.NOT_AVAILABLE_TIME);
     }
 
     Member noshowMember = member.equals(game.getTeam1()) ? game.getTeam2() : game.getTeam1();
@@ -183,14 +176,14 @@ public class GameService {
   @Transactional
   public CancelResponseDto handleCancel(String token, Long cancelId, boolean isAgreed) {
     GameCancel cancel = cancelRepository.findById(cancelId)
-        .orElseThrow(NotFoundCancelException::new);
+        .orElseThrow(() -> new CustomException(ErrorCode.CANCEL_NOT_FOUND));
     Game game = cancel.getGame();
 
     Member acceptMember = cancel.getMember().equals(game.getTeam1()) ? game.getTeam2() : game.getTeam1();
     memberService.checkMemberPermission(token, acceptMember);
 
     if (Boolean.TRUE.equals(cancel.getIsAgreed())) {
-      throw new AcceptedCancelException();
+      throw new CustomException(ErrorCode.ALREADY_ACCEPTED_CANCEL);
     }
 
     cancel.setIsAgreed(isAgreed);

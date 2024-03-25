@@ -12,21 +12,17 @@ import lombok.RequiredArgsConstructor;
 import matchingGoal.matchingGoal.alarm.domain.AlarmType;
 import matchingGoal.matchingGoal.alarm.service.AlarmService;
 import matchingGoal.matchingGoal.chat.service.ChatRoomService;
+import matchingGoal.matchingGoal.common.exception.CustomException;
+import matchingGoal.matchingGoal.common.type.ErrorCode;
 import matchingGoal.matchingGoal.matching.domain.StatusType;
 import matchingGoal.matchingGoal.matching.domain.entity.Game;
 import matchingGoal.matchingGoal.matching.domain.entity.MatchingBoard;
 import matchingGoal.matchingGoal.matching.domain.entity.MatchingRequest;
 import matchingGoal.matchingGoal.matching.dto.BoardDto;
 import matchingGoal.matchingGoal.matching.dto.BoardResponseDto;
+import matchingGoal.matchingGoal.matching.dto.BoardUpdateDto;
 import matchingGoal.matchingGoal.matching.dto.ListBoardDto;
 import matchingGoal.matchingGoal.matching.dto.MatchingRequestResponseDto;
-import matchingGoal.matchingGoal.matching.dto.BoardUpdateDto;
-import matchingGoal.matchingGoal.matching.exception.AlreadyRequestException;
-import matchingGoal.matchingGoal.matching.exception.CompletedMatchingException;
-import matchingGoal.matchingGoal.matching.exception.DeletedPostException;
-import matchingGoal.matchingGoal.matching.exception.NotFoundPostException;
-import matchingGoal.matchingGoal.matching.exception.NotFoundRequestException;
-import matchingGoal.matchingGoal.matching.exception.SelfRequestException;
 import matchingGoal.matchingGoal.matching.repository.GameRepository;
 import matchingGoal.matchingGoal.matching.repository.MatchingBoardRepository;
 import matchingGoal.matchingGoal.matching.repository.MatchingBoardSpecification;
@@ -156,12 +152,12 @@ public class MatchingService {
    */
   public BoardResponseDto getBoardById(Long boardId) {
     MatchingBoard matchingBoard = boardRepository.findById(boardId)
-        .orElseThrow(NotFoundPostException::new);
+        .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
 
     boardRepository.increaseViewCountById(boardId);
 
     if (matchingBoard.getIsDeleted()) {
-      throw new DeletedPostException();
+      throw new CustomException(ErrorCode.DELETED_POST);
     }
 
     return BoardResponseDto.of(matchingBoard);
@@ -176,12 +172,16 @@ public class MatchingService {
   @Transactional
   public BoardResponseDto updateBoard(String token, Long boardId, BoardUpdateDto requestDto) {
     MatchingBoard board = boardRepository.findById(boardId)
-        .orElseThrow(NotFoundPostException::new);
+        .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
 
     memberService.checkMemberPermission(token, board.getMember());
 
     if (board.getIsDeleted()) {
-      throw new DeletedPostException();
+      throw new CustomException(ErrorCode.DELETED_POST);
+    }
+
+    if (board.getStatus() == StatusType.CLOSED) {
+      throw new CustomException(ErrorCode.ALREADY_COMPLETED_MATCHING);
     }
 
     board.update(requestDto);
@@ -197,16 +197,16 @@ public class MatchingService {
   @Transactional
   public Long deleteBoard(String token, Long boardId) {
     MatchingBoard board = boardRepository.findById(boardId)
-        .orElseThrow(NotFoundPostException::new);
+        .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
 
     memberService.checkMemberPermission(token, board.getMember());
 
     if (board.getIsDeleted()) {
-      throw new DeletedPostException();
+      throw new CustomException(ErrorCode.DELETED_POST);
     }
 
     if (board.getStatus() == StatusType.CLOSED) {
-      throw new CompletedMatchingException();
+      throw new CustomException(ErrorCode.ALREADY_COMPLETED_MATCHING);
     }
 
     List<MatchingRequest> requests = requestRepository.findByBoardId(boardId)
@@ -231,23 +231,23 @@ public class MatchingService {
   @Transactional
   public String requestMatching(String token, Long boardId) {
     MatchingBoard board = boardRepository.findById(boardId)
-        .orElseThrow(NotFoundPostException::new);
+        .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
     Member member = memberService.getMemberInfo(token);
 
     if (board.getIsDeleted()) {
-      throw new DeletedPostException();
+      throw new CustomException(ErrorCode.DELETED_POST);
     }
 
     if (board.getStatus() == StatusType.CLOSED) {
-      throw new CompletedMatchingException();
+      throw new CustomException(ErrorCode.ALREADY_COMPLETED_MATCHING);
     }
 
     if (board.getMember() == member) {
-      throw new SelfRequestException();
+      throw new CustomException(ErrorCode.SELF_REQUEST);
     }
 
     if (requestRepository.existsByBoardIdAndMemberId(boardId, member.getId())) {
-      throw new AlreadyRequestException();
+      throw new CustomException(ErrorCode.ALREADY_REQUEST_MATCHING);
     }
 
     MatchingRequest matchingRequest = MatchingRequest.builder()
@@ -287,13 +287,13 @@ public class MatchingService {
   @Transactional
   public String acceptRequest(String token, Long requestId) {
     MatchingRequest request = requestRepository.findById(requestId)
-        .orElseThrow(NotFoundRequestException::new);
+        .orElseThrow(() -> new CustomException(ErrorCode.REQUEST_NOT_FOUND));
     MatchingBoard matchingBoard = request.getBoard();
     long matchingBoardId = matchingBoard.getId();
     memberService.checkMemberPermission(token, request.getBoard().getMember());
 
     if (request.getBoard().getStatus() == StatusType.CLOSED) {
-      throw new CompletedMatchingException();
+      throw new CustomException(ErrorCode.ALREADY_COMPLETED_MATCHING);
     }
 
     request.setIsAccepted(true);
@@ -327,12 +327,12 @@ public class MatchingService {
   @Transactional
   public String refuseRequest(String token, Long requestId) {
     MatchingRequest request = requestRepository.findById(requestId)
-        .orElseThrow(NotFoundRequestException::new);
+        .orElseThrow(() -> new CustomException(ErrorCode.REQUEST_NOT_FOUND));
 
     memberService.checkMemberPermission(token, request.getBoard().getMember());
 
     if (request.getBoard().getStatus() == StatusType.CLOSED) {
-      throw new CompletedMatchingException();
+      throw new CustomException(ErrorCode.ALREADY_REQUEST_MATCHING);
     }
     alarmService.createAlarm(request.getMember().getId(), AlarmType.MATCHING_REQUEST_DENIED,
         String.valueOf(request.getBoard().getId()));
@@ -343,7 +343,7 @@ public class MatchingService {
 
   private Optional<List<MatchingRequest>> findSameTimeRequests(Long requestId) {
     MatchingRequest request = requestRepository.findById(requestId)
-        .orElseThrow(NotFoundRequestException::new);
+        .orElseThrow(() -> new CustomException(ErrorCode.REQUEST_NOT_FOUND));
 
     Game game = request.getBoard().getGame();
     LocalDate date = game.getDate();
