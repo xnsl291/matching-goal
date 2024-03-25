@@ -40,7 +40,7 @@ public class AuthService {
             throw new CustomException(ErrorCode.DUPLICATED_EMAIL);
 
         // 닉네임 중복 확인
-        if (! memberService.isDuplicatedNickname(registerDto.getNickname()))
+        if (memberService.isDuplicatedNickname(registerDto.getNickname()))
             throw new CustomException(ErrorCode.DUPLICATED_NICKNAME);
 
         Member member = Member.builder()

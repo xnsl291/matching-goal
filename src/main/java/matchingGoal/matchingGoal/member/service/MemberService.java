@@ -41,10 +41,10 @@ public class MemberService {
 
     /**
      * 닉네임 중복 체크
-     * @return 중복 닉네임 존재시, false 반환
+     * @return 중복 닉네임 존재시, true 반환
      */
     public Boolean isDuplicatedNickname(String nickname) {
-        return memberRepository.findByNickname(nickname).isEmpty();
+        return memberRepository.findByNickname(nickname).isPresent();
     }
 
     /**
@@ -105,11 +105,22 @@ public class MemberService {
     public String editMemberInfo(String token, UpdateMemberDto updateDto) {
         Member member = getMemberInfo(token);
 
-        member.setName(updateDto.getName());
-        member.setNickname(updateDto.getNickname());
-        member.setIntroduction(updateDto.getIntroduction());
-        member.setRegion(updateDto.getRegion());
-        member.setImageUrl(updateDto.getImageUrl());
+        // 닉네임 중복검사
+        if (updateDto.getNickname() != null)
+        {
+            if (isDuplicatedNickname(updateDto.getNickname()))
+                throw new CustomException(ErrorCode.DUPLICATED_NICKNAME);
+            member.setNickname(updateDto.getNickname());
+        }
+
+        if(updateDto.getName() != null)
+            member.setName(updateDto.getName());
+        if(updateDto.getIntroduction() != null)
+            member.setIntroduction(updateDto.getIntroduction());
+        if(updateDto.getRegion() != null)
+            member.setRegion(updateDto.getRegion());
+        if(updateDto.getImageUrl() != null)
+            member.setImageUrl(updateDto.getImageUrl());
         return "수정완료";
     }
 
