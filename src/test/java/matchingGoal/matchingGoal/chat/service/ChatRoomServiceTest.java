@@ -37,7 +37,7 @@ class ChatRoomServiceTest {
                                     .guestId(1)
                                     .build();
     //when
-    String id = chatRoomService.createChatRoom(1, dto);
+    String id = chatRoomService.createChatRoom("tokenhere", dto);
 
     //then
     ChatRoom newChat = chatRoomRepository.findById(id).orElseThrow(RuntimeException::new);
@@ -55,7 +55,7 @@ class ChatRoomServiceTest {
         .matchingBoardId(1)
         .guestId(1)
         .build();
-    String id = chatRoomService.createChatRoom(1, dto);
+    String id = chatRoomService.createChatRoom("tokenhere", dto);
 
     //when
     Set<Member> members2 = new HashSet<>();
@@ -80,10 +80,10 @@ class ChatRoomServiceTest {
         .matchingBoardId(1)
         .guestId(1)
         .build();
-    String id = chatRoomService.createChatRoom(1, dto);
+    String id = chatRoomService.createChatRoom("tokenhere", dto);
 
     //when
-    List<ChatRoomListResponseDto> result = chatRoomService.myChat(1L);
+    List<ChatRoomListResponseDto> result = chatRoomService.myChat("tokenhere");
 
     boolean check = !result.isEmpty();
     //then
@@ -100,11 +100,11 @@ class ChatRoomServiceTest {
         .matchingBoardId(1)
         .guestId(1)
         .build();
-    String id = chatRoomService.createChatRoom(1, dto);
+    String id = chatRoomService.createChatRoom("tokenhere", dto);
 
     //when
 
-    chatRoomService.quit(2, id);
+    chatRoomService.quit("tokenhere", id);
     ChatRoom chatRoom = chatRoomRepository.findById(id).orElseThrow(RuntimeException::new);
 
     boolean result = chatRoom.getChatRoomMembers().size() == 1;

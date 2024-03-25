@@ -6,7 +6,6 @@ import matchingGoal.matchingGoal.chat.dto.ChatHistoryDto;
 import matchingGoal.matchingGoal.chat.dto.ChatRoomListResponseDto;
 import matchingGoal.matchingGoal.chat.dto.CreateChatRoomRequestDto;
 import matchingGoal.matchingGoal.chat.service.ChatRoomService;
-import matchingGoal.matchingGoal.common.auth.JwtTokenProvider;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,16 +22,13 @@ import org.springframework.web.bind.annotation.RestController;
 public class ChatRoomController {
 
   private final ChatRoomService chatRoomService;
-  private final JwtTokenProvider jwtTokenProvider;
 
   @PostMapping("/personal")
   public ResponseEntity<String> createChatRoom(@RequestHeader(value = "authorization") String token,
       @RequestBody
       CreateChatRoomRequestDto request) {
 
-    token = token.substring(7);
-    long hostId = jwtTokenProvider.getId(token);
-    String result = chatRoomService.createChatRoom(hostId, request);
+    String result = chatRoomService.createChatRoom(token, request);
 
     return ResponseEntity.ok(result);
   }
@@ -41,10 +37,7 @@ public class ChatRoomController {
   public ResponseEntity<List<ChatRoomListResponseDto>> myChats(
       @RequestHeader(value = "authorization") String token) {
 
-    token = token.substring(7);
-    long userId = jwtTokenProvider.getId(token);
-
-    List<ChatRoomListResponseDto> result = chatRoomService.myChat(userId);
+    List<ChatRoomListResponseDto> result = chatRoomService.myChat(token);
 
     return ResponseEntity.ok(result);
   }
@@ -54,17 +47,15 @@ public class ChatRoomController {
   public ResponseEntity<?> quitChatRoom(@RequestHeader(value = "authorization") String token,
       @PathVariable String chatRoomId) {
 
-    long userId = jwtTokenProvider.getId(token);
-
-    chatRoomService.quit(userId, chatRoomId);
+    chatRoomService.quit(token, chatRoomId);
 
     return ResponseEntity.ok(null);
   }
 
   @GetMapping("/{chatRoomId}")
-  public ResponseEntity<ChatHistoryDto> chatHistory(@PathVariable String chatRoomId) {
+  public ResponseEntity<ChatHistoryDto> chatHistory(@RequestHeader(value = "authorization") String token, @PathVariable String chatRoomId) {
 
-    ChatHistoryDto result = chatRoomService.getChatHistory(chatRoomId);
+    ChatHistoryDto result = chatRoomService.getChatHistory(token, chatRoomId);
 
     return ResponseEntity.ok(result);
   }
