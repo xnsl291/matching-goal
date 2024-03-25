@@ -54,6 +54,8 @@ public class JwtTokenProvider {
 
 
     public void validateToken(String token) {
+        token = getRawToken(token);
+
         try {
             // 로그아웃한 토큰일 경우
             if (redisService.hasKeyAndValue( BLACK_TOKEN_PREFIX + getEmail(token) , token))
@@ -87,6 +89,8 @@ public class JwtTokenProvider {
     }
 
     private Claims parseClaims(String token) {
+        token = getRawToken(token);
+
         try {
             return Jwts.parser().setSigningKey(key)
                     .parseClaimsJws(token).getBody();
@@ -101,7 +105,7 @@ public class JwtTokenProvider {
     }
 
     public void saveRefreshToken(String email, String token) {
-        redisService.setData(getRefreshTokenKey(email), token, refreshTokenExpirationTimeInSeconds);
+        redisService.setData(getRefreshTokenKey(email), getRawToken(token), refreshTokenExpirationTimeInSeconds);
     }
 
     public void deleteToken(String email) {
@@ -113,6 +117,8 @@ public class JwtTokenProvider {
     }
 
     public void setBlacklist(String token) {
+        token = getRawToken(token);
+
         redisService.setBlackList(BLACK_TOKEN_PREFIX + getEmail(token), token, refreshTokenExpirationTimeInSeconds);
     }
 
@@ -120,6 +126,8 @@ public class JwtTokenProvider {
      * 토큰 갱신
      */
     public JwtToken refresh(String token){
+        token = getRawToken(token);
+
         // 토큰 검증
         validateToken(token);
         Member member = memberRepository.findByEmail(getEmail(token)).orElseThrow(()->new CustomException(ErrorCode.MEMBER_NOT_FOUND));
@@ -128,5 +136,9 @@ public class JwtTokenProvider {
             throw new CustomException(ErrorCode.EXPIRED_TOKEN);
 
         return generateToken(member.getId(),member.getEmail(),member.getNickname());
+    }
+
+    private String getRawToken(String token) {
+        return token.replace("Bearer ","");
     }
 }
