@@ -1,6 +1,7 @@
 package matchingGoal.matchingGoal.alarm.service;
 
 
+import java.util.ArrayList;
 import java.util.List;
 import matchingGoal.matchingGoal.alarm.domain.AlarmType;
 import matchingGoal.matchingGoal.alarm.dto.AlarmDto;
@@ -56,11 +57,12 @@ class AlarmServiceTest  {
     token = "bearer " + token;
     alarmService.createAlarm(token, dto);
     List<AlarmDto> alarmList = alarmService.getAlarm(token);
-    long id = alarmList.get(0).getId();
+    List<Long> alarmIdList = new ArrayList<>();
+    alarmIdList.add(alarmList.get(0).getId());
     //when
-    alarmService.checkOut(token, id);
+    alarmService.checkOut(token, alarmIdList);
     //then
-    assert(alarmService.getAlarmEntity(id).getCheckedOut() == 1);
+    assert(alarmService.getAlarmEntity(alarmIdList.get(0)).getCheckedOut() == 1);
   }
 
   @Test

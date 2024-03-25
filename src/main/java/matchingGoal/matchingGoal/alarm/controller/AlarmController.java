@@ -7,7 +7,6 @@ import matchingGoal.matchingGoal.alarm.service.AlarmService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -37,9 +36,9 @@ public class AlarmController {
   }
 
   @PatchMapping("/{alarmId}")
-  public ResponseEntity<?> checkOut (@RequestHeader(value = "authorization") String token, @PathVariable(value = "alarmId") long alarmId) {
+  public ResponseEntity<?> checkOut (@RequestHeader(value = "authorization") String token, @RequestBody List<Long> alarmIdList) {
 
-    alarmService.checkOut(token, alarmId);
+    alarmService.checkOut(token, alarmIdList);
 
     return ResponseEntity.ok(null);
   }
