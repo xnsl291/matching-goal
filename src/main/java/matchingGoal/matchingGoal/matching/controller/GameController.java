@@ -31,27 +31,27 @@ public class GameController {
     return ResponseEntity.ok(gameService.writeResult(token, gameId, resultDto));
   }
 
-  @PatchMapping("/result/{resultId}")
-  public ResponseEntity<ResultResponseDto> updateResult(
-      @RequestHeader(value = "Authorization") String token,
-      @PathVariable Long resultId,
-      @Valid @RequestBody ResultDto resultDto) {
-    return ResponseEntity.ok(gameService.updateResult(token, resultId, resultDto));
-  }
-
-  @PostMapping("/result/{resultId}/accept")
-  public ResponseEntity<ResultResponseDto> acceptResult(
-      @RequestHeader(value = "Authorization") String token,
-      @PathVariable Long resultId) {
-    return ResponseEntity.ok(gameService.handleResult(token, resultId, true));
-  }
-
-  @PostMapping("/result/{resultId}/refuse")
-  public ResponseEntity<ResultResponseDto> refuseResult(
-      @RequestHeader(value = "Authorization") String token,
-      @PathVariable Long resultId) {
-    return ResponseEntity.ok(gameService.handleResult(token, resultId, false));
-  }
+//  @PatchMapping("/result/{resultId}")
+//  public ResponseEntity<ResultResponseDto> updateResult(
+//      @RequestHeader(value = "Authorization") String token,
+//      @PathVariable Long resultId,
+//      @Valid @RequestBody ResultDto resultDto) {
+//    return ResponseEntity.ok(gameService.updateResult(token, resultId, resultDto));
+//  }
+//
+//  @PostMapping("/result/{resultId}/accept")
+//  public ResponseEntity<ResultResponseDto> acceptResult(
+//      @RequestHeader(value = "Authorization") String token,
+//      @PathVariable Long resultId) {
+//    return ResponseEntity.ok(gameService.handleResult(token, resultId, true));
+//  }
+//
+//  @PostMapping("/result/{resultId}/refuse")
+//  public ResponseEntity<ResultResponseDto> refuseResult(
+//      @RequestHeader(value = "Authorization") String token,
+//      @PathVariable Long resultId) {
+//    return ResponseEntity.ok(gameService.handleResult(token, resultId, false));
+//  }
 
   @PostMapping("/{gameId}/comment")
   public ResponseEntity<CommentHistoryDto> writeComment(
