@@ -8,7 +8,6 @@ import matchingGoal.matchingGoal.common.type.ErrorCode;
 import matchingGoal.matchingGoal.matching.domain.CancelType;
 import matchingGoal.matchingGoal.matching.domain.entity.*;
 import matchingGoal.matchingGoal.matching.dto.CommentHistoryDto;
-import matchingGoal.matchingGoal.matching.exception.PermissionException;
 import matchingGoal.matchingGoal.matching.repository.CommentRepository;
 import matchingGoal.matchingGoal.matching.repository.GameCancelRepository;
 import matchingGoal.matchingGoal.matching.repository.GameRepository;
@@ -91,7 +90,7 @@ public class MemberService {
     public void checkMemberPermission(String token, Member allowed) {
         Member member = getMemberInfo(token);
         if (allowed != member) {
-            throw new PermissionException();
+            throw new CustomException(ErrorCode.NO_PERMISSION);
         }
     }
 

@@ -6,9 +6,10 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import matchingGoal.matchingGoal.common.exception.CustomException;
 import matchingGoal.matchingGoal.common.type.ErrorCode;
+import matchingGoal.matchingGoal.matching.domain.StatusType;
 import matchingGoal.matchingGoal.matching.domain.entity.MatchingBoard;
-import matchingGoal.matchingGoal.matching.exception.IllegalSearchTypeException;
 import matchingGoal.matchingGoal.member.model.entity.Member;
 import org.springframework.data.jpa.domain.Specification;
 
@@ -38,11 +39,12 @@ public class MatchingBoardSpecification {
             predicates.add(criteriaBuilder.like(root.get("region"), "%" + keyword + "%"));
             break;
           default:
-            throw new IllegalSearchTypeException();
+            throw new CustomException(ErrorCode.ILLEGAL_SEARCH_TYPE);
         }
       }
 
       predicates.add(criteriaBuilder.isFalse(root.get("isDeleted")));
+      predicates.add(criteriaBuilder.equal(root.get("status"), StatusType.OPEN));
 
       return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
     });
