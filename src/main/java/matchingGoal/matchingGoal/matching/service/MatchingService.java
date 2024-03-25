@@ -92,19 +92,22 @@ public class MatchingService {
   }
 
   public Page<ListBoardDto> getBoardList(
-      Integer page, int pageSize, String keyword, String type, String sort, String sortDirection, String date, String time
+      Integer page, int pageSize, String keyword, String type, String sort, String sortDirection,
+      String date, String time
   ) {
 
     LocalDate parsedDate = (date != null) ? LocalDate.parse(date) : null;
     LocalTime parsedTime = (time != null) ? LocalTime.parse(time) : null;
 
     Pageable pageable = creatPageable(page, pageSize, sort, sortDirection);
-    Page<MatchingBoard> boardPage = boardRepository.findAll(MatchingBoardSpecification.search(keyword, type, parsedDate, parsedTime), pageable);
+    Page<MatchingBoard> boardPage = boardRepository.findAll(
+        MatchingBoardSpecification.search(keyword, type, parsedDate, parsedTime), pageable);
 
     return boardPage.map(this::convertToListDto);
   }
 
-  private Pageable creatPageable(Integer page, Integer pageSize, String sort, String sortDirection) {
+  private Pageable creatPageable(Integer page, Integer pageSize, String sort,
+      String sortDirection) {
     int pageNum = (page != null && page >= 0) ? page : 0;
 
     Sort.Direction direction = Direction.DESC;
@@ -147,6 +150,7 @@ public class MatchingService {
 
   /**
    * 게시글 조회
+   *
    * @param boardId - 게시글 id
    * @return 게시글 조회 dto
    */
@@ -205,7 +209,8 @@ public class MatchingService {
       throw new CompletedMatchingException();
     }
 
-    List<MatchingRequest> requests = requestRepository.findByBoardId(boardId).orElse(Collections.emptyList());
+    List<MatchingRequest> requests = requestRepository.findByBoardId(boardId)
+        .orElse(Collections.emptyList());
     for (MatchingRequest request : requests) {
       request.setIsAccepted(false);
     }
@@ -214,7 +219,6 @@ public class MatchingService {
     board.getGame().setIsDeleted(true);
 
     chatRoomService.closeAllChatRoom(boardId);
-
 
     return board.getId();
   }
@@ -255,8 +259,8 @@ public class MatchingService {
 
     Member writer = board.getMember();
     writer.setRequestCount((countRequestsByMember(writer)));
-    alarmService.createAlarm(writer.getId(), AlarmType.NEW_MATCHING_REQUEST, String.valueOf(boardId));
-
+    alarmService.createAlarm(writer.getId(), AlarmType.NEW_MATCHING_REQUEST,
+        String.valueOf(boardId));
 
     return "매칭 신청 완료";
   }
@@ -296,19 +300,21 @@ public class MatchingService {
     matchingBoard.setStatus(StatusType.CLOSED);
     matchingBoard.getGame().setTeam2(request.getMember());
 
-    List<MatchingRequest> otherRequests = requestRepository.findOtherRequestsByIdAndBoardId(requestId, matchingBoardId)
+    List<MatchingRequest> otherRequests = requestRepository.findOtherRequestsByIdAndBoardId(
+            requestId, matchingBoardId)
         .orElse(Collections.emptyList());
     for (MatchingRequest req : otherRequests) {
       req.setIsAccepted(false);
     }
 
-    List<MatchingRequest> sameTimeRequests = findSameTimeRequests(requestId).orElse(Collections.emptyList());
+    List<MatchingRequest> sameTimeRequests = findSameTimeRequests(requestId).orElse(
+        Collections.emptyList());
     for (MatchingRequest req : sameTimeRequests) {
       req.setIsAccepted(false);
     }
-    alarmService.createAlarm(request.getMember().getId(), AlarmType.NEW_MATCHING_REQUEST, String.valueOf(matchingBoardId));
+    alarmService.createAlarm(request.getMember().getId(), AlarmType.MATCHING_REQUEST_ACCEPTED,
+        String.valueOf(matchingBoardId));
     chatRoomService.closeAllChatRoom(matchingBoardId);
-
 
     return "신청 수락 완료";
   }
@@ -328,7 +334,8 @@ public class MatchingService {
     if (request.getBoard().getStatus() == StatusType.CLOSED) {
       throw new CompletedMatchingException();
     }
-
+    alarmService.createAlarm(request.getMember().getId(), AlarmType.MATCHING_REQUEST_DENIED,
+        String.valueOf(request.getBoard().getId()));
     request.setIsAccepted(false);
 
     return "신청 거절 완료";
