@@ -77,7 +77,7 @@ public class MailService {
      */
     private Boolean sendMail(String email, String templateName, EmailContent emailContent) {
         final String mailCharset = "utf-8";
-        final String path =  (System.getProperty("user.dir") + "/backend/src/main/resources/templates/").replace("/",File.separator)  ;
+        final String path =  (System.getProperty("user.dir") + "/src/main/resources/templates/").replace("/",File.separator)  ;
 
         try {
             File input = new File(path + templateName);
@@ -110,7 +110,7 @@ public class MailService {
 
     /**
      * 인증번호 검증
-     * @param mailVerificationDto - email, code, name
+     * @param mailVerificationDto - email, code
      */
     public void verifyMail(MailVerificationDto mailVerificationDto) {
         // 코드 불일치
@@ -119,9 +119,6 @@ public class MailService {
 
         // 코드 일치
         redisService.deleteData(VALID_PREFIX+mailVerificationDto.getEmail());
-
-        // 메일 발송
-        sendWelcomeMail(mailVerificationDto.getEmail(), mailVerificationDto.getName());
     }
 }
 
