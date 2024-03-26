@@ -2,6 +2,7 @@ package matchingGoal.matchingGoal.member.service;
 
 import matchingGoal.matchingGoal.common.exception.CustomException;
 import matchingGoal.matchingGoal.common.type.ErrorCode;
+import matchingGoal.matchingGoal.mail.service.MailService;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +28,7 @@ public class AuthService {
     private final JwtTokenProvider jwtTokenProvider;
     private final MemberRepository memberRepository;
     private final MemberService memberService;
+    private final MailService mailService;
 
     /**
      * 회원가입
@@ -53,6 +55,9 @@ public class AuthService {
                 .build();
 
         memberRepository.save(member);
+
+        // 환영 메일 발송
+        mailService.sendWelcomeMail(member.getEmail(), member.getName());
         return "회원가입 성공";
     }
 

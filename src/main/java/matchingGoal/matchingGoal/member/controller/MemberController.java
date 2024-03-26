@@ -24,7 +24,7 @@ public class MemberController {
      * @return 중복여부 (중복 시, false)
      */
     @PostMapping("/checkNickname")
-    public ResponseEntity<Boolean> isDuplicatedNickname(@NotBlank @Nickname @RequestParam String nickname) {
+    public ResponseEntity<Boolean> isDuplicatedNickname(@NotBlank @Nickname @RequestParam("nickname") String nickname) {
         return ResponseEntity.ok().body(memberService.isDuplicatedNickname(nickname));
     }
 
