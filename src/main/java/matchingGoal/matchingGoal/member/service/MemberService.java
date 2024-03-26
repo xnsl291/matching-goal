@@ -130,12 +130,7 @@ public class MemberService {
      */
     public SimplerInfoResponse getSimpleUserinfo(Long memberId) {
         Member member = getMemberById(memberId);
-        return SimplerInfoResponse.builder()
-                .nickname(member.getNickname())
-                .introduction(member.getIntroduction())
-                .region(member.getRegion())
-                .imageUrl(member.getImageUrl())
-                .build();
+        return SimplerInfoResponse.of(member);
     }
 
     /**

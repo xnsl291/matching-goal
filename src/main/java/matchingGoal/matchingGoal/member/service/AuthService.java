@@ -91,13 +91,7 @@ public class AuthService {
         // 토큰 발행
         JwtToken tokens = jwtTokenProvider.generateToken(member.getId(), member.getEmail(), member.getNickname());
 
-        return SignInResponse.builder()
-                .accessToken(tokens.getAccessToken())
-                .refreshToken(tokens.getRefreshToken())
-                .memberId(member.getId())
-                .nickname(member.getNickname())
-                .email(member.getEmail())
-                .build();
+        return SignInResponse.of(tokens,member);
     }
 
     /**
