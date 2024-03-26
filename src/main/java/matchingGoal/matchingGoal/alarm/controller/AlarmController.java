@@ -3,6 +3,7 @@ package matchingGoal.matchingGoal.alarm.controller;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import matchingGoal.matchingGoal.alarm.dto.AlarmDto;
+import matchingGoal.matchingGoal.alarm.dto.AlarmIdListDto;
 import matchingGoal.matchingGoal.alarm.service.AlarmService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -36,8 +37,7 @@ public class AlarmController {
   }
 
   @PatchMapping("/check")
-  public ResponseEntity<?> checkOut (@RequestHeader(value = "authorization") String token, @RequestBody List<Long> alarmIdList) {
-
+  public ResponseEntity<?> checkOut (@RequestHeader(value = "authorization") String token, @RequestBody AlarmIdListDto alarmIdList) {
     alarmService.checkOut(token, alarmIdList);
 
     return ResponseEntity.ok(null);

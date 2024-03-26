@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import matchingGoal.matchingGoal.alarm.domain.AlarmType;
 import matchingGoal.matchingGoal.alarm.dto.AlarmDto;
 import matchingGoal.matchingGoal.alarm.domain.entity.Alarm;
+import matchingGoal.matchingGoal.alarm.dto.AlarmIdListDto;
 import matchingGoal.matchingGoal.alarm.repository.AlarmRepository;
 import matchingGoal.matchingGoal.chat.dto.ChatMessageDto;
 import matchingGoal.matchingGoal.common.auth.JwtTokenProvider;
@@ -71,11 +72,11 @@ public class AlarmService {
 
   //수신확인
   @Transactional
-  public void checkOut(String token, List<Long> alarmIdList) {
+  public void checkOut(String token, AlarmIdListDto alarmIdList) {
 
     jwtTokenProvider.validateToken(token);
     long memberId = jwtTokenProvider.getId(token);
-    for (long alarmId : alarmIdList) {
+    for (long alarmId : alarmIdList.getAlarmIdList()) {
       Alarm alarm = getAlarmEntity(alarmId);
       if (alarm.getMemberId() != memberId) {
         throw new CustomException(ErrorCode.MEMBER_NOT_MATCHED);
