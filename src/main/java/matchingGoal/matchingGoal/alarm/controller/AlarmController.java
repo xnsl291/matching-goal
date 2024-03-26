@@ -35,7 +35,7 @@ public class AlarmController {
     return ResponseEntity.ok(result);
   }
 
-  @PatchMapping("/")
+  @PatchMapping("/check")
   public ResponseEntity<?> checkOut (@RequestHeader(value = "authorization") String token, @RequestBody List<Long> alarmIdList) {
 
     alarmService.checkOut(token, alarmIdList);
