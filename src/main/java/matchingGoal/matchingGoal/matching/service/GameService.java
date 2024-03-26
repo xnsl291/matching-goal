@@ -38,6 +38,11 @@ public class GameService {
     Game game = gameRepository.findById(gameId)
         .orElseThrow(() -> new CustomException(ErrorCode.GAME_NOT_FOUND));
 
+    LocalDateTime gameDateTime = LocalDateTime.of(game.getDate(), game.getTime());
+    if (gameDateTime.isAfter(LocalDateTime.now())) {
+      throw new CustomException(ErrorCode.NOT_AVAILABLE_TIME);
+    }
+
 //    memberService.checkMemberPermission(token, game.getTeam2());
     Member member = memberService.getMemberInfo(token);
     if (game.getTeam1() != member && game.getTeam2() != member) {
