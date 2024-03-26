@@ -16,8 +16,4 @@ public class MailVerificationDto {
 
   @NotBlank(message = "인증코드를 입력해주세요")
   private String code;
-
-  @NotBlank(message = "이름을 입력해주세요")
-  private String name;
-
 }

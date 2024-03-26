@@ -13,7 +13,6 @@ public class UpdateMemberDto {
 
     private String name;
 
-    @NotBlank(message = "닉네임을 입력해주세요")
     @Nickname
     private String nickname;
 
