@@ -13,7 +13,7 @@
 
 ### 🛠️ Project Architecture
 
-![아키텍쳐 이미지]()
+![아키텍쳐 이미지](https://github.com/matching-goal/backend/assets/96179832/4a97d018-e78f-4a73-8368-4f933aabf383)
 
 <br>
 
