@@ -82,7 +82,11 @@
 <table>
   <tr>
     <td rowspan="7" max-width="500px">
-        <img src="" />프로필 조회사진
+        <img src="https://github.com/matching-goal/backend/assets/132976212/75015ba7-6fb8-427e-9748-895a66556e0d" />프로필 조회사진
+
+
+
+
     </td>
     <td>
       프로필 조회
