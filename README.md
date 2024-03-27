@@ -1,4 +1,4 @@
-<img src = "doc/images/배경이미지.jpg" height = "430" width = "100%" alt="">
+<img src = "doc/images/배경이미지.png" width = "100%" alt="">
 
 ## Overview
 
@@ -26,9 +26,10 @@
 - CI/CD: `Github Actions`
 - Communication Tools : `Notion`, `Gather`, `Slack`
 
+<br>
 
 ### 💻 주요 기능
-
+---
 🔑  **계정**
 <table>
   <tr>
@@ -75,9 +76,9 @@
       - 닉네임 중복x</td>
   </tr>
 </table>
+<br>
 
-
-📌  **프로필**
+📌  **회원 프로필**
 <table>
   <tr>
     <td rowspan="7" max-width="500px">
@@ -150,7 +151,7 @@
     </td>
   </tr>
 </table>
-
+<br>
 
 📌 **게시글**
 <table>
@@ -218,7 +219,7 @@
 
 </table>
 
-
+<br>
 
 📌 **채팅**
 <table>
@@ -230,14 +231,14 @@
       채팅
     </td>
     <td>
-      - 채팅할수있음 xxx가능(수정요망)
+      - 다른 회원과 1:1 채팅 가능 
     </td>
   </tr>
 </table>
 
+<br>
 
 ⏰  **알림**
-
 <table>
   <tr>
     <td max-width="500px">
@@ -247,12 +248,14 @@
       알림
     </td>
     <td>
-      -  xxx가능(수정요망)
+      - 채팅메세지 도착 알림<br>
+      - 상대방이 매칭신청 시 알림 
     </td>
   </tr>
 </table>
 
 
+<br>
 
 🔍  **검색**
 <table>
@@ -280,39 +283,34 @@
   </tr>
 </table>
 
-### 🔫 Trouble Shooting
 
-
-## 👋 Team
-
-### Document
+## 👋 Document
 #### ERD
 ![](doc/images/ERD.png)
 <br>
-#### API DOCUMENT
+#### API DOCUMENT (파일추가필요)
 - API DOCU
 
-
-### Members
+## 👋 Team (수정필요)
 <table>
   <tr>
-    <td> 이름</td>
-    <td> 맡은 기능 </td>
+    <td> 박지찬</td>
+    <td> 프론트 </td>
   </tr>
 
   <tr>
-    <td> 이름</td>
-    <td> 맡은 기능 </td>
+    <td> 류동훈</td>
+    <td> - 채팅<br>- 알림<br>- 배포 </td>
   </tr>
 
   <tr>
-    <td> 이름</td>
-    <td> 맡은 기능 </td>
+    <td> 서채현</td>
+    <td> 매칭 관련 기능 </td>
   </tr>
 
   <tr>
-    <td> 이름</td>
-    <td> 맡은 기능 </td>
+    <td> 조하나</td>
+    <td> - 인증기능(JWT, 메일인증)<br>- 회원 관련 기능<br>- 이미지업로드 </td>
   </tr>
 
 </table>
