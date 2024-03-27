@@ -34,7 +34,7 @@
 <table>
   <tr>
     <td rowspan="6" max-width="500px">
-        <img src="" />회원가입 or 로그인 사진
+        <video src="https://github.com/matching-goal/backend/assets/132976212/75015ba7-6fb8-427e-9748-895a66556e0d"/> 회원가입 or 로그인 사진
     </td>
     <td>
       회원가입
@@ -82,11 +82,7 @@
 <table>
   <tr>
     <td rowspan="7" max-width="500px">
-        <img src="https://github.com/matching-goal/backend/assets/132976212/75015ba7-6fb8-427e-9748-895a66556e0d" />프로필 조회사진
-
-
-
-
+        <img src=""/>프로필 조회사진
     </td>
     <td>
       프로필 조회
