@@ -249,12 +249,11 @@
 <table>
   <tr>
     <td max-width="500px">
-        <video src="https://github.com/matching-goal/backend/assets/132976212/e3b002ab-1d8a-48d9-b23f-9de83d1ed3fe" />알림사진
+        <video src="https://github.com/matching-goal/backend/assets/132976212/e3b002ab-1d8a-48d9-b23f-9de83d1ed3fe"/>
     </td>
     <td>
       알림
     </td>
-    
     <td>
       - 채팅메세지 도착 알림<br>
       - 상대방이 매칭신청 시 알림 
