@@ -82,7 +82,7 @@
 <table>
   <tr>
     <td rowspan="7" max-width="500px">
-        <img src=""/>프로필 조회사진
+        <video src="https://github.com/matching-goal/backend/assets/132976212/59245169-e4fa-4a51-b4a2-94e370d1634d"/>프로필 조회사진
     </td>
     <td>
       프로필 조회
@@ -157,7 +157,7 @@
 <table>
   <tr>
     <td rowspan="7" max-width="500px">
-        <img src="" />게시글 등록사진
+        <video src="https://github.com/matching-goal/backend/assets/132976212/d8d47a41-8b21-433c-97d7-2c7e6420cbc0" />게시글 등록사진
     </td>
     <td>
       게시글 등록/수정/삭제
@@ -225,7 +225,7 @@
 <table>
   <tr>
     <td max-width="500px">
-        <img src="" />채팅사진
+        <video src="https://github.com/matching-goal/backend/assets/132976212/a74d7ae3-017e-4a84-8e1a-1b4139014da8" />채팅사진
     </td>
     <td>
       채팅
@@ -242,11 +242,12 @@
 <table>
   <tr>
     <td max-width="500px">
-        <img src="" />알림사진
+        <video src="https://github.com/matching-goal/backend/assets/132976212/e3b002ab-1d8a-48d9-b23f-9de83d1ed3fe" />알림사진
     </td>
     <td>
       알림
     </td>
+    
     <td>
       - 채팅메세지 도착 알림<br>
       - 상대방이 매칭신청 시 알림 
@@ -261,7 +262,7 @@
 <table>
   <tr>
     <td rowspan="7" max-width="500px">
-        <img src="" />알림사진
+        <video src="https://github.com/matching-goal/backend/assets/132976212/d8d47a41-8b21-433c-97d7-2c7e6420cbc0" />알림사진
     </td>
     <td>
       게시글 조회
