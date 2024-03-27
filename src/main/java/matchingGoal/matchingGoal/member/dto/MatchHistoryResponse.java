@@ -19,8 +19,8 @@ public class MatchHistoryResponse {
     private String opponentNickname;
     private String opponentImgUrl;
     private boolean isWin;
-    private int score1;
-    private int score2;
+    private int myScore;
+    private int opponentScore;
     private LocalDate date;
     private LocalTime time;
 
@@ -28,9 +28,18 @@ public class MatchHistoryResponse {
         Game game = result.getGame();
         Member opponent = game.getTeam1().getId().equals(member.getId()) ? game.getTeam2() : game.getTeam1();
 
-        boolean isMemberWin = result.getScore1() > result.getScore2() ;  // 글 작성자가 이겼는지?
-        if (game.getTeam2().getId().equals(member.getId()) ) // 글 작성자 != 멤버 인지 확인
-            isMemberWin = !isMemberWin ;
+        int myScore = 0, opponentScore = 0;
+        if (member.getId().equals(game.getTeam1().getId())) {
+            myScore = result.getScore1();
+            opponentScore = result.getScore2();
+        } else if (member.getId().equals(game.getTeam2().getId())){
+            myScore = result.getScore2();
+            opponentScore = result.getScore1();
+        }
+
+        boolean isMemberWin = myScore > opponentScore ;  // 글 작성자가 이겼는지?
+//        if (game.getTeam2().getId().equals(member.getId()) ) // 글 작성자 != 멤버 인지 확인
+//            isMemberWin = !isMemberWin ;
 
         return MatchHistoryResponse.builder()
                 .resultId(result.getId())
@@ -38,8 +47,8 @@ public class MatchHistoryResponse {
                 .opponentImgUrl(opponent.getImageUrl())
                 .opponentNickname(opponent.getNickname())
                 .isWin(isMemberWin)
-                .score1(result.getScore1())
-                .score2(result.getScore2())
+                .myScore(myScore)
+                .opponentScore(opponentScore)
                 .date(game.getDate())
                 .time(game.getTime())
                 .build();

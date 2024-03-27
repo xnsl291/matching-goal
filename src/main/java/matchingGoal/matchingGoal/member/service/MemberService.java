@@ -176,12 +176,13 @@ public class MemberService {
         Member member = getMemberById(memberId);
         List<MatchHistoryResponse> history = new ArrayList<>();
         List<Game> allGames = gameRepository
-                .findByTeam1OrTeam2AndTeam2IsNotNullAndDateLessThanEqualAndTimeLessThanOrderByDateDesc(
-                        member, member, LocalDate.now(), LocalTime.now());
+                .findByMemberAndDateBeforeOrTodayAndTimeBeforeAndTeam2IsNotNullOrderByDateDesc(
+                        member, LocalDate.now(), LocalTime.now());
 
         for (Game game : allGames){
             try{
-                Result result = resultRepository.findByGameId(game.getId()).orElseThrow(() -> new CustomException(ErrorCode.GAME_NOT_FOUND));
+                Result result = resultRepository.findByGameId(game.getId()).orElseThrow(
+                    () -> new CustomException(ErrorCode.GAME_NOT_FOUND));
                 history.add(MatchHistoryResponse.of(member, result));
             }catch (Exception e){}
         }
@@ -225,7 +226,7 @@ public class MemberService {
                 win += 1;
 
             else{
-                if(record.getScore1() == record.getScore2())
+                if(record.getMyScore() == record.getOpponentScore())
                     draw += 1;
                 else
                     lose += 1;
@@ -233,7 +234,7 @@ public class MemberService {
         }
 
         if (totalSize != 0 )
-            winRate = (double) win / totalSize;
+            winRate = (double) win / totalSize * 100;
 
         return new MatchStatisticResponse(winRate, totalSize, win , lose ,draw );
     }
@@ -245,7 +246,9 @@ public class MemberService {
         int cancel = 0, noshow = 0 ;
         Member member = getMemberById(memberId);
 
-        List<Game> allGames = gameRepository.findByTeam1OrTeam2AndTeam2IsNotNullAndDateLessThanEqualAndTimeLessThanOrderByDateDesc(member,member,LocalDate.now(),LocalTime.now());
+        List<Game> allGames =
+            gameRepository.findByMemberAndDateBeforeOrTodayAndTimeBeforeAndTeam2IsNotNullOrderByDateDesc(
+                member, LocalDate.now(), LocalTime.now());
         List<GameCancel> cancelGames = gameCancelRepository.findByMember(member);
 
         for (GameCancel gameCancel : cancelGames){
