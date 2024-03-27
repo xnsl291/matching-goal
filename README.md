@@ -25,6 +25,13 @@
 - Deploy: `AWS EC2`
 - CI/CD: `Github Actions`
 - Communication Tools : `Notion`, `Gather`, `Slack`
+  
+### 🛠️ Frontend Tech Stack
+- 프레임워크: `Next Js`
+- 상태관리: `React Query Next Auth`
+- 언어: `Type Script`
+- css: `Tailwind`, `Daisyui`
+- 그 외 : `Axios`
 
 <br>
 
