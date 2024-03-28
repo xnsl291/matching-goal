@@ -25,7 +25,7 @@
 - Deploy: `AWS EC2`
 - CI/CD: `Github Actions`
 - Communication Tools : `Notion`, `Gather`, `Slack`
-  
+
 ### 🛠️ Frontend Tech Stack
 - 프레임워크: `Next Js`
 - 상태관리: `React Query Next Auth`
@@ -290,15 +290,28 @@
   </tr>
 </table>
 
+## 🎯 Trouble Shotting
+- 문제점
+    - 해결방법
 
-## 👋 Document
-#### ERD
+- 문제점
+    - 해결방법
+
+## 📂 Document
+
+#### - ERD
 ![](doc/images/ERD.png)
 <br>
-#### API DOCUMENT (파일추가필요)
-- API DOCU
 
-## 👋 Team (수정필요)
+#### - API
+- <a href= "https://valuable-filament-8e0.notion.site/API-b155780b79724ac6af28ef3cbee5e7b3?pvs=4">API 명세서</a>
+  <br>
+
+#### - OTHERS
+- <a href= "https://valuable-filament-8e0.notion.site/5-57bd100a3b894b6da2edb1b3f34b85ec?pvs=4">Team Notion</a>
+
+
+## 👋 Team
 <table>
   <tr>
     <td> 박지찬</td>
