@@ -21,6 +21,7 @@ public enum ErrorCode {
 
     //image
     INVALID_FILE_FORMAT(HttpStatus.BAD_REQUEST,"파일 형식이 잘못되었습니다"),
+    FILE_SIZE_EXCEED(HttpStatus.BAD_REQUEST,"파일 사이즈가 너무 큽니다"),
 
     // member
     MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 회원입니다."),
@@ -46,7 +47,7 @@ public enum ErrorCode {
     ALREADY_ACCEPTED_RESULT(HttpStatus.BAD_REQUEST, "이미 수락된 경기 결과입니다."),
     ALREADY_COMMENT_EXISTS(HttpStatus.BAD_REQUEST, "한줄평이 입력된 게임입니다."),
     NOT_AVAILABLE_TIME(HttpStatus.BAD_REQUEST, "요청 가능한 시간이 아닙니다."),
-    CANCEL_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 취소 신청입니다."), 
+    CANCEL_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 취소 신청입니다."),
     ALREADY_ACCEPTED_CANCEL(HttpStatus.BAD_REQUEST, "이미 수락된 취소 신청입니다."),
 
     //Stomp
