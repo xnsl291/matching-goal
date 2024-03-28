@@ -23,6 +23,7 @@
 - Login: `JWT`
 - Database: `AWS RDS(MySQL)`, `AWS Elasticache(Redis)`, `AWS S3`
 - Deploy: `AWS EC2`
+- Message Broker: 'rabbitMQ'
 - CI/CD: `Github Actions`
 - Communication Tools : `Notion`, `Gather`, `Slack`
 
@@ -253,10 +254,7 @@
     </td>
     <td>
       알림
-    </td>
-    <td>
-      - 채팅메세지 도착 알림<br>
-      - 상대방이 매칭신청 시 알림 
+   림
     </td>
   </tr>
 </table>
