@@ -17,10 +17,10 @@ import matchingGoal.matchingGoal.member.model.entity.Member;
 @Builder
 public class MatchingRequestResponseDto {
 
-  private Long id;
+  private long id;
   @JsonFormat(shape = Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss", timezone = "Asia/Seoul")
   private LocalDateTime createdDate;
-  private Long memberId;
+  private long memberId;
   private String nickname;
   private String memberImg;
   @JsonFormat(shape = Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm", timezone = "Asia/Seoul")

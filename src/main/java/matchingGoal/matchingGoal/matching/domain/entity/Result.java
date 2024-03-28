@@ -5,15 +5,11 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-import matchingGoal.matchingGoal.matching.dto.ResultDto;
-import matchingGoal.matchingGoal.member.model.entity.Member;
 
 @Entity
 @Builder
@@ -30,18 +26,18 @@ public class Result {
   @JoinColumn(name = "game_id")
   private Game game;
 
-  private Integer score1;
+  private int score1;
 
-  private Integer score2;
+  private int score2;
 
-  private Integer duration;
+  private int duration;
 
 //  @Setter
 //  private Boolean isAccepted;
-
-  public void update(ResultDto resultDto) {
-    this.score1 = resultDto.getScore1();
-    this.score2 = resultDto.getScore2();
-    this.duration = resultDto.getDuration();
-  }
+//
+//  public void update(ResultDto resultDto) {
+//    this.score1 = resultDto.getScore1();
+//    this.score2 = resultDto.getScore2();
+//    this.duration = resultDto.getDuration();
+//  }
 }

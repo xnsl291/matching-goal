@@ -17,16 +17,16 @@ import matchingGoal.matchingGoal.matching.domain.StatusType;
 @Builder
 public class ListBoardDto {
 
-  private Long id;
-  private Long memberId;
+  private long id;
+  private long memberId;
   private String nickname;
   private String memberImgUrl;
   private String title;
   @JsonFormat(shape = Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm", timezone = "Asia/Seoul")
   private LocalDateTime createdDate;
-  private Integer viewCount;
+  private int viewCount;
   private StatusType status;
-  private Integer requestCount;
+  private int requestCount;
   private String region;
   private String stadium;
   private LocalDate date;

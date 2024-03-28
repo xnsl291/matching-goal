@@ -47,6 +47,6 @@ public class Game {
   private LocalTime time;
 
   @Setter
-  private Boolean isDeleted;
+  private boolean isDeleted;
 
 }

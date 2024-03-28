@@ -12,11 +12,11 @@ import matchingGoal.matchingGoal.matching.domain.entity.Result;
 @Builder
 public class ResultResponseDto {
 
-  private Long resultId;
-  private Long gameId;
-  private Integer score1;
-  private Integer score2;
-  private Integer duration;
+  private long resultId;
+  private long gameId;
+  private int score1;
+  private int score2;
+  private int duration;
 
   public static ResultResponseDto of(Result result) {
     return ResultResponseDto.builder()
