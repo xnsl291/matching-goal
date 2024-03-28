@@ -23,7 +23,7 @@
 - Login: `JWT`
 - Database: `AWS RDS(MySQL)`, `AWS Elasticache(Redis)`, `AWS S3`
 - Deploy: `AWS EC2`
-- Message Broker: 'rabbitMQ'
+- Message Broker: `rabbitMQ`
 - CI/CD: `Github Actions`
 - Communication Tools : `Notion`, `Gather`, `Slack`
 
