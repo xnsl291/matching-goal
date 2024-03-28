@@ -26,7 +26,7 @@ public class ListBoardDto {
   private LocalDateTime createdDate;
   private int viewCount;
   private StatusType status;
-  private int requestCount;
+  private Integer requestCount;
   private String region;
   private String stadium;
   private LocalDate date;
