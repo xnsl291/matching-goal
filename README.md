@@ -92,6 +92,7 @@
   <tr>
     <td rowspan="7">
         <video src="https://github.com/matching-goal/backend/assets/132976212/59245169-e4fa-4a51-b4a2-94e370d1634d" width=500px></video> 
+      <video src="https://github.com/matching-goal/backend/assets/132976212/01bf1a03-748e-4a6a-9a71-1a0ee74728b3"/>
     </td>
     <td>
       프로필 조회
