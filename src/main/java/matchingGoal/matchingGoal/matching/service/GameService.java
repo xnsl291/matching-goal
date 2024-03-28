@@ -168,6 +168,10 @@ public class GameService {
       throw new CustomException(ErrorCode.NOT_AVAILABLE_TIME);
     }
 
+    if(resultRepository.existsByGame(game)) {
+      throw new CustomException(ErrorCode.ALREADY_RESULT_EXISTS);
+    }
+
     Member noshowMember = member.equals(game.getTeam1()) ? game.getTeam2() : game.getTeam1();
 
     GameCancel cancel = GameCancel.builder()
