@@ -18,10 +18,10 @@
 <br>
 
 ### 🛠️ Backend Tech Stack
-- Framework: `SpringBoot`, `SpringSecurity`, `SpringDataJPA`
+- Framework: `SpringBoot 3.2.3`, `SpringSecurity`, `SpringDataJPA`
 - Language: `JAVA 17`
 - Login: `JWT`
-- Database: `AWS RDS(MySQL)`, `AWS S3`
+- Database: `AWS RDS(MySQL)`, `AWS S3`, `Redis`
 - Deploy: `AWS EC2`
 - Message Broker: `rabbitMQ`
 - CI/CD: `Github Actions`
