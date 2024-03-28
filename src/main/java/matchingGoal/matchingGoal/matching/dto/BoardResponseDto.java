@@ -19,8 +19,8 @@ import matchingGoal.matchingGoal.matching.domain.entity.MatchingBoard;
 @Builder
 public class BoardResponseDto {
 
-  private Long id;
-  private Long memberId;
+  private long id;
+  private long memberId;
   private String nickname;
   private String memberImg;
   private String title;
@@ -30,9 +30,9 @@ public class BoardResponseDto {
   private LocalDateTime createdDate;
   @JsonFormat(shape = Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm", timezone = "Asia/Seoul")
   private LocalDateTime modifiedDate;
-  private Integer viewCount;
+  private int viewCount;
   private StatusType status;
-  private Integer requestCount;
+  private int requestCount;
   private String region;
   private String stadium;
   private LocalDate date;

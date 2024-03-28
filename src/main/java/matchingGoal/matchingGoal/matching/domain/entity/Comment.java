@@ -45,7 +45,7 @@ public class Comment {
 
   private LocalDateTime modifiedDate;
 
-  private Boolean isDeleted;
+  private boolean isDeleted;
 
   private LocalDateTime deletedDate;
 

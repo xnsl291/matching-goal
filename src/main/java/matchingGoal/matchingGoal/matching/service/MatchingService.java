@@ -3,7 +3,6 @@ package matchingGoal.matchingGoal.matching.service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -157,7 +156,7 @@ public class MatchingService {
 
     boardRepository.increaseViewCountById(boardId);
 
-    if (matchingBoard.getIsDeleted()) {
+    if (matchingBoard.isDeleted()) {
       throw new CustomException(ErrorCode.DELETED_POST);
     }
 
@@ -177,7 +176,7 @@ public class MatchingService {
 
     memberService.checkMemberPermission(token, board.getMember());
 
-    if (board.getIsDeleted()) {
+    if (board.isDeleted()) {
       throw new CustomException(ErrorCode.DELETED_POST);
     }
 
@@ -202,7 +201,7 @@ public class MatchingService {
 
     memberService.checkMemberPermission(token, board.getMember());
 
-    if (board.getIsDeleted()) {
+    if (board.isDeleted()) {
       throw new CustomException(ErrorCode.DELETED_POST);
     }
 
@@ -217,7 +216,7 @@ public class MatchingService {
     }
 
     board.delete();
-    board.getGame().setIsDeleted(true);
+    board.getGame().setDeleted(true);
 
     chatRoomService.closeAllChatRoom(boardId);
 
@@ -235,7 +234,7 @@ public class MatchingService {
         .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
     Member member = memberService.getMemberInfo(token);
 
-    if (board.getIsDeleted()) {
+    if (board.isDeleted()) {
       throw new CustomException(ErrorCode.DELETED_POST);
     }
 
