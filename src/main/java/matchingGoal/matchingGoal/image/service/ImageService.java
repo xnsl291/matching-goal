@@ -1,91 +1,78 @@
 package matchingGoal.matchingGoal.image.service;
 
-import lombok.AllArgsConstructor;
+import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.model.*;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import matchingGoal.matchingGoal.common.exception.CustomException;
 import matchingGoal.matchingGoal.common.type.ErrorCode;
-import matchingGoal.matchingGoal.image.model.entity.Image;
-import matchingGoal.matchingGoal.image.repository.ImageRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.io.InputStream;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 import java.util.UUID;
 
 @Service
-@AllArgsConstructor
+@Slf4j
+@RequiredArgsConstructor
 public class ImageService {
-    private final ImageRepository imageRepository;
+    private final AmazonS3Client amazonS3Client;
+
+    @Value("${cloud.aws.s3.bucket}")
+    private String bucket;
 
     /**
-     * 이미지 폴더 위치 반환
-     * @param date - 이미지 업로드일
-     * @return 폴더 위치 (ex. [BASE_PATH]/2023/01/01/ "
+     * 파일명 생성
+     * @return 년/월/일/UUID_파일명
      */
-    public String getFolderPath(LocalDate date) {
-        String path = System.getProperty("user.dir") + "/src/main/resources/static/images/"
-                + date.format(DateTimeFormatter.ofPattern("yyyy/MM/dd"))
-                + "/";
-        return path.replace("/", File.separator);
+    private String generateFileName(String name) {
+        //년/월/일/
+        String path = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd")) + "/";
+
+        // S3에 저장된 파일 이름
+        return path + UUID.randomUUID() + "_" + name;
     }
 
     /**
      * 이미지 업로드
-     * @return 이미지 url
+     * @return 빈 파일: "" , 이미지 파일 : url
      */
-    @Transactional
-    public String uploadImage(MultipartFile file) {
-        UUID uuid = UUID.randomUUID();
-        String path = getFolderPath(LocalDate.now());
-        String saveName = uuid + "_" + file.getOriginalFilename();
-        String pathName = path + saveName;
-
-        if (!Objects.requireNonNull(file.getContentType()).startsWith("image"))
+    public String uploadImage(MultipartFile uploadFile) {
+        if (uploadFile.isEmpty()) // 파일이 비었을 경우
+            return "";
+        if (!Objects.requireNonNull(uploadFile.getContentType()).startsWith("image"))
             throw new CustomException(ErrorCode.INVALID_FILE_FORMAT);
 
-        Path directory = Paths.get(path);
+        // S3에 저장할 파일 이름
+        String fileName = generateFileName(uploadFile.getOriginalFilename());
 
-        try {
-            if (!Files.exists(directory)) {
-                Files.createDirectories(directory);
-            }
+        ObjectMetadata metadata = new ObjectMetadata();
+        metadata.setContentLength(uploadFile.getSize());
+        metadata.setContentType(uploadFile.getContentType());
 
-            // 파일 저장
-            file.transferTo(directory.resolve(saveName).toFile());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        try (InputStream inputStream = uploadFile.getInputStream()) {
+            // s3로 업로드
+            amazonS3Client.putObject(
+                    new PutObjectRequest(bucket, fileName, inputStream, metadata));// PublicRead 권한으로 upload
+//							.withCannedAcl(CannedAccessControlList.PublicRead));
+
+        } catch (IOException | AmazonS3Exception e) {
+            throw new RuntimeException("파일 업로드 중 오류 발생: " + e.getMessage());
         }
+        return amazonS3Client.getUrl(bucket, fileName).toString(); // File의 URL return
 
-        Image image = Image.builder()
-                .size(file.getSize())
-                .savedName(saveName)
-                .filePathName(pathName)
-                .build();
-        imageRepository.save(image);
-
-        // 저장된 파일 url 반환
-        return pathName;
     }
 
-    /**
-     * 이미지 삭제
-     * @return 완료여부
-     */
-    @Transactional
-    public boolean removeImage(String imageUrl) {
-
-        try {
-            Path filePath = Paths.get(imageUrl);
-            return Files.deleteIfExists(filePath);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+    // 이미지 삭제
+    public void removeImage(String fileUrl) {
+        String splitStr = ".com/";
+        String fileName = fileUrl.substring(
+                fileUrl.lastIndexOf(splitStr) + splitStr.length());
+        amazonS3Client.deleteObject(new DeleteObjectRequest(bucket, fileName));
     }
 }
