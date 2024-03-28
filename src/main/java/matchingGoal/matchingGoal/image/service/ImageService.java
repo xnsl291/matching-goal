@@ -58,8 +58,8 @@ public class ImageService {
         try (InputStream inputStream = uploadFile.getInputStream()) {
             // s3로 업로드
             amazonS3Client.putObject(
-                    new PutObjectRequest(bucket, fileName, inputStream, metadata)  // PublicRead 권한으로 upload
-							.withCannedAcl(CannedAccessControlList.PublicRead));
+                    new PutObjectRequest(bucket, fileName, inputStream, metadata));// PublicRead 권한으로 upload
+//							.withCannedAcl(CannedAccessControlList.PublicRead));
 
         } catch (IOException | AmazonS3Exception e) {
             throw new RuntimeException("파일 업로드 중 오류 발생: " + e.getMessage());
