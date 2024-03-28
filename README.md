@@ -21,7 +21,7 @@
 - Framework: `SpringBoot`, `SpringSecurity`, `SpringDataJPA`
 - Language: `JAVA 17`
 - Login: `JWT`
-- Database: `AWS RDS(MySQL)`, `AWS Elasticache(Redis)`, `AWS S3`
+- Database: `AWS RDS(MySQL)`, `AWS S3`
 - Deploy: `AWS EC2`
 - Message Broker: `rabbitMQ`
 - CI/CD: `Github Actions`
@@ -48,7 +48,7 @@
       회원가입
     </td>
     <td>
-      - 메일인증 필수<br> - 닉네임 중복x 
+      - 메일인증 필수 <br> - 인증번호 3분동안 유효 <br> - 닉네임 중복x 
     </td>
   </tr>
 
@@ -62,7 +62,8 @@
       로그인 
     </td>
     <td>
-      - 이메일, 비밀번호 입력
+      - 이메일, 비밀번호 입력 <br>
+- Access token 30분& Refresh token 7일
     </td>
   </tr>
 
@@ -287,13 +288,6 @@
     </td>
   </tr>
 </table>
-
-## 🎯 Trouble Shotting
-- 문제점
-  - 해결방법
-
-- 문제점
-  - 해결방법
 
 ## 📂 Document
 
