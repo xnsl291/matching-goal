@@ -51,11 +51,11 @@ public class MatchingBoard {
 
   private LocalDateTime createdDate;
 
-  private Boolean isDeleted;
+  private boolean isDeleted;
 
   private LocalDateTime deletedDate;
 
-  private Integer viewCount;
+  private int viewCount;
 
   private LocalDateTime modifiedDate;
 

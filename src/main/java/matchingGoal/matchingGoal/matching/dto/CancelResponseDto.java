@@ -12,9 +12,9 @@ import matchingGoal.matchingGoal.matching.domain.entity.GameCancel;
 @Builder
 public class CancelResponseDto {
 
-  private Long cancelId;
-  private Long memberId;
-  private Long gameId;
+  private long cancelId;
+  private long memberId;
+  private long gameId;
 
   public static CancelResponseDto of(GameCancel cancel) {
     return CancelResponseDto.builder()
