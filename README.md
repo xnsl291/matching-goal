@@ -40,8 +40,8 @@
 🔑  **계정**
 <table>
   <tr>
-    <td rowspan="6" max-width="500px">
-        <video src="https://github.com/matching-goal/backend/assets/132976212/75015ba7-6fb8-427e-9748-895a66556e0d"/> 회원가입 or 로그인 사진
+    <td rowspan="6"  >
+        <video src="https://github.com/matching-goal/backend/assets/132976212/75015ba7-6fb8-427e-9748-895a66556e0d" width=500px></video> 
     </td>
     <td>
       회원가입
@@ -88,8 +88,8 @@
 📌  **회원 프로필**
 <table>
   <tr>
-    <td rowspan="7" max-width="500px">
-        <video src="https://github.com/matching-goal/backend/assets/132976212/59245169-e4fa-4a51-b4a2-94e370d1634d"/>프로필 조회사진
+    <td rowspan="7">
+        <video src="https://github.com/matching-goal/backend/assets/132976212/59245169-e4fa-4a51-b4a2-94e370d1634d" width=500px></video> 
     </td>
     <td>
       프로필 조회
@@ -163,8 +163,8 @@
 📌 **게시글**
 <table>
   <tr>
-    <td rowspan="7" max-width="500px">
-        <video src="https://github.com/matching-goal/backend/assets/132976212/d8d47a41-8b21-433c-97d7-2c7e6420cbc0" />게시글 등록사진
+    <td rowspan="7"  >
+        <video src="https://github.com/matching-goal/backend/assets/132976212/d8d47a41-8b21-433c-97d7-2c7e6420cbc0" width=500px></video> 
     </td>
     <td>
       게시글 등록/수정/삭제
@@ -231,8 +231,8 @@
 📌 **채팅**
 <table>
   <tr>
-    <td max-width="500px">
-        <video src="https://github.com/matching-goal/backend/assets/132976212/a74d7ae3-017e-4a84-8e1a-1b4139014da8" />채팅사진
+    <td  >
+        <video src="https://github.com/matching-goal/backend/assets/132976212/a74d7ae3-017e-4a84-8e1a-1b4139014da8" width=500px></video> 
     </td>
     <td>
       채팅
@@ -248,8 +248,8 @@
 ⏰  **알림**
 <table>
   <tr>
-    <td max-width="500px">
-        <video src="https://github.com/matching-goal/backend/assets/132976212/e3b002ab-1d8a-48d9-b23f-9de83d1ed3fe"/>
+    <td>
+        <video src="https://github.com/matching-goal/backend/assets/132976212/e3b002ab-1d8a-48d9-b23f-9de83d1ed3fe" width=500px></video> 
     </td>
     <td>
       알림
@@ -267,8 +267,8 @@
 🔍  **검색**
 <table>
   <tr>
-    <td rowspan="7" max-width="500px">
-        <video src="https://github.com/matching-goal/backend/assets/132976212/d8d47a41-8b21-433c-97d7-2c7e6420cbc0" />알림사진
+    <td rowspan="7" >
+        <video src="https://github.com/matching-goal/backend/assets/132976212/d8d47a41-8b21-433c-97d7-2c7e6420cbc0"  width=500px ></video> 
     </td>
     <td>
       게시글 조회
@@ -292,10 +292,10 @@
 
 ## 🎯 Trouble Shotting
 - 문제점
-    - 해결방법
+  - 해결방법
 
 - 문제점
-    - 해결방법
+  - 해결방법
 
 ## 📂 Document
 
